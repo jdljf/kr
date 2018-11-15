@@ -93,8 +93,8 @@ export default {
     },
     testSet(){
       // console.log(baidu);
-      this.$refs.krcdEditor.dddd();
-      // this.$refs.krcdEditor.krcd.exportXML();
+      // this.$refs.krcdEditor.dddd();
+      this.$refs.krcdEditor.krcd.exportXML();
       // var getControls=JSON.parse(sessionStorage.control_arr);
       // console.log(getControls)
       // document.execCommand("insertHTML","false",'<h1>插入插入插入</h1>')
