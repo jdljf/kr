@@ -28,6 +28,7 @@
           </span>
       
     </div>
+    <!-- <div class="toolbars"></div> -->
     <button @click="testSet()">设置按钮</button>
     <div style="margin:0 auto;width:100%;height:100%;">
       <krcd-editor ref="krcdEditor"></krcd-editor>
@@ -49,7 +50,7 @@ import krcdEditor from "../components/krcdEditor";
 import { ajax } from "../common";
 export default {
   components: {
-    krcdEditor
+    krcdEditor,
   },
   data() {
     return {
@@ -91,8 +92,15 @@ export default {
       this.$refs.krcdEditor.krcd.downloadXML();
     },
     testSet(){
-      console.log(baidu);
-      console.log(this.$refs.krcdEditor.krcd.exportXML())
+      // console.log(baidu);
+      this.$refs.krcdEditor.dddd();
+      // this.$refs.krcdEditor.krcd.exportXML();
+      // var getControls=JSON.parse(sessionStorage.control_arr);
+      // console.log(getControls)
+      // document.execCommand("insertHTML","false",'<h1>插入插入插入</h1>')
+      
+      // document.execCommand("insertHTML","false",'<h1>asdasasdsa</h1>')
+      
     }
   },
   mounted() {

@@ -163,7 +163,7 @@ select配置项（krcd-model）如下：
 select控件结构如下（新建控件必须符合以下结构）：
 ```html
 section运行时结构：
-<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id="section1" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%7D">
+<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="select" id="section1" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%7D">
   <p contenteditable="true" class="krcd-value">
     内容
   </p>

@@ -81,15 +81,52 @@ export default {
     getHTML() {
       return this.krcd.html();
     },
+    dddd() {
+      var div = document.createElement("div");
+      div.innerHTML = `<span id="gj" krcd-right="." krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false">
+  <span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value">
+  </span>
+</span>`;
+      div = div.firstElementChild;
+      var thisCtr=this.krcd.getControlByEl(div);
+      console.log(thisCtr)
+      this.krcd.getControlByEl(div).setValue([
+        {
+          label: "感觉很好",
+          value: 1
+        },
+        {
+          label: "感觉一般",
+          value: 2
+        }
+      ]);
+      this.krcd.insertControl(div, {
+        mode: "EDITOR", //当前模式
+        notdel: 0, //不许删除
+        strictverify: 0, //强制校验
+        desc: "感觉", //描述
+        bindingdata: [
+          //绑定数据
+          {
+            label: "感觉很好",
+            value: 1
+          },
+          {
+            label: "感觉一般",
+            value: 2
+          }
+        ],
+        remotedata: {
+          //krcd v4的异步请求采用目前主流的axios，remotedata为发起异步请求时的配置项目
+          url: "", //这里建议配置初始化KRCD时options中的ctrl_remote_handle一起用，因为存在你设置模板跟你打开模板时当前路径不一致的情况，导致如果用相对路径会出错的情况（如果用绝对路径也会存在换一家医院实施所有模板都需要改的情况）。故所有控件中的异步请求数据在发起请求前都会调用options.ctrl_remote_handle方法进行处理（也可以加一些权限控制）
+          method: "get",
+          headers: {},
+          data: {}
+        }
+      });
+    },
     setHTML(html) {
       this.krcd.html(html);
-    },
-    dddd() {
-      var editor = window.$EDITORUI["edui1"].editor;
-      console.log(UE);
-      console.log(editor);
-      var ue = UE.getEditor("editor");
-          console.log(ue.getContentTxt())
     }
   },
   created() {
@@ -183,7 +220,7 @@ export default {
           </div>`;
                     div = div.firstElementChild;
                     div.addEventListener("click", function() {
-                      alert("对象扩展");
+                      that.dddd();
                     });
                     return div;
                   }
@@ -908,9 +945,8 @@ export default {
     console.log(window.$EDITORUI.edui1.editor);
     console.log(window.$EDITORUI["edui75"].editor);
     var ue = window.$EDITORUI["edui151"].editor;
-      
-        // console.log(ue.getContent());
-     
+
+    // console.log(ue.getContent());
   },
   beforeDestroy() {
     this.krcd.__ue__.destroy();
