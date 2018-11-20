@@ -3,7 +3,7 @@
 var options={
   ctrl_remote_handle: null, //ctrl远程数据异步请求，接收一个remote对象，返回处理后的remote对象本身
   el: null, //querySelector满足的值，比如#id、.className、Element。可以是Element，也可以是#id等
-  footer: 'SoDiaoEditor V4', //element或者string 表示底部显示内容
+  footer: '康软电子病历', //element或者string 表示底部显示内容
   iframe_css_src: null, //string/Array数组 扩展css
   iframe_js_src: null, //string/Array数组 扩展js
   outer_width: 816, //单位px，页面的外部宽度

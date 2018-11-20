@@ -15914,6 +15914,7 @@
   })
 }, function (e, t, n) {
   "use strict";
+  console.log(n(4))
   var r = n(7),
     i = function (e) {
       return e && e.__esModule ? e : {
@@ -15999,8 +16000,12 @@
         if (this[a.kernel].importXML) return this[a.kernel].importXML(e);
         A("importXML 不存在！")
       }, e.prototype.exportXML = function () {
+        console.log(this)
         if (this[a.kernel].exportXML) return this[a.kernel].exportXML();
         A("exportXML 不存在！")
+      },e.prototype.getJSON=function(){
+        if (this[a.kernel].getJSON) return this[a.kernel].getJSON();
+        A("getJSON 不存在！")
       }, e.prototype.downloadXML = function () {
         if (this[a.kernel].downloadXML) return this[a.kernel].downloadXML();
         A("downloadXML 不存在！")
@@ -17914,6 +17919,8 @@
         this[h.__private__].editor && this[h.__private__].editor.importXML(e)
       }, t.prototype.exportXML = function () {
         return this[h.__private__].editor ? this[h.__private__].editor.exportXML() : null
+      },t.prototype.getJSON=function(){
+        return this[h.__private__].editor ? this[h.__private__].editor.getJSON() : null
       }, t.prototype.downloadXML = function () {
         return this[h.__private__].editor ? this[h.__private__].editor.downloadXML() : null
       }, t.prototype.revise = function () {

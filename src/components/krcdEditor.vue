@@ -88,8 +88,8 @@ export default {
   </span>
 </span>`;
       div = div.firstElementChild;
-      var thisCtr=this.krcd.getControlByEl(div);
-      console.log(thisCtr)
+      var thisCtr = this.krcd.getControlByEl(div);
+      console.log(thisCtr);
       this.krcd.getControlByEl(div).setValue([
         {
           label: "感觉很好",
@@ -169,6 +169,11 @@ export default {
         printDirection: "vertical", //打印方向 vertical|horizontal
         printCssUrl: null, //打印的样式表，可以是string，也可以是array
         printJsUrl: null //打印的js，可以是string，也可以是array
+      },
+      user: {
+        //主要用于修订
+        name: "krcd", //必须有name，用来判断是否是本人修改
+        displayname: "KRCD默认用户56465465465" //支持扩展，但displayname 为必有项
       },
       ctrl_remote_handle: function(data) {
         //这里可以处理url，对url进行再加工。比如重置data.url值

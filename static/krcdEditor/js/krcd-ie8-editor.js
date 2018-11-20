@@ -3757,9 +3757,6 @@
       }, t.prototype.show = function () {
         this[w].style.display = ""
       }, t.prototype.getCtrlElement = function () {
-        console.log(this);
-        console.log(w)
-        console.log(this[w]);
         return this[w]
       }, t.prototype.getValueElement = function () {
         return this[D]
@@ -14676,6 +14673,7 @@
         if (this[i.kernel].querySelectorIframeElement) return this[i.kernel].querySelectorIframeElement(e);
         o("querySelectorIframeElement 不存在！")
       }, e.prototype.mode = function () {
+        console.log("111")
         var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         if (this[i.kernel].mode) return this[i.kernel].mode(e);
         o("mode 不存在！")
@@ -14725,6 +14723,9 @@
       }, e.prototype.exportXML = function () {
         if (this[i.kernel].exportXML) return this[i.kernel].exportXML();
         o("exportXML 不存在！")
+      }, e.prototype.getJSON = function () {
+        if (this[i.kernel].getJSON) return this[i.kernel].getJSON();
+        o("getJSON 不存在！")
       }, e.prototype.downloadXML = function () {
         if (this[i.kernel].downloadXML) return this[i.kernel].downloadXML();
         o("downloadXML 不存在！")
@@ -19144,6 +19145,7 @@
         var r = null;
         _["default"].isString(n.el) ? r = document.querySelector(n.el) : M["default"].isElement(n.el) && (r = n.el), r = M["default"].formatTmp(r), n._isinit = !1;
         var o = new k["default"](document);
+        console.log(r)
         a[p.__private__] = {
           rootDom: r,
           contentValue: r.querySelector(".krcd-tmp-content-value"),
@@ -19288,9 +19290,11 @@
         if (null === e) return this[p.__private__].options.openassistant;
         this[p.__private__].options.openassistant !== e && (this[p.__private__].options.openassistant = e)
       }, t.prototype.mode = function () {
+        console.log("222")
         var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         if (!e) return this[p.__private__].options.mode;
         O.call(this, e);
+        console.log(T["default"]["change" + e])
         var t = T["default"]["change" + e];
         t && (this[p.__private__].options.mode = e, t(this))
       }, t.prototype.getControlByEl = function (e) {
@@ -19340,21 +19344,67 @@
         return this._backCtrl
       }, t.prototype.exportXML = function () {
         var e = {};
+        console.log(this)
+        console.log(this.getControlById())
+        console.log(_["default"])
+        var ctrls = [];
         e.controls = [], _["default"].each(this.getControlById(), function (t) {
-          console.log(t);
           console.log(t.getCtrlElement())
-          // console.log(t.getCtrlElement().getAttribute("id"))
+          var thisParent2 = t.getCtrlElement().parentNode.parentNode,
+              divText='',
+            thisParent3 = t.getCtrlElement().parentNode.parentNode.parentNode;
+          if(t.TYPE_NAME=="section"){
+            var div=document.createElement("div");
+            div.innerHTML=t.getValue();
+            var inps=div.getElementsByTagName("input"),
+                inpLen=inps.length;
+            console.log(inps);
+            if(inpLen!=0){
+              for(var i=0;i<inpLen;i++){
+                if(inps[i].getAttribute("checked")!="checked"){
+                  inps[i].classList.add("removeInp");
+                }
+              }
+              var removes=div.querySelectorAll(".removeInp,.krcd-revise-del");
+              for(var i=0;i<removes.length;i++){
+                removes[i].parentNode.remove();
+              }
+              divText=div.innerText;
+            }
+          }
           e.controls.push({
             id: t.getCtrlElement().getAttribute("id"),
             type: t.TYPE_NAME,
-            value: t.getValue()
-          })
+            parentID: (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') ? (thisParent2.getAttribute("id") || thisParent3.getAttribute("id")) : '',
+            value: t.getValue(),
+            text:divText,
+          });
+          if (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') {
+            ctrls.push({
+              id: t.getCtrlElement().getAttribute("id"),
+              type: t.TYPE_NAME,
+              parentID: (thisParent2.getAttribute("id") || thisParent3.getAttribute("id")),
+              value: t.getValue()
+            })
+          }
         });
         e.html = encodeURIComponent(this.html());
-        sessionStorage.control_arr=JSON.stringify(e);
+        sessionStorage.control_arr = JSON.stringify(e);
         return '<?xml version="1.0" encoding="UTF-8"?>' + (new E["default"]).js2xml({
           xml: e
         })
+      }, t.prototype.getJSON = function () {
+        var e = {};
+        e.controls = [];
+        var demos = document.querySelectorAll('.krcd-ctrl');
+        for (var i = 0; i < demos.length; i++) {
+          e.controls.push({
+            id: demos[i].getAttribute("id"),
+            type: demos[i].getAttribute("krcd-type"),
+            value: demos[i].innerHTML
+          })
+        }
+        console.log(e)
       }, t.prototype.downloadXML = function () {
         var e = this.exportXML(),
           t = document.createElement("a");
@@ -21252,7 +21302,7 @@
   n(27)(a, r);
   a.locals && (e.exports = a.locals)
 }, function (e, t, n) {
-  t = e.exports = n(26)(!1), t.push([e.i, ".flatpickr-confirm {\r\n  height: 40px;\r\n  max-height: 0px;\r\n  visibility: hidden;\r\n  display: flex;\r\n  /*justify-content: center;*/\r\n  justify-content: inherit;\r\n  align-items: inherit;\r\n  cursor: pointer;\r\n  background: rgba(0, 0, 0, 0.06);\r\n  border-left: 1px solid rgba(72, 72, 72, 0.2);\r\n  border-right: 1px solid rgba(72, 72, 72, 0.2);\r\n  border-bottom: 1px solid rgba(72, 72, 72, 0.2);\r\n  border-radius: 0 0 5px 5px;\r\n}\r\n\r\n.flatpickr-confirm svg path {\r\n  fill: inherit;\r\n}\r\n\r\n.flatpickr-confirm div:hover {\r\n  background-color: #cdcdcd;\r\n}\r\n\r\n.flatpickr-confirm .left {\r\n  line-height: 40px;\r\n  width: 33%;\r\n}\r\n\r\n.flatpickr-confirm .right {\r\n  width: 33%;\r\n  line-height: 40px;\r\n}\r\n\r\n.flatpickr-confirm .center {\r\n  width: 34%;\r\n  line-height: 40px;\r\n}\r\n\r\n.flatpickr-confirm.darkTheme {\r\n  color: white;\r\n  fill: white;\r\n}\r\n\r\n.flatpickr-confirm.visible {\r\n  max-height: 40px;\r\n  visibility: visible\r\n}\r\n\r\n.flatpickr-calendar {\r\n  background: #fff;\r\n}\r\n\r\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\r\n  /*border-bottom: 1px solid rgba(72,72,72,0.2);*/\r\n  border-bottom: none;\r\n}\r\n\r\n.flatpickr-time {\r\n  border-radius: 0;\r\n}", ""])
+  t = e.exports = n(26)(!1), t.push([e.i, ".flatpickr-confirm {\r\n  height: 40px;\r\n  max-height: 0px;\r\n  visibility: hidden;\r\n  display: flex;\r\n  /*justify-content: center;*/\r\n  justify-content: inherit;\r\n  align-items: inherit;\r\n  cursor: pointer;\r\n  background: rgba(240, 240, 240, 1);\r\n  border-left: 1px solid rgba(72, 72, 72, 0.2);\r\n  border-right: 1px solid rgba(72, 72, 72, 0.2);\r\n  border-bottom: 1px solid rgba(72, 72, 72, 0.2);\r\n  border-radius: 0 0 5px 5px;\r\n}\r\n\r\n.flatpickr-confirm svg path {\r\n  fill: inherit;\r\n}\r\n\r\n.flatpickr-confirm div:hover {\r\n  background-color: #cdcdcd;\r\n}\r\n\r\n.flatpickr-confirm .left {\r\n  line-height: 40px;\r\n  width: 33%;\r\n}\r\n\r\n.flatpickr-confirm .right {\r\n  width: 33%;\r\n  line-height: 40px;\r\n}\r\n\r\n.flatpickr-confirm .center {\r\n  width: 34%;\r\n  line-height: 40px;\r\n}\r\n\r\n.flatpickr-confirm.darkTheme {\r\n  color: white;\r\n  fill: white;\r\n}\r\n\r\n.flatpickr-confirm.visible {\r\n  max-height: 40px;\r\n  visibility: visible\r\n}\r\n\r\n.flatpickr-calendar {\r\n  background: #fff;\r\n}\r\n\r\n.flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {\r\n  /*border-bottom: 1px solid rgba(72,72,72,0.2);*/\r\n  border-bottom: none;\r\n}\r\n\r\n.flatpickr-time {\r\n  border-radius: 0;\r\n}", ""])
 }, function (e, t, n) {
   var a = n(504);
   "string" == typeof a && (a = [
@@ -21357,6 +21407,7 @@
         if (!e) return this.getValue();
         this.setValue(e)
       }, t.prototype.mode = function (t) {
+        console.log("333")
         var n = arguments.length > 1 && arguments[1] !== undefined && arguments[1];
         if (!t) return e.prototype.getOpt.call(this).mode;
         T.call(this, t, n)
@@ -21632,6 +21683,7 @@
       })
     },
     changeSTRICT: function (e) {
+      document.querySelector(".krcd-tmp-content-value").setAttribute("contenteditable", false);
       e[r.__private__].contentValue.setAttribute("contenteditable", !1);
       var t = e[r.__private__].rootDom.querySelectorAll('[krcd-type="label"]');
       s["default"].each(t, function (e) {

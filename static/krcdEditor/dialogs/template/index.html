@@ -136,7 +136,7 @@
         $(".btn-wrap").on("click", "button", function (e) {
           var active = $(e.target).index();
           defauldTemplate = templates[active].item;
-          // console.log(decodeURIComponent(defauldTemplate))
+          // console.log(decodeURIComponent('%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%7D'))
           $(".show-content").html(defauldTemplate)
         })
         console.log(decodeURIComponent)
