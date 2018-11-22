@@ -448,6 +448,8 @@
             }
             //新建
             editor.execCommand('insertControl', domCtrl, newOpt)
+            
+            // sessionStorage.ctrl=String(domCtrl.outerHTML);//保存模板获取的控件源码
           }
         };
       })(UE);

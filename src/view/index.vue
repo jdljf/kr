@@ -48,9 +48,10 @@
 <script>
 import krcdEditor from "../components/krcdEditor";
 import { ajax } from "../common";
+import $ from 'jquery';
 export default {
   components: {
-    krcdEditor,
+    krcdEditor
   },
   data() {
     return {
@@ -91,29 +92,97 @@ export default {
     downloadXML() {
       this.$refs.krcdEditor.krcd.downloadXML();
     },
-    testSet(){
+    testSet() {
       // console.log(baidu);
       // this.$refs.krcdEditor.dddd();
       this.$refs.krcdEditor.krcd.exportXML();
       this.$refs.krcdEditor.krcd.getJSON();
+      var jiedian = document
+        .getElementById("ueditor_1")
+        .contentWindow.document.getElementById("username");
+      jiedian.firstElementChild.innerHTML = "45";
       // var getControls=JSON.parse(sessionStorage.control_arr);
       // console.log(getControls)
       // document.execCommand("insertHTML","false",'<h1>插入插入插入</h1>')
-      
+
       // document.execCommand("insertHTML","false",'<h1>asdasasdsa</h1>')
-      
     }
   },
   mounted() {
-    var data = {
-      ClusA: "001",
-      PageIndex: 1,
-      PageSize: 30
-    };
-    ajax.post("/clus/GetAllComb", data).then(r => {
-      console.log(r);
-    });
-    $(".krcd-editor").parent().width('100%')
+    // var data = {
+    //   ClusA: "001",
+    //   PageIndex: 1,
+    //   PageSize: 30
+    // };
+    // ajax.post("/clus/GetAllComb", data).then(r => {
+    //   console.log(r);
+    // });
+    $(".krcd-editor")
+      .parent()
+      .width("100%");
+    // var b1 = "";
+    // var param = {};
+    // param.TenancyName = "汕尾市人民医院";
+    // param.UsernameOrEmailAddress = "system";
+    // param.Password = "0000";
+    // $.ajax({
+    //   url: "http://192.168.1.50:62114/api/TokenAuth/Authenticate",
+    //   method: "POST",
+    //   data: JSON.stringify(param),
+    //   dataType: "json",
+    //   contentType: "application/json",
+    //   success(ret) {
+    //     console.log("1111111111111")
+    //     console.log(ret);
+    //     b1 = ret.accessToken;
+    //   },
+    //   error(err) {
+    //     console.log("1233333",err);
+    //   }
+    // });
+
+    // var data = { Id: 2 };
+    // ajax.post('http://192.168.1.50:62114/api/services/app/emrdocumenttemplate/GetById',data){
+      
+    // }
+    // $.ajax({
+    //   url: "http://192.168.1.50:62114/api/services/app/emrdocumenttemplate/GetById",
+    //   method: "POST",
+    //   data: JSON.stringify(param),
+    //   dataType: "json",
+      
+    //   headers: {
+    //     contentType: "application/json",
+    //       Authorization: `Bearer ${b1}`
+    //   },
+    //   success(ret) {
+    //     console.log(ret)
+    //   },
+    //   error(err) {
+        
+    //   }
+    // })
+    //////////////////////////////////////////////////
+    // console.log(data)
+    // ajax.post('/TokenAuth/Authenticate',JSON.stringify(param)).then(r=>{
+    //   console.log(r)
+    // })
+    // ajax.post('/services/app/emrdocumenttemplate/GetById',JSON.stringify(data)).then(r=>{
+    //   console.log("564564654654",r)
+    // }).catch(e=>{
+    //   console.log("3333333333",e)
+    // })
+    // var data={
+    //   name: 'admins',
+    //   pass: 'admins'
+    // }
+    // // ajax.get('http://192.168.1.50:62114/api/Login/Token?name=admins&pass=admins').then(r=>{
+    // //   console.log("545454545454545",r)
+    // // })
+    // ajax.get('http://192.168.1.60:28255/api/Common/logTest').then(r=>{
+    //   console.log("aaaaaaaaaa",r)
+    // })
+    
   }
 };
 </script>

@@ -1,12 +1,12 @@
 (function() {
   var parent = window.parent;
   //dialog对象
-  console.log(window.frameElement.id.replace(/_iframe$/, ''))
+  // console.log(window.frameElement.id.replace(/_iframe$/, ''))
   dialog = parent.$EDITORUI[window.frameElement.id.replace(/_iframe$/, '')];
-  console.log(dialog)
+  // console.log(dialog)
   //当前打开dialog的编辑器实例
   editor = dialog.editor;
-  console.log(editor)
+  // console.log(editor)
   UE = parent.UE;
   console.log(UE)
 

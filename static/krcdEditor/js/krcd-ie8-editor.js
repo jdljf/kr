@@ -19344,10 +19344,10 @@
         return this._backCtrl
       }, t.prototype.exportXML = function () {
         var e = {};
-        console.log(this)
-        console.log(this.getControlById())
-        console.log(_["default"])
-        var ctrls = [];
+        // console.log(this)
+        // console.log(this.getControlById())
+        // console.log(_["default"])
+        // var ctrls = [];
         e.controls = [], _["default"].each(this.getControlById(), function (t) {
           console.log(t.getCtrlElement())
           var thisParent2 = t.getCtrlElement().parentNode.parentNode,
@@ -19379,14 +19379,14 @@
             value: t.getValue(),
             text:divText,
           });
-          if (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') {
-            ctrls.push({
-              id: t.getCtrlElement().getAttribute("id"),
-              type: t.TYPE_NAME,
-              parentID: (thisParent2.getAttribute("id") || thisParent3.getAttribute("id")),
-              value: t.getValue()
-            })
-          }
+          // if (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') {
+          //   ctrls.push({
+          //     id: t.getCtrlElement().getAttribute("id"),
+          //     type: t.TYPE_NAME,
+          //     parentID: (thisParent2.getAttribute("id") || thisParent3.getAttribute("id")),
+          //     value: t.getValue()
+          //   })
+          // }
         });
         e.html = encodeURIComponent(this.html());
         sessionStorage.control_arr = JSON.stringify(e);
