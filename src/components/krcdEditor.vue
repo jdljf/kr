@@ -1,14 +1,16 @@
-<template>
-  <div class="krcd-root">
-    <div class="left-wrap">
-        <h1>病历列表</h1>
-        <div class="bl-content">
-          
-        </div>
+<template>  
+    <div class="sde-root height-ful">
+    <div class="widget-list">
+      <Widgets :list="patlist"/>
     </div>
-    <div class="my-editor" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;flex:1;">
-               
+    <div class="tools" :style="onOff">  
+      <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />  
+    </div>  
+    <div class="editor-box height-ful" ref="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
     </div>
+    <div class="widget-list">
+      <Widgets :list="widgetlist" :fun="insert"/>
+    </div>    
   </div>
 </template>
 <script>
@@ -20,7 +22,8 @@ import "../../static/krcdEditor/js/krcd-ie8-design.js";
 
 export default {
   name: "krcdEditor",
-  components: {},
+  components: {    
+  },
   props: {
     //编辑器的宽高取决于编辑器渲染节点本身的宽高
     width: {
@@ -30,7 +33,7 @@ export default {
     height: {
       type: String,
       default: "calc(100%-144px)"
-    }
+    },
   },
   data() {
     return {
@@ -134,10 +137,11 @@ export default {
   },
   mounted() {
     //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');
-    console.log(UE.getEditor("editor"));
+    console.log(UE.getEditor("editor"));    
     var that = this;
     this.krcd = new KRCD({
       el: this.$refs.editor,
+      // el: editor,
       iframe_css_src: null, //string/Array数组 扩展css
       iframe_js_src: null, //string/Array数组 扩展js
       page_start_num: 6, //页面起始页//默认为1
@@ -229,7 +233,63 @@ export default {
                     });
                     return div;
                   }
-                }
+                },
+                {
+                  name: 'tt3',
+                  title: '保存模版', 
+                  render: ()=>{
+                    let div = document.createElement('div');
+                    div.innerHTML = `<div class="panel-content-ctrl" title="保存模版" >
+            <div class="sde-icon sde-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
+            <div style="text-align: center;">保存模版</div>
+            <div class="shade" style="display:none;background-color:rgba(0,0,0,0.3);position:fixed;left:0;right:0;top:0;bottom:0;z-index:1008;">
+              <div class="modelId-input" style="position:absolute;left:50%;top:50%;margin-left:-150px;margin-top:-80px;background-color:#ffffff;width:300px;height:160px;display:flex;align-items:center;flex-direction:column;justify-content:center;">
+                <input type="text" placeholder="新建模版名" class="modelId-input" style="width:200px;height:28px;border-radius:6px;padding:8px;"/> 
+                <div style="padding-top:20px;">
+                  <button style="width:80px;height:40px;">确认</button>
+                  <button style="width:80px;height:40px;">取消</button>  
+                </div>                       
+              </div>              
+            </div>
+          </div>`;
+                    
+                    div = div.firstElementChild;
+                    const win = div.querySelector('.shade');
+                    const inp = win.querySelector('input');
+                    const btns = win.querySelectorAll('button');
+                    const btn1 = btns[0],
+                          btn2 = btns[1];                    
+
+                    const stopEvent = (e)=>{
+                      if ( e && e.stopPropagation ) 
+                            //因此它支持W3C的stopPropagation()方法 
+                            e.stopPropagation(); 
+                      else
+                            //否则，我们需要使用IE的方式来取消事件冒泡 
+                            window.event.cancelBubble = true; 
+                    }
+
+                    // 设定调用保存函数
+                    div.addEventListener('click', ()=>{   
+                      // console.log("点了flex")                     
+                        win.style.display = "flex";   
+                      });
+                    
+                    btn1.addEventListener('click', (e)=>{  
+                        stopEvent()     // 阻止冒泡              
+                        let modelId = inp.value;
+                        that.saveHtmlContent(modelId, ()=>{ win.style.display = "none"})                                    
+                      });
+
+                    btn2.addEventListener('click', ()=>{ 
+                        stopEvent()                 
+                        win.style.display = "none";        
+                        // console.log( win)           
+                      });
+
+                    return div;
+                  }
+                },
               ]
             }
           ]
@@ -949,7 +1009,7 @@ export default {
     console.log(window.baidu.editor.getEditor("editor"));
     console.log(window.$EDITORUI.edui1.editor);
     console.log(window.$EDITORUI["edui75"].editor);
-    var ue = window.$EDITORUI["edui151"].editor;
+    // var ue = window.$EDITORUI["edui151"].editor;
 
     // console.log(ue.getContent());
   },
@@ -990,6 +1050,26 @@ export default {
 .left-wrap .bl-content {
   flex: 1;
   overflow-y: auto;
+}
+
+.krcd-section::before{
+  content: "我是标签"
+}
+.krcd-root{
+  display: flex;
+  flex-direction: row;
+}
+.widget-list{
+  flex-basis: 150px;
+  flex-shrink: 0;
+  box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px, rgb(204, 204, 204) 0px 0px 3px 1px;
+}
+.editor-box{
+  display: flex;
+  flex-direction: column;
+}
+.height-ful{
+  height: 100%;
 }
 </style>
 

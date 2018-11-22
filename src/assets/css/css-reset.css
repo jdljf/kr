@@ -1,0 +1,102 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  /* margin-top: 60px; */
+}
+
+a,
+input,
+label{
+    -webkit-tap-highlight-color:rgba(255,0,0,0);
+    text-decoration: none;
+    outline: none;
+    color: #808080;
+} 
+
+/* 这是防止Chrome的移动端滑动效果问题的方案2 */
+* { touch-action: pan-y; } 
+
+/* 超出2行省略号 */
+.ellipse2 {
+	word-break: break-all;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+  }
+
+  /* 超出1行省略号 必须限制宽度*/
+  .ellipse1 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+  }
+  
+
+  /* 兼容性最好的省略号方式 */
+  .ellipse-new{
+	position: relative;
+	line-height: 16px; /* 行高 */
+	/* 3 times the line-height to show 3 lines */
+	height: 32px;  /* 行高*2 = 16*2 */
+	overflow: hidden;
+  } 
+
+  .ellipse-new::after{
+	content:"...";
+	background-color: #f8f8f8;  /* 字体所在底色 */
+	font-weight:bold;
+    position:absolute;
+    bottom:0;
+    right:0;
+    padding:0 9px 0px 2px;
+  }
