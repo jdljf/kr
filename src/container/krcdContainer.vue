@@ -88,7 +88,13 @@ export default {
           name: "康软人",
           id: 1112,
         }
-      ],      
+      ],    
+      
+      patlistOnoff: (event)=>{
+        const e = event || window.event;
+        alert(`你点击的是：第${+e.currentTarget.getAttribute('index')+1}个病人`)        
+      },
+
       
       /* 初始化的函数对象 */
 
@@ -128,23 +134,24 @@ export default {
        * params {string} idName  head>style标签中的样式文本
        */
       styleTag: (ctrlId,idName)=>{
-        return `#${ctrlId}>*:nth-child(1){
-              position: relative;
-            }#${ctrlId}>*:nth-child(1)::before {
-              text-indent: 5px;
-              display: block;
-              content: "${idName}";
-              position: absolute;
-              left: -40px;
-              top: 0;
-              line-height:20px;
-              background-color: #ff000080;
-              color: white;
-              font-size: 12px;      
-              text-align: center;        
-              border-bottom-left-radius: 10px;
-              border-top-left-radius: 10px;
-            }`
+        return ''
+        // `#${ctrlId}>*:nth-child(1){
+        //       position: relative;
+        //     }#${ctrlId}>*:nth-child(1)::before {
+        //       text-indent: 5px;
+        //       display: block;
+        //       content: "${idName}";
+        //       position: absolute;
+        //       left: -40px;
+        //       top: 0;
+        //       line-height:20px;
+        //       background-color: #ff000080;
+        //       color: white;
+        //       font-size: 12px;      
+        //       text-align: center;        
+        //       border-bottom-left-radius: 10px;
+        //       border-top-left-radius: 10px;
+        //     }`
       },
       
       /**
@@ -155,22 +162,23 @@ export default {
       styleSection: (ctrlId,idName)=>{
         // 因为不想用relative所以改为在子元素加
         // 不知道为什么有分号分割的样式字符串会有问题
-        return `#${ctrlId}>*:nth-child(1){
-              position: relative;
-            }#${ctrlId}>*:nth-child(1)::before {
-              padding: 0 4px;
-              display: block;
-              content: "${idName}";
-              position: absolute;
-              left: -5px;
-              top: -28px;
-              line-height:20px;
-              background-color: #006bff80;
-              color: white;
-              font-size: 12px;         
-              border-top-right-radius: 4px;
-              border-top-left-radius: 4px;
-            }`
+        return ""
+        // `#${ctrlId}>*:nth-child(1){
+        //       position: relative;
+        //     }#${ctrlId}>*:nth-child(1)::before {
+        //       padding: 0 4px;
+        //       display: block;
+        //       content: "${idName}";
+        //       position: absolute;
+        //       left: -5px;
+        //       top: -28px;
+        //       line-height:20px;
+        //       background-color: #006bff80;
+        //       color: white;
+        //       font-size: 12px;         
+        //       border-top-right-radius: 4px;
+        //       border-top-left-radius: 4px;
+        //     }`
       },
       
     }

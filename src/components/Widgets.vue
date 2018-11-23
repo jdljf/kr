@@ -1,8 +1,8 @@
 <template>  
   <div>
     <div class='title'>列表</div>
-    <ul class='content' v-for="(item,index) in list" :key="index">
-      <li class='content-item' content="item.content?item.content:''" @click="todo(fun,item.content,item.styleString)">
+    <ul class='content'>
+      <li class='content-item'  v-for="(item,index) in list" :key="index" :index="index" content="item.content?item.content:''" @click="todo(fun,item.content,item.styleString)">
         <span class="left">{{item.id}}</span>
         <span class="right">{{item.name}}</span>
       </li>

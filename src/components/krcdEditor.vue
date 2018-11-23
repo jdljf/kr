@@ -1,7 +1,7 @@
 <template>  
     <div class="sde-root height-ful">
     <div class="widget-list">
-      <Widgets :list="patlist"/>
+      <Widgets :list="patlist" :fun="patlistOnoff"/>
     </div>
     <div class="tools" :style="onOff">  
       <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />  
