@@ -449,7 +449,7 @@ export default {
       let domSet = {
         'ctrlName': ctrlName,
         'ctrlId': ctrlId,
-        'ctrlStyle': `${ctrlStyle};padding-left:44px;display:inline-block;margin-top:4px;margin-bottom:4px`  // 为了before伪类定位用
+        'ctrlStyle': `${ctrlStyle};padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px`  // 为了before伪类定位用
       }
       // 判断
       let newDiv;  
