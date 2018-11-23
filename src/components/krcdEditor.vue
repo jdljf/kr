@@ -6,7 +6,7 @@
     <div class="tools" :style="onOff">  
       <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />  
     </div>  
-    <div class="editor-box height-ful" ref="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
+    <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
     </div>
     <div class="widget-list">
       <Widgets :list="widgetlist" :fun="insert"/>
@@ -137,7 +137,7 @@ export default {
   },
   mounted() {
     //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');
-    console.log(UE.getEditor("editor"));    
+    console.log(UE.getEditor("editor"));  
     var that = this;
     this.krcd = new KRCD({
       el: this.$refs.editor,
@@ -953,7 +953,7 @@ export default {
                                     <select class="size-select" style="width:50px;height:27px;border-radius: 4px;margin-bottom: 5px;"><option>A3</option><option selected>A4</option><option>A5</option></select>
                                     <div style="text-align: center;">尺寸</div>
                                     </div>`;
-                    console.log($(div));
+                    // console.log($(div));
                     $(div)
                       .find(".size-select")
                       .on("change", function(e) {
@@ -976,7 +976,7 @@ export default {
         }
       ]
     });
-    console.log(this.krcd);
+    // console.log(this.krcd);
     this.krcd.addListener("ready", function() {
       console.log("krcd 初始化完成！");
     });
@@ -992,10 +992,10 @@ export default {
       console.log(arguments);
       console.log("rendered ok!");
     });
-    this.krcd.addListener("click", function() {
-      console.log(arguments);
-      console.log("click ok!");
-    });
+    // this.krcd.addListener("click", function() {
+    //   console.log(arguments);
+    //   console.log("click ok!");
+    // });
     this.krcd.addListener("valuechange", function() {
       console.log(arguments);
       console.log("valuechange ok!");
@@ -1004,11 +1004,11 @@ export default {
     this.krcd.addListener("contentchange", function() {
       console.log("contentchange ok!");
     });
-    console.log(window);
-    //todo 这里可以尝试调用this.krcd的各种方法
-    console.log(window.baidu.editor.getEditor("editor"));
-    console.log(window.$EDITORUI.edui1.editor);
-    console.log(window.$EDITORUI["edui75"].editor);
+    // console.log(window);
+    // //todo 这里可以尝试调用this.krcd的各种方法
+    // console.log(window.baidu.editor.getEditor("editor"));
+    // console.log(window.$EDITORUI.edui1.editor);
+    // console.log(window.$EDITORUI["edui75"].editor);
     // var ue = window.$EDITORUI["edui151"].editor;
 
     // console.log(ue.getContent());
@@ -1071,5 +1071,27 @@ export default {
 .height-ful{
   height: 100%;
 }
+
+/* jimmyFok's CSS style */
+.sde-section::before{
+  content: "我是标签"
+}
+.sde-root{
+  display: flex;
+  flex-direction: row;
+}
+.widget-list{
+  flex-basis: 150px;
+  flex-shrink: 0;
+  box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px, rgb(204, 204, 204) 0px 0px 3px 1px;
+}
+.editor-box{
+  display: flex;
+  flex-direction: column;
+}
+.height-ful{
+  height: 100%;
+}
+
 </style>
 

@@ -1,4 +1,3 @@
-
 <script>
 import Tools from '../components/Tools'
 import Widgets from '../components/Widgets'
@@ -559,29 +558,13 @@ export default {
       // console.log(document.getElementsByTagName('iframe'))
   },
   mounted() {   
-    // this.editor= this.$refs.editor
-    // console.log(this.krcd)
     
-    // // 将this赋予self，为加载时各方法的各种调用
     let self = this;
-   
-    // this.krcd.addListener('ready', function() {
-    //   console.log('krcd 初始化完成！');
-    // });
-    // this.krcd.addListener('headerfooteropen', function() {
-    //   console.log('design headerfooteropen ok!');
-    // });
-
-    // this.krcd.addListener('beforerender', function() {
-    //   console.log('beforerender ok!');
-    // });
-    // this.krcd.addListener('rendered', function() {
-    //   console.log(arguments);
-    //   console.log('rendered ok!');
-    // });
     
     // 点击聚焦
     this.krcd.addListener('click', function(event) {
+
+       console.log(arguments);
 
       // 获取ifame中的window
       self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow
@@ -597,7 +580,7 @@ export default {
         if(arguments[1]['TYPE_NAME']==='section'){  
           self.inSection = true;
           // 切割成这样，不显示插入文档段
-          console.log('找到有section')
+          // console.log('找到有section')
           self.toolBtns = self.arrBtns.slice(0,self.arrBtns.length-2);  
           self.toolBtns.push(self.arrBtns[self.arrBtns.length-1]); 
         }else{       
@@ -696,14 +679,6 @@ export default {
       }
     });
     
-    // this.krcd.addListener('valuechange', function() {
-    //   console.log(arguments);
-    //   console.log('valuechange ok!');
-    // });
-
-    // this.krcd.addListener('contentchange', function() {
-    //   console.log('contentchange ok!');
-    // });
     
   },
   beforeDestroy() {
@@ -711,15 +686,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-
-
-</style>
-
-
-
-
-
-// WEBPACK FOOTER //
-// src/components/krcdEditor.vue
