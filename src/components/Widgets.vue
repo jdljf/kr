@@ -1,7 +1,8 @@
 <template>  
   <div>
     <div class='title'>列表</div>
-    <ul class='content'>
+    <slot></slot>
+    <ul v-if="type!=='pat-list'" class='content'>
       <li class='content-item'  v-for="(item,index) in list" :key="index" :index="index" content="item.content?item.content:''" @click="todo(fun,item.content,item.styleString)">
         <span class="left">{{item.id}}</span>
         <span class="right">{{item.name}}</span>
@@ -19,7 +20,8 @@ export default {
   name: 'Tools',
   props: {
     list: Array,   // 通过props传入
-    fun: Function
+    fun: Function,
+    type: String
   },
   data() {
     return {

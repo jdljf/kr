@@ -2,6 +2,7 @@
 import Tools from '../components/Tools'
 import Widgets from '../components/Widgets'
 import krcdEditor from '../components/krcdEditor'
+import Tree from '../components/Tree'
 
 export default {
   name: 'krcdContainer',
@@ -24,7 +25,8 @@ export default {
   components:{
       Tools,
       Widgets,
-      krcdEditor
+      krcdEditor,
+      Tree
   },
   data() {
     return {  
@@ -78,17 +80,13 @@ export default {
                         []:
                     [],
 
-      // 左方病人列表（暂时就这样）
-      patlist: [
-        {
-          name: "康软人",
-          id: 1111,
-        },
-        {
-          name: "康软人",
-          id: 1112,
-        }
-      ],    
+      // 左方病人的共有列表格式（暂时就这样）
+      patlist:[
+              { name: '康软人1',id: 1 }, 
+              { name: '康软人2',id: 2 }, 
+              { name: '康软人3',id: 3 }, 
+              { name: '康软人4',id: 4, count: 1 } // 这个为了子元素编号来设定的count
+            ],    
       
       patlistOnoff: (event)=>{
         const e = event || window.event;
