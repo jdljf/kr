@@ -4,7 +4,10 @@ import Widgets from '../components/Widgets'
 import krcdEditor from '../components/krcdEditor'
 import Tree from '../components/Tree'
 import Models from '../components/Template'
+import NavMenu from '../components/NavMenu'
+
 import funs from '../common/funs'
+
 import tabContainer from './tabContainer'
 
 export default {
@@ -31,7 +34,8 @@ export default {
       krcdEditor,
       Tree,
       Models,
-      tabContainer
+      tabContainer,
+      NavMenu
   },
   data() {
     return {  
@@ -406,18 +410,6 @@ export default {
       return newDiv
     },
 
-    // 时间戳转时间函数
-     timestampToTime(timestamp) {
-        let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
-        let Y = date.getFullYear() + '-';
-        let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-        let D = date.getDate() + ' ';
-        let h = date.getHours() + ':';
-        let m = date.getMinutes() + ':';
-        let s = date.getSeconds();
-        return Y+M+D+h+m+s;
-      },       
-
     // Date控件
     /**
      * params1{object}: domSet
@@ -438,7 +430,7 @@ export default {
           "strictverify":0,//是否强制校验
           "required":0,//是否必填
           "desc":"日期控件",//描述
-          "defvalue":this.timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
+          "defvalue":funs.timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
           "format":"{yyyy}-{MM}-{dd} {hh}:{mm}:{ss}",//格式化要求。必须以大括号包裹。
           "min":"",//最小日期
           "max":""//最大日期
@@ -660,19 +652,28 @@ export default {
         let toolbtnW = document.querySelector('.tools-btn').offsetWidth
         let toolbtnH = document.querySelector('.tools-btn').offsetHeight
 
+        // alert(toolbtnH)
+
         // 设定工具条的样式
         const sources = {
           "flex": 1,
           "display": "flex",
           "align-items": "center",
           "flex-direction": "column",  // 改变column再扩展字典
+          "line-height": "30px",
           "background-color": "white",        
           "padding": "4px",
           'position': 'absolute',
-          'left': editorX + arguments[0].clientX + toolbtnW + 'px',
-          'top': toolsH + editorY + arguments[0].clientY + toolbtnH + 'px',   
+          'width': '72px',
+          'height': 34*6 + 'px',
+          'left': editorX + arguments[0].clientX + 
+                toolbtnW + 144 +
+                'px',
+          'top': toolsH + editorY + arguments[0].clientY + 
+                // toolbtnH + 
+                'px',   
           'border':"1px solid #d3d3d3",
-          'height':'30px',
+          // 'height':'30px',
           "margin-top": "-30px",
           'z-index': '1005',
           'box-shadow': '1px 1px 4px #00000033'
