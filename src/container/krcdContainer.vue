@@ -3,6 +3,9 @@ import Tools from '../components/Tools'
 import Widgets from '../components/Widgets'
 import krcdEditor from '../components/krcdEditor'
 import Tree from '../components/Tree'
+import Models from '../components/Template'
+import funs from '../common/funs'
+import tabContainer from './tabContainer'
 
 export default {
   name: 'krcdContainer',
@@ -26,7 +29,9 @@ export default {
       Tools,
       Widgets,
       krcdEditor,
-      Tree
+      Tree,
+      Models,
+      tabContainer
   },
   data() {
     return {  
@@ -216,10 +221,12 @@ export default {
       
       // 创建需要存到模版的对象
       const newItem = {
-          name: '文档段' + target.id,
+          name: target.id,
           id: target.id,
           styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent
+          content: htmlContent,
+          scope: '全院',
+          date: funs.nowtime(),  //  存起来保存时间
       }
 
       // 将模版push到widgetlist数组中
@@ -249,9 +256,11 @@ export default {
       
       const newItem = {
           name: itemName,
-          // id: 1111,
+          id: '',
           styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent
+          content: htmlContent,
+          scope: '全院',
+          date: funs.nowtime(),
       }
       this.widgetlist.push(newItem);
 
@@ -397,6 +406,18 @@ export default {
       return newDiv
     },
 
+    // 时间戳转时间函数
+     timestampToTime(timestamp) {
+        let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        let Y = date.getFullYear() + '-';
+        let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        let D = date.getDate() + ' ';
+        let h = date.getHours() + ':';
+        let m = date.getMinutes() + ':';
+        let s = date.getSeconds();
+        return Y+M+D+h+m+s;
+      },       
+
     // Date控件
     /**
      * params1{object}: domSet
@@ -408,19 +429,7 @@ export default {
     createDate(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
       let div = document.createElement('span');      
       div.innerHTML = `<span class="krcd-ctrl" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-date'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-type="date"><span class="krcd-value" contenteditable="true" krcd-left="[" krcd-right="]"></span></span>`     
-      div = div.firstElementChild;      
-
-      // 时间戳转时间函数
-      function timestampToTime(timestamp) {
-        let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
-        let Y = date.getFullYear() + '-';
-        let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-        let D = date.getDate() + ' ';
-        let h = date.getHours() + ':';
-        let m = date.getMinutes() + ':';
-        let s = date.getSeconds();
-        return Y+M+D+h+m+s;
-      }       
+      div = div.firstElementChild;   
 
       /* 创建控制器（装饰了一下原来的DOM元素）*/
       let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
@@ -429,7 +438,7 @@ export default {
           "strictverify":0,//是否强制校验
           "required":0,//是否必填
           "desc":"日期控件",//描述
-          "defvalue":timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
+          "defvalue":this.timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
           "format":"{yyyy}-{MM}-{dd} {hh}:{mm}:{ss}",//格式化要求。必须以大括号包裹。
           "min":"",//最小日期
           "max":""//最大日期
@@ -564,6 +573,7 @@ export default {
       // console.log(document.getElementsByTagName('iframe'))
   },
   mounted() {   
+    console.log(funs)
     
     let self = this;
     
@@ -655,7 +665,7 @@ export default {
           "flex": 1,
           "display": "flex",
           "align-items": "center",
-          "flex-direction": "row", 
+          "flex-direction": "column",  // 改变column再扩展字典
           "background-color": "white",        
           "padding": "4px",
           'position': 'absolute',

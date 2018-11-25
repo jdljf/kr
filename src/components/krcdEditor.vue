@@ -1,5 +1,5 @@
 <template>  
-    <div class="sde-root height-ful">
+    <div class="krcd-root height-ful">
     <div class="widget-list">
       <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>
     </div>
@@ -9,7 +9,9 @@
     <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
     </div>
     <div class="widget-list">
-      <Widgets :list="widgetlist" :fun="insert"/>
+      <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
+      <!-- <Models :list="widgetlist" :fun="insert"/> -->
+      <tabContainer :list="widgetlist" :fun="insert"/>
     </div>    
   </div>
 </template>
@@ -240,7 +242,7 @@ export default {
                   render: ()=>{
                     let div = document.createElement('div');
                     div.innerHTML = `<div class="panel-content-ctrl" title="保存模版" >
-            <div class="sde-icon sde-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
+            <div class="krcd-icon krcd-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
             <div style="text-align: center;">保存模版</div>
             <div class="shade" style="display:none;background-color:rgba(0,0,0,0.3);position:fixed;left:0;right:0;top:0;bottom:0;z-index:1008;">
               <div class="modelId-input" style="position:absolute;left:50%;top:50%;margin-left:-150px;margin-top:-80px;background-color:#ffffff;width:300px;height:160px;display:flex;align-items:center;flex-direction:column;justify-content:center;">
@@ -1073,10 +1075,10 @@ export default {
 }
 
 /* jimmyFok's CSS style */
-.sde-section::before{
+.krcd-section::before{
   content: "我是标签"
 }
-.sde-root{
+.krcd-root{
   display: flex;
   flex-direction: row;
 }

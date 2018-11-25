@@ -17,7 +17,7 @@ const btnStyle = {
       }
 
 export default {
-  name: 'Tools',
+  name: 'Widgets',
   props: {
     list: Array,   // 通过props传入
     fun: Function,

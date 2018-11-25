@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  let id = 0;
   export default {
     data() {
       // props属性绑定的数据就是设定树形节点标签的。label是当前节点标签标题，而children就是子节点，一直嵌套就能一直延伸树状图
@@ -34,7 +35,7 @@
         filterText: '',   // 与input双向绑定了
         treeProps: {
           label: 'name',
-          children: 'zones'
+          children: 'zones',
         },           
       };
     },   
@@ -49,10 +50,41 @@
       }
     },
     methods: {
+
+       /* 自定义树节点，用于底层文件数量部分 */
+       // 添加树节点
+    //    append(data) {
+    //     const newChild = { id: id++, name: 'testtest', children: [] };
+    //     if (!data.children) {
+    //       this.$set(data, 'children', []);
+    //     }
+    //     data.children.push(newChild);
+    //   },
+    //   // 移除树节点
+    //   remove(node, data) {
+    //     const parent = node.parent;
+    //     const children = parent.data.children || parent.data;
+    //     const index = children.findIndex(d => d.id === data.id);
+    //     children.splice(index, 1);
+    //   },
+    //   // 渲染自定义工具栏
+    //   renderContent(h, { node, data, store }) {
+    //     return (
+    //       <span class="custom-tree-node">
+    //         <span>{node.label}</span>
+    //         <span>
+    //           <el-button size="mini" type="text" on-click={ () => this.append(data) }>新建</el-button>
+    //           <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }>删除</el-button>
+    //         </span>
+    //       </span>);
+    //   },
+
+      // 搜索匹配函数
       filterNode(value, data) {
         if (!value) return true;
         return data.name.indexOf(value) !== -1 ;  // 这里要设定监控data中的那个字段，例子中用label而我的是name
       },
+
       // 选择checkbox时的函数
       handleCheckChange(data, checked, indeterminate) {
         console.log(data, checked, indeterminate);
@@ -60,7 +92,7 @@
       // 点击节点的函数
       handleNodeClick(data) {
         console.log(data);
-        alert(`你点击的是${data.name}`) 
+        // alert(`你点击的是${data.name}`) 
       },
 
       // 加载节点函数，绑定load属性，加载时绑定对应树状数据
@@ -71,10 +103,10 @@
         }      
         if (node.level === 1) {
           return resolve([
-              { name: '住院病案首页' }, 
-              { name: '病程记录' }, 
-              { name: '入院记录' }, 
-              { name: '24小时内入出院记录',count: 1 }
+              { name: '住院病案首页' , id: id++,  children: [] }, 
+              { name: '病程记录' , id: id++,  children: [] }, 
+              { name: '入院记录' , id: id++,  children: [] }, 
+              { name: '24小时内入出院记录', id: id++,  children: [], count: 1 }
             ]);  // 这里count自定义为1作为编号
         }
         // 子节点大于3层后必然范围空节点
@@ -96,17 +128,19 @@
           var data;
           if (hasChild) {
             data = [{
-              name: node.data.name + node.data.count++
+              name: node.data.name + node.data.count++, id: id++, 
             }, {
-              name: node.data.name + node.data.count++
+              name: node.data.name + node.data.count++, id: id++, 
             }];
           } else {
             data = [];
           }
 
           resolve(data);
-        }, 500);
+        }, 500);    
+        console.log(this.list)    
       }
+      
     }
   };
 </script>
@@ -122,10 +156,20 @@
     .tree{
         width: 100%;
         padding-right: 20px;
+        box-sizing: border-box;
     }
     .input-box{
         box-sizing: border-box;
         width: 100%;
         padding: 8px;
+    }
+    /* 自定义工具样式 */
+    .custom-tree-node {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        padding-right: 8px;
     }
 </style>

@@ -1,2 +1,7 @@
 import{ajax} from './ajax';
-export{ajax};
+import{funs} from './funs';
+
+export {
+    ajax,
+    funs
+};
