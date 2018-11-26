@@ -19345,17 +19345,27 @@
       }, t.prototype.exportXML = function () {
         var e = {};
         // console.log(this)
-        // console.log(this.getControlById())
+        console.log(this.getControlById())
         // console.log(_["default"])
         // var ctrls = [];
         e.controls = [], _["default"].each(this.getControlById(), function (t) {
           console.log(t.getCtrlElement())
           var thisParent2 = t.getCtrlElement().parentNode.parentNode,
               divText='',
+              sectionHTML=[],//控件的描述
+              ctrls,//控件节点
             thisParent3 = t.getCtrlElement().parentNode.parentNode.parentNode;
           if(t.TYPE_NAME=="section"){
             var div=document.createElement("div");
             div.innerHTML=t.getValue();
+            ///////////////////////获取所有控件的描述
+            ctrls=div.querySelectorAll(".krcd-ctrl");
+            var ctrlsLen=ctrls.length;
+              for(var i=0;i<ctrlsLen;i++){
+                sectionHTML.push(ctrls[i].getAttribute("title"))
+              }
+              sectionHTML=sectionHTML.join(',')
+            ////////////////////////
             var inps=div.getElementsByTagName("input"),
                 inpLen=inps.length;
             console.log(inps);
@@ -19378,6 +19388,7 @@
             parentID: (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') ? (thisParent2.getAttribute("id") || thisParent3.getAttribute("id")) : '',
             value: t.getValue(),
             text:divText,
+            ctrlsDesc:t.TYPE_NAME=="section"?sectionHTML:''
           });
           // if (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') {
           //   ctrls.push({
