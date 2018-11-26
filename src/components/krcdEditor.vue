@@ -4,7 +4,14 @@
       <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>
     </div>
     <div class="tools" :style="onOff">  
-      <NavMenu class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />
+      <NavMenu 
+        class="tools-btn" 
+        :addCtrl="addCtrl" 
+        :toolStyle="toolStyle" 
+        :toolBtns="toolBtns" 
+        contenteditable="false" 
+        :self="self"
+        />
       <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
     </div>  
     <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
@@ -12,7 +19,7 @@
     <div class="widget-list">
       <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
       <!-- <Models :list="widgetlist" :fun="insert"/> -->
-      <tabContainer :list="widgetlist" :fun="insert"/>
+      <tabContainer :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" />
     </div>    
   </div>
 </template>

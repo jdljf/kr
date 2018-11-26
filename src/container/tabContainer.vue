@@ -3,11 +3,12 @@
         <el-tab-pane>
             <!-- slot 属性可以自定义标签内容而不像下面那些那样 -->
             <span slot="label"><i class="el-icon-tickets"></i>模版</span> 
-            <Template :list="list" :fun="fun"/>
+            <Template :list="templatelist" :fun="templatefun"/>
             <!-- 这里就是内容部分 -->
         </el-tab-pane>
         <el-tab-pane label="组件">
-            <Template :list="list" :fun="fun"/>
+            <!-- <Tree :list="patlist"></Tree> -->
+            <Template :list="widgetlist" :fun="widgetfun"/>
         </el-tab-pane>    
     </el-tabs>
 </template>
@@ -15,6 +16,8 @@
 <script>
 import Widgets from '../components/Widgets';
 import Template from '../components/Template';
+import Tree from '../components/Tree';
+
 
 export default {
     data(){
@@ -24,12 +27,16 @@ export default {
     },
     components:{
         Widgets,
-        Template
+        Template,
+        Tree
     },
     // 设置来纯粹做传递属性的
     props:{
-        list: Array,
-        fun: Function
+        widgetlist: Array,
+        widgetfun: Function,
+        templatelist: Array,
+        templatefun: Function,        
+        patlist: Array,
     }
 }
 </script>

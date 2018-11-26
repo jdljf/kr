@@ -1,43 +1,55 @@
 
 <template>
-  <el-table
-    :data="list"
+  <!--row-click 参数是row, event, column-->
+  <!-- :data="list" :data中的filter筛选是搜索的关键-->
+  <el-table   
     style="width: 100%;"
-    @click="handleEdit('123', '456')"
+    :data="list.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+    @row-click="callback"
     >
-    <el-table-column
-      label="最新编辑日期"
-      width="130">
-      <template slot-scope="scope">
-        <i class="el-icon-time"></i>
-        <span style="margin-left: 10px">{{ scope.row.date }}</span>
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="模版名称"
-      width="150">
-      <template slot-scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>模版: {{ scope.row.name }}</p>
-          <p>归属: {{ scope.row.scope }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.name }}</el-tag>
-          </div>
-        </el-popover>
-      </template>
-    </el-table-column>
-    <el-table-column label="操作" width="146">
-      <template slot-scope="scope">
-        <el-button
-          size="mini"
-          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-        <el-button
-          size="mini"
-          type="danger"
-          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+          
+        <el-table-column
+          label="最新编辑日期"
+          width="130">
+          <template slot-scope="scope">
+            <i class="el-icon-time"></i>
+            <span style="margin-left: 10px">{{ scope.row.date }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="模版名称"
+          width="150">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>模版: {{ scope.row.name }}</p>
+              <p>归属: {{ scope.row.scope }}</p>
+              <div slot="reference" class="name-wrapper">
+                <el-tag size="medium">{{ scope.row.name }}</el-tag>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="146">
+          <!-- 标题处改为input -->
+          <template slot="header" slot-scope="scope">
+            <el-input
+              v-model="search"
+              size="mini"
+              placeholder="输入关键字搜索"/>
+          </template>
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+  
+    
 </template>
 
 <script>
@@ -52,7 +64,7 @@ import funs from '../common/funs';
     },
     data() {
       return {
-       
+        search: ''       
       }
     },
     mounted(){
@@ -127,6 +139,14 @@ import funs from '../common/funs';
       // 一个函数的包装
       todo(fun,args,styleString){
         return fun(args,styleString) // 返回该函数的运行
+      },
+      callback(row, event, column) {
+        console.log(row)  // 改行的元素
+        console.log(event)
+        console.log(column)
+        // 事件函数直接在这里设置这几个函数就可以读取了，不需要自己传入。
+        // 填好对应参数即可
+        this.todo(this.fun,row.content,row.styleString)
       }
     }
   }
