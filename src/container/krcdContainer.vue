@@ -2,6 +2,13 @@
 import Tools from '../components/Tools'
 import Widgets from '../components/Widgets'
 import krcdEditor from '../components/krcdEditor'
+import Tree from '../components/Tree'
+import Models from '../components/Template'
+import NavMenu from '../components/NavMenu'
+
+import funs from '../common/funs'
+
+import tabContainer from './tabContainer'
 
 export default {
   name: 'krcdContainer',
@@ -24,7 +31,11 @@ export default {
   components:{
       Tools,
       Widgets,
-      krcdEditor
+      krcdEditor,
+      Tree,
+      Models,
+      tabContainer,
+      NavMenu
   },
   data() {
     return {  
@@ -32,9 +43,11 @@ export default {
       inSection: false,   // 聚焦点是否在文档段
       tarEl: null,   // 每次点击获取的DOM对象
       tarType: null,  // 每次点击获取的TYPE_NAME
-      self: null,    // 让this.self可以引用this
+      self: this,    // 让this.self可以引用this
       iframeWin: null,  // 将iframe下的window对象
       krcd: null,   // krcd
+      on: {'opacity':'1'},
+      off: {'opacity':'0','width':'0','height':'0'},
       onOff: {'opacity':'0','width':'0','height':'0'}, // 工具条显示隐藏开关      
       toolStyle: {},    // 初始化工具条样式
 
@@ -44,58 +57,165 @@ export default {
       // 工具条所有可用按钮数组
       arrBtns: [{
           name: '文本', 
-          type: 'TEXT'
+          type: 'TEXT',
+          iconCls: 'el-icon-edit',
+          // 预留每个类型的字典
+          dic: [
+            {
+              group: "文本字典1", // 分组名
+              groupItems: [
+                  { 
+                    name:'默认字典', 
+                    content: `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id="krcd-text-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22verify%22%3A%22%22%2C%22required%22%3A0%2C%22desc%22%3A%22%E6%96%87%E6%9C%AC%E8%BE%93%E5%85%A5%22%7D"><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true" title="文本输入">文本输入</span></span>` ,
+                    date: "2018-11-25 21:04:10",
+                  }
+                ]  // 组项目
+            },
+          ]
         },
         {
           name: '下拉', 
-          type: 'SELECT'
+          type: 'SELECT',
+          iconCls: 'el-icon-location',
+           dic: [
+            {
+              group: "下拉字典1", // 分组名
+              groupItems: [
+                  { 
+                    name:'下拉1', 
+                    content: `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id="krcd-select-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22multi%22%3A0%2C%22desc%22%3A%22%E6%80%A7%E5%88%AB%22%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%94%B7%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E5%A5%B3%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%9C%AA%E7%9F%A5%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="[{&quot;value&quot;:&quot;1&quot;,&quot;label&quot;:&quot;男&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;2&quot;,&quot;label&quot;:&quot;女&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;3&quot;,&quot;label&quot;:&quot;未知&quot;,&quot;selected&quot;:0}]" krcd-updatetime="2018-11-26T10:22:28.332Z"><span contenteditable="true" class="krcd-value krcd-select" title="性别">性别</span></span>`
+                  },
+                  { 
+                    name:'下拉2', 
+                    content: `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id="krcd-select-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22multi%22%3A0%2C%22desc%22%3A%22%E5%B2%97%E4%BD%8D%22%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E5%8C%BB%E7%94%9F%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%8A%A4%E5%A3%AB%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%9C%AA%E7%9F%A5%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="[{&quot;value&quot;:&quot;1&quot;,&quot;label&quot;:&quot;医生&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;2&quot;,&quot;label&quot;:&quot;护士&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;3&quot;,&quot;label&quot;:&quot;未知&quot;,&quot;selected&quot;:0}]" krcd-updatetime="2018-11-26T10:45:22.721Z"><span contenteditable="true" class="krcd-value krcd-select" title="岗位">岗位</span></span>`
+                  },
+                ]  // 组项目
+            },
+          ]
         },
         {
           name: '单选', 
-          type: 'RADIO'
+          type: 'RADIO',
+          iconCls: 'el-icon-more-outline',
+          dic:[
+            {
+              group: "单选字典1", // 分组名
+              groupItems: [
+                  { 
+                    name:'病人的感觉', 
+                    content: `<span id="krcd-radio-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-right="." krcd-type="radio" class="krcd-ctrl" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22desc%22%3A%22%E7%97%85%E4%BA%BA%E7%9A%84%E6%84%9F%E8%A7%89%22%2C%22required%22%3A0%2C%22multi%22%3A1%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E5%BE%88%E5%A5%BD%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E4%B8%80%E8%88%AC%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%97%A0%E6%84%9F%E8%A7%89%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E7%B3%9F%E7%B3%95%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E5%BE%88%E5%A5%BD%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E4%B8%80%E8%88%AC%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%97%A0%E6%84%9F%E8%A7%89%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E7%B3%9F%E7%B3%95%22%2C%22selected%22%3A0%7D%5D" krcd-updatetime="2018-11-26T11:13:43.578Z"><span contenteditable="true" krcd-left="[" krcd-right="]" class="krcd-value"><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E5%BE%88%E5%A5%BD%22%2C%22selected%22%3A0%7D">感觉很好</label><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E4%B8%80%E8%88%AC%22%2C%22selected%22%3A0%7D">感觉一般</label><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%97%A0%E6%84%9F%E8%A7%89%22%2C%22selected%22%3A0%7D">无感觉</label><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E7%B3%9F%E7%B3%95%22%2C%22selected%22%3A0%7D">感觉糟糕</label></span></span>`
+                  },
+                  { 
+                    name:'费用类型', 
+                    content: `<span id="krcd-radio-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-right="." krcd-type="radio" class="krcd-ctrl" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22desc%22%3A%22%E8%B4%B9%E7%94%A8%E7%B1%BB%E5%9E%8B%22%2C%22required%22%3A0%2C%22multi%22%3A1%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E8%87%AA%E8%B4%B9%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E7%A4%BE%E4%BF%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E8%AE%B0%E8%B4%A6%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%85%B6%E4%BB%96%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E8%87%AA%E8%B4%B9%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E7%A4%BE%E4%BF%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E8%AE%B0%E8%B4%A6%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%85%B6%E4%BB%96%22%2C%22selected%22%3A0%7D%5D" krcd-updatetime="2018-11-26T11:20:35.048Z"><span contenteditable="true" krcd-left="[" krcd-right="]" class="krcd-value" title="病人的感觉"><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E8%87%AA%E8%B4%B9%22%2C%22selected%22%3A0%7D">自费</label><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E7%A4%BE%E4%BF%9D%22%2C%22selected%22%3A0%7D">社保</label><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E8%AE%B0%E8%B4%A6%22%2C%22selected%22%3A0%7D">记账</label><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%85%B6%E4%BB%96%22%2C%22selected%22%3A0%7D">其他</label></span></span>`
+                  },
+                ]  // 组项目
+            },
+          ]
         },
         {
           name: '复选', 
-          type: 'CHECKBOX'
+          type: 'CHECKBOX',
+          iconCls: 'el-icon-more',
+          dic:[
+            {
+              group: "复选字典1", // 分组名
+              groupItems: [
+                  { 
+                    name:'缴费方式', 
+                    content: `<span id="krcd-checkbox-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-right="." krcd-type="checkbox" class="krcd-ctrl" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22desc%22%3A%22%E7%BC%B4%E8%B4%B9%E6%96%B9%E5%BC%8F%22%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%8E%B0%E9%87%91%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E9%93%B6%E8%81%94%E5%8D%A1%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%94%AF%E4%BB%98%E5%AE%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%BE%AE%E4%BF%A1%22%2C%22selected%22%3A0%7D%5D%2C%22required%22%3A0%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%8E%B0%E9%87%91%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E9%93%B6%E8%81%94%E5%8D%A1%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%94%AF%E4%BB%98%E5%AE%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%BE%AE%E4%BF%A1%22%2C%22selected%22%3A0%7D%5D" krcd-updatetime="2018-11-26T11:30:17.773Z"><span contenteditable="true" krcd-left="[" krcd-right="]" class="krcd-value" title="多选框"><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%8E%B0%E9%87%91%22%2C%22selected%22%3A0%7D">现金</label><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E9%93%B6%E8%81%94%E5%8D%A1%22%2C%22selected%22%3A0%7D">银联卡</label><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%94%AF%E4%BB%98%E5%AE%9D%22%2C%22selected%22%3A0%7D">支付宝</label><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%BE%AE%E4%BF%A1%22%2C%22selected%22%3A0%7D">微信</label></span></span>`
+                  },
+                  
+                ]  // 组项目
+            },
+
+          ]
         },
         {
-          name: '📅', 
-          type: 'DATE'
+          name: '日历', 
+          type: 'DATE',
+          iconCls: 'el-icon-date',
+          dic:[
+             {
+              group: "日历字典1", // 分组名
+              groupItems: [
+                  { 
+                    name:'日历', 
+                    content: `<span class="krcd-ctrl" id="krcd-date-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-type="date" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22desc%22%3A%22%E6%97%A5%E6%9C%9F%E6%8E%A7%E4%BB%B6%22%2C%22defvalue%22%3A%222018-11-26%2012%3A00%3A00%22%2C%22format%22%3A%22%7Byyyy%7D-%7BMM%7D-%7Bdd%7D%20%7Bhh%7D%3A%7Bmm%7D%3A%7Bss%7D%22%2C%22min%22%3A%22%22%2C%22max%22%3A%22%22%7D" contenteditable="false"><span class="krcd-value flatpickr-input" contenteditable="true" krcd-left="[" krcd-right="]" title="日期控件">2018-11-26 19:33:31</span><div class="flatpickr-calendar hasTime animate showTimeInput arrowTop" tabindex="-1" style="top: 65.4688px; left: 15.957px; right: auto;"><div class="flatpickr-months"><span class="flatpickr-prev-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z"></path></svg></span><div class="flatpickr-month"><div class="flatpickr-current-month"><span class="cur-month">十一月 </span><div class="numInputWrapper"><input class="numInput cur-year" type="text" pattern="\d*" tabindex="-1" aria-label="Year"><span class="arrowUp"></span><span class="arrowDown"></span></div></div></div><span class="flatpickr-next-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z"></path></svg></span></div><div class="flatpickr-innerContainer"><div class="flatpickr-rContainer"><div class="flatpickr-weekdays"><div class="flatpickr-weekdaycontainer"><span class="flatpickr-weekday">周日</span><span class="flatpickr-weekday">周一</span><span class="flatpickr-weekday">周二</span><span class="flatpickr-weekday">周三</span><span class="flatpickr-weekday">周四</span><span class="flatpickr-weekday">周五</span><span class="flatpickr-weekday">周六</span></div></div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="十月 28, 2018" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="十月 29, 2018" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="十月 30, 2018" tabindex="-1">30</span><span class="flatpickr-day prevMonthDay" aria-label="十月 31, 2018" tabindex="-1">31</span><span class="flatpickr-day " aria-label="十一月 1, 2018" tabindex="-1">1</span><span class="flatpickr-day " aria-label="十一月 2, 2018" tabindex="-1">2</span><span class="flatpickr-day " aria-label="十一月 3, 2018" tabindex="-1">3</span><span class="flatpickr-day " aria-label="十一月 4, 2018" tabindex="-1">4</span><span class="flatpickr-day " aria-label="十一月 5, 2018" tabindex="-1">5</span><span class="flatpickr-day " aria-label="十一月 6, 2018" tabindex="-1">6</span><span class="flatpickr-day " aria-label="十一月 7, 2018" tabindex="-1">7</span><span class="flatpickr-day " aria-label="十一月 8, 2018" tabindex="-1">8</span><span class="flatpickr-day " aria-label="十一月 9, 2018" tabindex="-1">9</span><span class="flatpickr-day " aria-label="十一月 10, 2018" tabindex="-1">10</span><span class="flatpickr-day " aria-label="十一月 11, 2018" tabindex="-1">11</span><span class="flatpickr-day " aria-label="十一月 12, 2018" tabindex="-1">12</span><span class="flatpickr-day " aria-label="十一月 13, 2018" tabindex="-1">13</span><span class="flatpickr-day " aria-label="十一月 14, 2018" tabindex="-1">14</span><span class="flatpickr-day " aria-label="十一月 15, 2018" tabindex="-1">15</span><span class="flatpickr-day " aria-label="十一月 16, 2018" tabindex="-1">16</span><span class="flatpickr-day " aria-label="十一月 17, 2018" tabindex="-1">17</span><span class="flatpickr-day " aria-label="十一月 18, 2018" tabindex="-1">18</span><span class="flatpickr-day " aria-label="十一月 19, 2018" tabindex="-1">19</span><span class="flatpickr-day " aria-label="十一月 20, 2018" tabindex="-1">20</span><span class="flatpickr-day " aria-label="十一月 21, 2018" tabindex="-1">21</span><span class="flatpickr-day " aria-label="十一月 22, 2018" tabindex="-1">22</span><span class="flatpickr-day " aria-label="十一月 23, 2018" tabindex="-1">23</span><span class="flatpickr-day " aria-label="十一月 24, 2018" tabindex="-1">24</span><span class="flatpickr-day " aria-label="十一月 25, 2018" tabindex="-1">25</span><span class="flatpickr-day today selected" aria-label="十一月 26, 2018" aria-current="date" tabindex="-1">26</span><span class="flatpickr-day " aria-label="十一月 27, 2018" tabindex="-1">27</span><span class="flatpickr-day " aria-label="十一月 28, 2018" tabindex="-1">28</span><span class="flatpickr-day " aria-label="十一月 29, 2018" tabindex="-1">29</span><span class="flatpickr-day " aria-label="十一月 30, 2018" tabindex="-1">30</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 1, 2018" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 2, 2018" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 3, 2018" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 4, 2018" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 5, 2018" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 6, 2018" tabindex="-1">6</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 7, 2018" tabindex="-1">7</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 8, 2018" tabindex="-1">8</span></div></div></div></div><div class="flatpickr-time time24hr hasSeconds" tabindex="-1"><div class="numInputWrapper"><input class="numInput flatpickr-hour" type="text" pattern="\d*" tabindex="-1" data-step="1" data-min="0" data-max="23"><span class="arrowUp"></span><span class="arrowDown"></span></div><span class="flatpickr-time-separator">:</span><div class="numInputWrapper"><input class="numInput flatpickr-minute" type="text" pattern="\d*" tabindex="-1" data-step="1" data-min="0" data-max="59"><span class="arrowUp"></span><span class="arrowDown"></span></div><span class="flatpickr-time-separator">:</span><div class="numInputWrapper"><input class="numInput flatpickr-second" type="text" pattern="\d*" data-step="1" data-min="0" data-max="59"><span class="arrowUp"></span><span class="arrowDown"></span></div></div><div class="flatpickr-confirm visible lightTheme"><div class="left">清除</div><div class="center">今天</div><div class="right" tabindex="-1">确定 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17" height="17" viewBox="0 0 17 17"> <g> </g> <path d="M15.418 1.774l-8.833 13.485-4.918-4.386 0.666-0.746 4.051 3.614 8.198-12.515 0.836 0.548z" fill="#000000"></path> </svg></div></div></div></span>`
+                  },
+                  
+                ]  // 组项目
+            },
+
+          ]
         },
         {
           name: '文档段', 
-          type: 'SECTION'
+          type: 'SECTION',
+          iconCls: 'el-icon-news',
+          dic:[
+            {
+              group: "文档段字典", // 分组名
+              groupItems: [
+                  { 
+                    name:'文档段', 
+                    content: `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id="krcd-section-default" style="display: inline-block;background-color: #006ffc14;border-width: 1px;border-style: solid;border-color: #006ffc7d;width: 92%;height: 90%;box-sizing: border-box;" krcd-isloadasyncdata="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%2C%22desc%22%3A%22%22%7D"><p contenteditable="true" class="krcd-value"><br></p></div>`
+                  },
+                  
+                ]  // 组项目
+            },
+
+          ]
         },
         {
           name: '存控件', 
-          type: 'WIDGET'
+          type: 'WIDGET',
+          iconCls: 'el-icon-document',
+          dic:[]
         }],
 
-      // 从localStorage中取模版数据存起来
-      widgetlist: localStorage.getItem('moban')?
-                    JSON.parse(localStorage.getItem('moban'))&&JSON.parse(localStorage.getItem('moban')).length!==0?
-                        JSON.parse(localStorage.getItem('moban')):
+      // 从localStorage中取组件数据存起来
+      widgetlist: localStorage.getItem('widget')?
+                    JSON.parse(localStorage.getItem('widget'))&&JSON.parse(localStorage.getItem('widget')).length!==0?
+                        JSON.parse(localStorage.getItem('widget')):
                         []:
                     [],
 
-      // 左方病人列表（暂时就这样）
-      patlist: [
-        {
-          name: "康软人",
-          id: 1111,
-        },
-        {
-          name: "康软人",
-          id: 1112,
-        }
-      ],    
+      // 从localStorage中取模版数据存起来
+      templatelist: localStorage.getItem('template')?
+                    JSON.parse(localStorage.getItem('template'))&&JSON.parse(localStorage.getItem('template')).length!==0?
+                        JSON.parse(localStorage.getItem('template')):
+                        []:
+                    [],
+
+      // 左方病人的共有列表格式（暂时就这样）
+      patlist:[
+              { name: '康软人1',id: 1 }, 
+              { name: '康软人2',id: 2 }, 
+              { name: '康软人3',id: 3 }, 
+              { name: '康软人4',id: 4, count: 1 } // 这个为了子元素编号来设定的count
+            ],    
       
       patlistOnoff: (event)=>{
         const e = event || window.event;
         alert(`你点击的是：第${+e.currentTarget.getAttribute('index')+1}个病人`)        
       },
 
-      
+      /**
+       * 0、模版插入替换
+       * params {string} content   模版/控件/字典的innerHTML内容
+       * params {string} styleString  head>style标签中的样式文本
+       */
+      replaceFun: (content,styleString)=>{
+          const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
+
+          // 确保初始化时没有聚焦导致不能倒入模版
+          innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
+
+          innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML='';
+          this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
+      },
+
       /* 初始化的函数对象 */
 
       /**
@@ -184,6 +304,13 @@ export default {
     }
   },
   methods: {    
+    // 保存成功函数
+      saveSuccess(msg) {
+        this.$message({
+          message: '恭喜你，保存'+msg+'模版成功！',
+          type: 'success'
+        });
+      },
 
     // 去除字符串头尾空格
     strTrim(str) {
@@ -218,17 +345,21 @@ export default {
       
       // 创建需要存到模版的对象
       const newItem = {
-          name: '文档段' + target.id,
+          name: target.id,
           id: target.id,
           styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent
+          content: htmlContent,
+          scope: '全院',
+          date: funs.nowtime(),  //  存起来保存时间
       }
 
       // 将模版push到widgetlist数组中
       this.widgetlist.push(newItem);
 
       // 保存到localStorage
-      localStorage.setItem('moban',JSON.stringify(this.widgetlist))
+      localStorage.setItem('widget',JSON.stringify(this.widgetlist))
+
+      this.saveSuccess('组件');
       
       return callback() 
     },  
@@ -251,14 +382,18 @@ export default {
       
       const newItem = {
           name: itemName,
-          // id: 1111,
+          id: '',
           styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent
+          content: htmlContent,
+          scope: '全院',
+          date: funs.nowtime(),
       }
-      this.widgetlist.push(newItem);
+      this.templatelist.push(newItem);
 
       // 设置localStorage
-      localStorage.setItem('moban',JSON.stringify(this.widgetlist))
+      localStorage.setItem('template',JSON.stringify(this.templatelist))
+
+      this.saveSuccess('模版');
       
       return callback()
     },     
@@ -410,19 +545,7 @@ export default {
     createDate(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
       let div = document.createElement('span');      
       div.innerHTML = `<span class="krcd-ctrl" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-date'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-type="date"><span class="krcd-value" contenteditable="true" krcd-left="[" krcd-right="]"></span></span>`     
-      div = div.firstElementChild;      
-
-      // 时间戳转时间函数
-      function timestampToTime(timestamp) {
-        let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
-        let Y = date.getFullYear() + '-';
-        let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-        let D = date.getDate() + ' ';
-        let h = date.getHours() + ':';
-        let m = date.getMinutes() + ':';
-        let s = date.getSeconds();
-        return Y+M+D+h+m+s;
-      }       
+      div = div.firstElementChild;   
 
       /* 创建控制器（装饰了一下原来的DOM元素）*/
       let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
@@ -431,7 +554,7 @@ export default {
           "strictverify":0,//是否强制校验
           "required":0,//是否必填
           "desc":"日期控件",//描述
-          "defvalue":timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
+          "defvalue":funs.timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
           "format":"{yyyy}-{MM}-{dd} {hh}:{mm}:{ss}",//格式化要求。必须以大括号包裹。
           "min":"",//最小日期
           "max":""//最大日期
@@ -508,7 +631,7 @@ export default {
       }
       
       // 插入后隐藏工具条
-      this.onOff = {'opacity':'0'}
+      this.onOff = {...this.off}
     },
 
     // 插入Section区域控件（文档段）
@@ -566,6 +689,7 @@ export default {
       // console.log(document.getElementsByTagName('iframe'))
   },
   mounted() {   
+    console.log(funs)
     
     let self = this;
     
@@ -581,7 +705,7 @@ export default {
       
       self.tarEl = arguments[0].target;  // 获取点中的对象
       
-      self.onOff = {'opacity':'1'}   // 点击让工具条显示
+      self.onOff = {...this.on}   // 点击让工具条显示
 
       // 判断点击的控件是否在section中，并控制工具条呈现的功能
       if(arguments[1]!==null){  
@@ -640,7 +764,7 @@ export default {
         
 
       }else if (arguments[1]!==null&&arguments[1]['TYPE_NAME']!=='section'){      // 选中文档段中控件时隐藏工具条
-         self.onOff = {'opacity':'0'}  
+         self.onOff = {...this.off}
       }
 
       // 根据点击对象的坐标给组件传值来定位
@@ -652,19 +776,28 @@ export default {
         let toolbtnW = document.querySelector('.tools-btn').offsetWidth
         let toolbtnH = document.querySelector('.tools-btn').offsetHeight
 
+        // alert(toolbtnH)
+
         // 设定工具条的样式
         const sources = {
           "flex": 1,
           "display": "flex",
           "align-items": "center",
-          "flex-direction": "row", 
+          "flex-direction": "column",  // 改变column再扩展字典
+          "line-height": "30px",
           "background-color": "white",        
-          "padding": "4px",
+          // "padding": "4px",
           'position': 'absolute',
-          'left': editorX + arguments[0].clientX + toolbtnW + 'px',
-          'top': toolsH + editorY + arguments[0].clientY + toolbtnH + 'px',   
-          'border':"1px solid #d3d3d3",
-          'height':'30px',
+          // 'width': '72px',
+          // 'height': 56*6 + 'px',
+          'left': editorX + arguments[0].clientX + 
+                toolbtnW + 144 +
+                'px',
+          'top': toolsH + editorY + arguments[0].clientY + 
+                // toolbtnH + 
+                'px',   
+          // 'border':"1px solid #d3d3d3",
+          // 'height':'30px',
           "margin-top": "-30px",
           'z-index': '1005',
           'box-shadow': '1px 1px 4px #00000033'

@@ -6,7 +6,7 @@
           :key="index"         
           :index="index"
           :style="item.type==='WIDGET'?widgetBtnStyle:btnStyle" 
-          @click="addCtrl(item.type,item.name, `sde-${item.type.toLowerCase()}-${index}`)"
+          @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`)"
           readonly="readonly"
        >{{item.name}}</span>
   </span>
@@ -31,7 +31,7 @@ export default {
     addCtrl: Function,  // 通过props传入
     showHide: Boolean,
     toolStyle: Object,
-    toolBtns: Array,    
+    toolBtns: Array,    // 工具的数组
   },
   // extends: sdeEditor, // 继承自sdeEditor 
   data() {
