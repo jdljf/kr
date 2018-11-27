@@ -159,7 +159,7 @@ export default {
               groupItems: [
                   { 
                     name:'文档段', 
-                    content: `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id="krcd-section-default" style="display: inline-block;background-color: #006ffc14;border-width: 1px;border-style: solid;border-color: #006ffc7d;width: 92%;height: 90%;box-sizing: border-box;" krcd-isloadasyncdata="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%2C%22desc%22%3A%22%22%7D"><p contenteditable="true" class="krcd-value"><br></p></div>`
+                    content: `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id="krcd-section-default" style="display:inline-block;background-color: #006ffc14;border-width: 1px;border-style: solid;border-color: #006ffc7d;width: 92%;height: 90%;box-sizing: border-box;" krcd-isloadasyncdata="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%2C%22desc%22%3A%22%22%7D"><p contenteditable="true" class="krcd-value"><br></p></div>`
                   },
                   
                 ]  // 组项目
@@ -793,7 +793,7 @@ export default {
           'left': editorX + arguments[0].clientX + 
                 toolbtnW + 144 +
                 'px',
-          'top': toolsH + editorY + arguments[0].clientY + 
+          'top': toolsH + editorY + arguments[0].clientY + 55 +
                 // toolbtnH + 
                 'px',   
           // 'border':"1px solid #d3d3d3",
