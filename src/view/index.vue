@@ -29,7 +29,7 @@
       
     </div>
     <!-- <div class="toolbars"></div> -->
-    <!-- <button @click="testSet()">设置按钮</button> -->
+    <button @click="testSet()">设置按钮</button>
     <div style="margin:0 auto;width:100%;height:100%;">
       <krcd-editor ref="krcdEditor"></krcd-editor>
     </div>
