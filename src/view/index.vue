@@ -97,10 +97,6 @@ export default {
       // this.$refs.krcdEditor.dddd();
       this.$refs.krcdEditor.krcd.exportXML();
       this.$refs.krcdEditor.krcd.getJSON();
-      var jiedian = document
-        .getElementById("ueditor_1")
-        .contentWindow.document.getElementById("username");
-      jiedian.firstElementChild.innerHTML = "45";
       // var getControls=JSON.parse(sessionStorage.control_arr);
       // console.log(getControls)
       // document.execCommand("insertHTML","false",'<h1>插入插入插入</h1>')

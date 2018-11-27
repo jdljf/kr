@@ -19380,6 +19380,8 @@
                 removes[i].parentNode.remove();
               }
               divText=div.innerText;
+            }else{
+              divText=div.innerText;
             }
           }
           e.controls.push({
