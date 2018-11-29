@@ -152,6 +152,7 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
+        flex-shrink: 0;
     }
     .tree{
         width: 100%;

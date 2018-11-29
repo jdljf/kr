@@ -40,7 +40,7 @@
                   :key="(index+1)+'-'+(groupIdx+1)"                 
                   >                   
                     <el-card shadow="hover"  style="margin-bottom:12px;" class="card-style">                      
-                      <el-menu-item :index="(index+1)+'-'+(groupIdx+1)" @click="addDic(groupItem.content)" v-html="`<span style='color:#409EFF'>${groupItem.name} | </span>`+groupItem.content" ></el-menu-item>
+                      <el-menu-item :index="(index+1)+'-'+(groupIdx+1)" @click="addDic(groupItem.content)" v-html="`<span style='color:#999'>${groupItem.name} | </span>`+groupItem.content" ></el-menu-item>
                     </el-card>
                   </el-col>                  
                 </el-row>

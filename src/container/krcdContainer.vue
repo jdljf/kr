@@ -5,6 +5,8 @@ import krcdEditor from '../components/krcdEditor'
 import Tree from '../components/Tree'
 import Models from '../components/Template'
 import NavMenu from '../components/NavMenu'
+import {ajax} from '../common'
+
 
 import funs from '../common/funs'
 
@@ -179,14 +181,17 @@ export default {
                     JSON.parse(localStorage.getItem('widget'))&&JSON.parse(localStorage.getItem('widget')).length!==0?
                         JSON.parse(localStorage.getItem('widget')):
                         []:
-                    [],
+                    []
+      ,
 
       // 从localStorage中取模版数据存起来
-      templatelist: localStorage.getItem('template')?
-                    JSON.parse(localStorage.getItem('template'))&&JSON.parse(localStorage.getItem('template')).length!==0?
-                        JSON.parse(localStorage.getItem('template')):
-                        []:
-                    [],
+      templatelist: []
+      // localStorage.getItem('template')?
+      //               JSON.parse(localStorage.getItem('template'))&&JSON.parse(localStorage.getItem('template')).length!==0?
+      //                   JSON.parse(localStorage.getItem('template')):
+      //                   []:
+      //               [],
+      ,
 
       // 左方病人的共有列表格式（暂时就这样）
       patlist:[
@@ -215,6 +220,67 @@ export default {
           innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML='';
           this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
       },
+
+      // 提示输入模版名称弹窗
+      inputName(fun) {
+        this.$prompt('请输入模版名', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,9}$/,  // 自己写的
+          inputErrorMessage: '模版名必须大于2不得超过9个字符'
+        }).then(({ value }) => {
+          this.$message({
+            // type: 'success',
+            message: value  + '  模版，正在保存...' 
+          });
+          fun(value);
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消输入'
+          });       
+        });
+      },
+
+      // 保存真整页内容为模版
+      saveHtmlContent: (val)=>{
+
+        const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
+        let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML;  // 获取对应的innerHTML  
+
+        const headStyleString = (()=>{
+          const arr = innerDoc.querySelectorAll('style[stylename]');
+          const newArr = []
+          for(let i=0, len=arr.length;i<len;i++){
+            newArr.push(this.strTrim(arr[i].innerHTML))
+          }
+          return newArr.join('')
+        })()  
+        
+        const newItem = {
+            name: val,
+            id: '',  // 因为是模版所以不设置了
+            styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
+            content: htmlContent,
+            scope: '全院',
+            discribe: '描述', // 描述
+            // date: funs.nowtime(),          // 应该以后台返回数据为准
+        }
+
+        // 将原来的转为接口的格式
+        const postData = this.font2back(newItem)
+
+        // let content = JSON.stringify(postData);
+        // console.log(content)
+
+        this.ajaxTemplate('Save',postData,`${value}模版，保存成功`,()=>{            
+            this.templatelist.push(newItem);
+            // 设置localStorage
+            // localStorage.setItem('template',JSON.stringify(this.templatelist))
+        });
+        
+      },   
+
 
       /* 初始化的函数对象 */
 
@@ -300,12 +366,36 @@ export default {
         //       border-top-left-radius: 4px;
         //     }`
       },
+
+      ajaxTemplate: (type,content,successMsg,sucessFun)=>{ 
+        ajax.post(
+          `/DocumentTemplate/${type}`,
+          JSON.stringify(content)                            
+        ).then((res)=>{
+          this.saveSuccess(successMsg)  
+          sucessFun()
+          console.log(res)
+        }).catch((err)=>{
+          console.log(err)
+          this.saveError('请查看控制台错误')
+        })
+      },  
       
     }
   },
-  methods: {    
+  methods: {
+    
+    
     // 保存成功函数
-      saveSuccess(msg) {
+    saveError(msg) {
+        this.$message({
+          message: '抱歉，保存'+msg+'模版失败！',
+          type: 'error'
+        });
+      },
+    
+     // 保存成功函数
+    saveSuccess(msg) {
         this.$message({
           message: '恭喜你，保存'+msg+'模版成功！',
           type: 'success'
@@ -315,9 +405,36 @@ export default {
     // 去除字符串头尾空格
     strTrim(str) {
       return str.replace(/^\s+|\s+$/gm,'');
+    },    
+
+    // 数据值转换为后端的
+    font2back(newItem){
+      return{
+          "code": newItem.id,   // 组件id
+          "discribe": newItem.discribe,  // 描述
+          "deptCode": newItem.scope,
+          "creatorUserId": 0,     // 可以默认0
+          "templateName": newItem.name,
+          "htmlContent": newItem.content,
+          "styleContent": newItem.styleString,
+          "id": newItem.index!==0?newItem.index:0       // 可以默认0
+      }
     },
 
-    // 保存文档段为控件
+    back2font(newItem){      
+      return{
+          id: newItem.code,   // 组件id
+          discribe: newItem.discribe,  // 描述
+          scope: newItem.deptCode,
+          "creatorUserId": 0,     // 可以默认0
+          name: newItem.templateName,
+          content: newItem.htmlContent,
+          styleContent: newItem.styleString,
+          index: newItem.id  // 将后台的顺序存到index中
+      }
+    },
+
+      // 保存文档段为控件
     saveSection2Widget(itemName="哈哈哈哈", callback=()=>{}){     
       let target;
       if(this.tarEl.className ==='krcd-value'&&this.tarEl.parentNode.className==='krcd-ctrl krcd-section'){
@@ -350,53 +467,60 @@ export default {
           styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
           content: htmlContent,
           scope: '全院',
+          discribe: '描述', // 描述
           date: funs.nowtime(),  //  存起来保存时间
       }
-
+      
       // 将模版push到widgetlist数组中
       this.widgetlist.push(newItem);
 
       // 保存到localStorage
-      localStorage.setItem('widget',JSON.stringify(this.widgetlist))
+      // localStorage.setItem('widget',JSON.stringify(this.widgetlist))
 
-      this.saveSuccess('组件');
+      // this.saveSuccess('组件');
       
       return callback() 
     },  
+    
+    // // 保存真整页内容为模版
+    // saveHtmlContent(itemName="哈哈哈哈", callback=()=>{}){
 
-    // 保存真整页内容为模版
-    saveHtmlContent(itemName="哈哈哈哈", callback=()=>{}){
+    //   const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
+    //   let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML;  // 获取对应的innerHTML  
+    //   // let htmlContent = this.getHTML()
+    //   console.log(htmlContent)
+    //   // console.log(innerDoc.querySelectorAll('style[stylename]'))
 
-      const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
-      let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML;  // 获取对应的innerHTML    
-      // console.log(innerDoc.querySelectorAll('style[stylename]'))
-
-      const headStyleString = (()=>{
-        const arr = innerDoc.querySelectorAll('style[stylename]');
-        const newArr = []
-        for(let i=0, len=arr.length;i<len;i++){
-          newArr.push(this.strTrim(arr[i].innerHTML))
-        }
-        return newArr.join('')
-      })()  
+    //   const headStyleString = (()=>{
+    //     const arr = innerDoc.querySelectorAll('style[stylename]');
+    //     const newArr = []
+    //     for(let i=0, len=arr.length;i<len;i++){
+    //       newArr.push(this.strTrim(arr[i].innerHTML))
+    //     }
+    //     return newArr.join('')
+    //   })()  
       
-      const newItem = {
-          name: itemName,
-          id: '',
-          styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent,
-          scope: '全院',
-          date: funs.nowtime(),
-      }
-      this.templatelist.push(newItem);
+    //   const newItem = {
+    //       name: itemName,
+    //       id: '',  // 因为是模版所以不设置了
+    //       styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
+    //       content: htmlContent,
+    //       scope: '全院',
+    //       date: funs.nowtime(),          
+    //   }
 
-      // 设置localStorage
-      localStorage.setItem('template',JSON.stringify(this.templatelist))
+    //   // 将原来的转为接口的格式
+    //   const postData = this.font2back(newItem)
 
-      this.saveSuccess('模版');
+    //   this.templatelist.push(newItem);
+
+    //   // 设置localStorage
+    //   localStorage.setItem('template',JSON.stringify(this.templatelist))
+
+    //   this.ajaxTemplate(content);
       
-      return callback()
-    },     
+    //   return callback(JSON.stringify(postData))
+    // },     
 
     /************************
      * 以下为每个工具栏中的方法
@@ -411,11 +535,11 @@ export default {
         div = div.firstElementChild; 
         let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
             "mode":"EDITOR",//控件状态。EDITOR编辑;READONLY只读
-            "notdel":0,//是否不许删除，默认0位可以删除
-            "strictverify":0,//是否强制校验（不符合要求既不允许输入），默认为0不强制校验
-            "verify":"",//验证输入是否符合要求，可自己定义表达式
-            "required":0,//是否必填
-            "desc":"文本输入",//控件描述值
+            "notdel": 0,//是否不许删除，默认0位可以删除
+            "strictverify": 0,//是否强制校验（不符合要求既不允许输入），默认为0不强制校验
+            "verify": "",//验证输入是否符合要求，可自己定义表达式
+            "required": 0,//是否必填
+            "desc": "文本输入",//控件描述值
         })
         return newDiv
     },
@@ -596,7 +720,7 @@ export default {
             this.addSection([],{
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
-              'ctrlStyle': `${ctrlStyle};position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box`
+              'ctrlStyle': `${ctrlStyle};display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box`
               })           
             break
         case 'WIDGET':
@@ -688,10 +812,57 @@ export default {
   beforeUpdate(){
       // console.log(document.getElementsByTagName('iframe'))
   },
+
+  // 侦查templatelist
+   watch: {
+    //  侦查templist保存local
+    templatelist: function (newTemplatelist, oldTemplatelist) {
+      console.log('存local')
+      localStorage.setItem("template",JSON.stringify(newTemplatelist.map(this.font2back)))  // 这样就要改变读取时的问题
+    }
+  },
+
   mounted() {   
     console.log(funs)
     
     let self = this;
+
+    // // 为什么不能这样？！
+    // let content = {
+    //       "deptCode": "",
+    //       "creatorUserId": 0,
+    //        "id": 0
+    //    }
+    
+    // this.ajaxTemplate('GetList', content ,()=>{
+    //     console.log('成功了！',typeof res.data.data) 
+
+    //     const templataData = res.data.data;
+        
+    //     // 后端数组转为前端数组
+    //     const templateArr = templataData.map(this.back2font)        
+    //     // 修改templatelist的数据
+    //     this.templatelist = [ ...templateArr]
+    //      });
+
+    ajax.post(
+      '/DocumentTemplate/GetList',
+       {
+          "deptCode": "",
+          "creatorUserId": 0,
+           "id": 0
+       }).then((res)=>{
+        console.log('成功了！',typeof res.data.data) 
+
+        const templataData = res.data.data;
+        
+        // 后端数组转为前端数组
+        const templateArr = templataData.map(this.back2font)        
+        // 修改templatelist的数据
+        this.templatelist = [ ...templateArr]
+         }).catch((err)=>{
+         console.log(err)
+    })
     
     // 点击聚焦
     this.krcd.addListener('click', function(event) {
@@ -771,10 +942,16 @@ export default {
       const getPositon = ()=>{
         let editorX = document.querySelector('.krcd-editor-inner').offsetLeft
         let editorY = document.querySelector('.krcd-editor-inner').offsetTop
+        let scrTop = document.querySelector('.krcd-editor').scrollTop   // 滚动的高度
         let toolsH = document.querySelector('.krcd-toolbars').offsetHeight
         console.log(document.querySelector('.tools-btn'))
         let toolbtnW = document.querySelector('.tools-btn').offsetWidth
-        let toolbtnH = document.querySelector('.tools-btn').offsetHeight
+        let toolbtnH = document.querySelector('.tools-btn').offsetHeightd
+
+        console.log(document.body.scrollTop)
+
+        console.log(scrTop)
+        console.log(editorY)
 
         // alert(toolbtnH)
 
@@ -793,9 +970,15 @@ export default {
           'left': editorX + arguments[0].clientX + 
                 toolbtnW + 144 +
                 'px',
-          'top': toolsH + editorY + arguments[0].clientY + 55 +
+          // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
+          //       // toolbtnH + 
+          //       'px',  
+          'top': arguments[0].clientY - scrTop > (arguments[0].screenY*2/3) ? editorY + arguments[0].clientY - scrTop - 55 - toolsH +  // 为了要输入的时候不要被影响到
                 // toolbtnH + 
-                'px',   
+                'px':toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
+          //       // toolbtnH + 
+                'px'                
+                ,   
           // 'border':"1px solid #d3d3d3",
           // 'height':'30px',
           "margin-top": "-30px",

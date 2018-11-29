@@ -2,65 +2,76 @@
 <template>
   <!--row-click 参数是row, event, column-->
   <!-- :data="list" :data中的filter筛选是搜索的关键-->
-  <el-table   
-    style="width: 100%;"
-    :data="list.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
-    @row-click="callback"
-    >
-          
-        <el-table-column
-          label="最新编辑日期"
-          width="130">
-          <template slot-scope="scope">
-            <i class="el-icon-time"></i>
-            <span style="margin-left: 10px">{{ scope.row.date }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="模版名称"
-          width="150">
-          <template slot-scope="scope">
-            <el-popover trigger="hover" placement="top">
-              <p>模版: {{ scope.row.name }}</p>
-              <p>归属: {{ scope.row.scope }}</p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag size="medium">{{ scope.row.name }}</el-tag>
-              </div>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="146">
-          <!-- 标题处改为input -->
-          <template slot="header" slot-scope="scope">
-            <el-input
-              v-model="search"
-              size="mini"
-              placeholder="输入关键字搜索"/>
-          </template>
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+  <div>
+      <div class="nav-tools">
+        <el-button type="success" size="mini" plain @click="savetemple">文档存模版</el-button>
+        <el-button type="warning" size="mini" plain @click="savewidget">文档存控件</el-button>
+      </div>      
+      <el-table   
+        style="width: 100%;"
+        :data="list.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+        @row-click="callback"
+        >       
+            <el-table-column
+              label="最新编辑日期"
+              width="130">
+              <template slot-scope="scope">
+                <i class="el-icon-time"></i>
+                <span style="margin-left: 10px">{{ scope.row.date }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="模版名称"
+              width="150">
+              <template slot-scope="scope">
+                <el-popover trigger="hover" placement="top">
+                  <p>模版: {{ scope.row.name }}</p>
+                  <p>归属: {{ scope.row.scope }}</p>
+                  <div slot="reference" class="name-wrapper">
+                    <el-tag size="medium">{{ scope.row.name }}</el-tag>
+                  </div>
+                </el-popover>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="146">
+              <!-- 标题处改为input -->
+              <template slot="header" slot-scope="scope">
+                <el-input
+                  v-model="search"
+                  size="mini"
+                  placeholder="输入关键字搜索"/>
+              </template>
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  @click.stop="handleEdit(scope.$index, scope.row)">替换</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click.stop="handleDelete(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+  </div>
+  
   
     
 </template>
 
 <script>
 import funs from '../common/funs';
+// import {ajax} from '../common'
 
 // 模版的组件
   export default {
-    name: "Models",   
+    name: "Template",   
     props:{
         list: Array,
         fun: Function,
+        savetemple: Function,  
+        savewidget: Function,  
+        ajaxtemple: Function,
+        back2font: Function
     },
     data() {
       return {
@@ -68,69 +79,123 @@ import funs from '../common/funs';
       }
     },
     mounted(){
+      console.log("template",this.savetemple)
         // console.log(this.list)
     },
-    methods: {
+    methods: {      
       handleEdit(index, row) {
         console.log(index, row);
-        // 编辑TODO
-         const editWarn= ()=>{
-                this.$prompt(`当前模版 “ ${row.name} ” ，请输入新的模版名称`, '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        // 规定匹配模式
-                        inputPattern: /^[\u4E00-\u9FA5a-zA-Z0-9_]+$/,
-                        // 输入的错误信息
-                        inputErrorMessage: '控件名称不能含由空格或特殊符号'
-                    }).then(({ value }) => {
-                        // 修改名称
-                        this.list[index].name = value;
-                        // 但是也需要更新一下编辑的时间
-                        this.list[index].date = funs.nowtime();
-
-                        localStorage.setItem('moban',JSON.stringify(this.list))
-                        this.$message({
-                            type: 'success',
-                            message: '控件名称 “ ' + value + ' ” ，保存成功'
-                        });
-                    }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '取消输入'
-                    });       
-                });
-         }
-         editWarn()
-        
-      },
-      handleDelete(index, row) {
-        console.log(index, row); // row就是该行对象
-
+        // 改成保存替换
         // 删除警告
-        const delWarn= (title,todo)=>{
+        const replaceWarn= (title,todo)=>{
                 // window DOM的方法confirm
-                this.$confirm(`此操作将永久删除${title?('                                                                                                                                                                                                                             该'+title):""}, 是否继续?`, '提示', {
-                    confirmButtonText: '确定',
+                this.$confirm(`此操作将替换当前${title}的内容,确定替换吗?`,'提示',{        
+                    confirmButtonText: '确认提交',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     todo();
                     this.$message({
                         type: 'success',
-                        message: '删除成功!'
+                        message: '保存成功!'
                     });
                     }).catch(() => {
                         this.$message({
                             type: 'info',
-                            message: '已取消删除'
+                            message: '已取消'
                         });          
                     });
                 }
 
+        const updatecommit = ()=>{
+            // 删除TODO
+            console.log(row.index)
+             // 这里只是改变了临时的list数据，还需要改变local中的数据    
+             
+            const updateData = {
+                // "templateName": "优秀优秀",
+                "htmlContent": "string",
+                "lastModifierUserId": 0,
+                "id": row.index
+            }
+            
+            this.ajaxtemple('Update', updateData,"模版数据更新成功", ()=>this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})
+            );
+        }
+        
+        replaceWarn('模版',updatecommit) 
+
+        // 编辑TODO
+        //  const editWarn= ()=>{
+        //         this.$prompt(`当前模版 “ ${row.name} ” ，请输入新的模版名称`, '提示', {
+        //                 confirmButtonText: '确定',
+        //                 cancelButtonText: '取消',
+        //                 // 规定匹配模式
+        //                 inputPattern: /^[\u4E00-\u9FA5a-zA-Z0-9_]+$/,
+        //                 // 输入的错误信息
+        //                 inputErrorMessage: '控件名称不能含由空格或特殊符号'
+        //             }).then(({ value }) => {
+        //                 // 修改名称
+        //                 this.list[index].name = value;
+        //                 // 但是也需要更新一下编辑的时间
+        //                 this.list[index].date = funs.nowtime();
+                        
+        //                 // ajax对接删除之后再重新读回来
+        //                 // this.ajaxtemple('Delete',)
+
+        //                 localStorage.setItem('moban',JSON.stringify(this.list))
+        //                 this.$message({
+        //                     type: 'success',
+        //                     message: '控件名称 “ ' + value + ' ” ，保存成功'
+        //                 });
+        //             }).catch(() => {
+        //             this.$message({
+        //                 type: 'info',
+        //                 message: '取消输入'
+        //             });       
+        //         });
+        //  }
+        //  editWarn()
+        
+      },
+      handleDelete(index, row) {
+        console.log(index, row); // row就是该行对象
+        console.log(this);
+
+        // 删除警告
+        const delWarn= (title,todo)=>{
+                // window DOM的方法confirm
+                this.$confirm(`此操作将永久删除${title}?`, '提示', {        
+                    confirmButtonText: '确认提交',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    console.log(this)
+                    todo()
+                    this.$message({
+                        type: 'success',
+                        message: '删除成功!'
+                      })
+                  }).catch(() => {
+                      this.$message({
+                          type: 'info',
+                          message: '已取消删除'
+                      });          
+                  });
+                }
+
         const delcommit = ()=>{
             // 删除TODO
-            this.list.splice(row,1) // 这里只是改变了临时的list数据，还需要改变local中的数据
-            localStorage.setItem('moban',JSON.stringify(this.list))
+            console.log(row.index)
+             // 这里只是改变了临时的list数据，还需要改变local中的数据            
+            
+            this.ajaxtemple('Delete', {
+                "deleterUserId": 0,
+                "id": row.index
+              },
+              "模版删除成功",
+              ()=>this.list.splice(index,1)
+            );
         }
 
         delWarn('模版',delcommit)
@@ -139,6 +204,9 @@ import funs from '../common/funs';
       // 一个函数的包装
       todo(fun,args,styleString){
         return fun(args,styleString) // 返回该函数的运行
+      },
+      setCurrent(row) {
+        this.$refs.singleTable.setCurrentRow(row);
       },
       callback(row, event, column) {
         console.log(row)  // 改行的元素
@@ -156,5 +224,9 @@ import funs from '../common/funs';
 /* 为了覆盖框架默认的样式 */
 .el-table .cell {
   display: flex;
+}
+.nav-tools{
+  display: flex;
+  flex-direction: flex-start;
 }
 </style>

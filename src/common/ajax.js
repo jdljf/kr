@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 var settings = {
-    baseURL:'',
+    baseURL:'http://192.168.1.50:8008/api',
     // baseURL:'http://192.168.1.50:62114/api',
 //   baseURL: 'http://kpjkglwxgl.krmanager.com/api',
   timeout: 3000,
