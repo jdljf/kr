@@ -1,7 +1,10 @@
 <template>  
     <div class="krcd-root height-ful">
+      
     <div class="widget-list">
+      <button @click="editWin">sdfdsfds</button>
       <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>
+      
     </div>
     <div class="tools" :style="onOff">  
       <NavMenu 
@@ -19,7 +22,7 @@
     <div class="widget-list">
       <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
       <!-- <Models :list="widgetlist" :fun="insert"/> -->
-      <tabContainer :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font"/>
+      <tabContainer :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
     </div>    
   </div>
 </template>
@@ -1117,7 +1120,7 @@ export default {
     // console.log(window.$EDITORUI.edui1.editor);
     // console.log(window.$EDITORUI["edui75"].editor);
     // var ue = window.$EDITORUI["edui151"].editor;
-
+    
     // console.log(ue.getContent());
   },
   beforeDestroy() {

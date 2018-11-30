@@ -53,6 +53,46 @@ export default {
       onOff: {'opacity':'0','width':'0','height':'0'}, // 工具条显示隐藏开关      
       toolStyle: {},    // 初始化工具条样式
 
+      // 模版类型
+      templateTag:[
+        {
+          id: "0",
+          title: "住院病案首页"
+        },
+        {
+          id: "1",
+          title: "病程记录"
+        },
+        {
+          id: "2",
+          title: "入院记录"
+        },
+        {
+          id: "4",
+          title: "24小时内入出院记录"
+        },
+      ],
+      // 组件类型（归属于哪种表）
+      widgetTag:[
+        {
+          id: "0",
+          title: "获得性免疫缺陷综合征(HIV)"
+        },
+        {
+          id: "1",
+          title: "肿瘤（tumour）"
+        },
+        {
+          id: "2",
+          title: "帕金森病（Parkinson’s disease，PD）"
+        },
+        {
+          id: "4",
+          title: "肌萎缩侧索硬化（ALS）"
+        },
+        
+      ],
+
       // 初始化工具条按钮数组
       toolBtns: null,
       
@@ -215,18 +255,20 @@ export default {
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
 
           // 确保初始化时没有聚焦导致不能倒入模版
-          innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
+          // innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
 
-          innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML='';
-          this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
+          // innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML='';
+          // this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
+
+          innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content
       },
 
       // 提示输入模版名称弹窗
-      inputName(fun) {
+      inputName:(fun)=>{
         this.$prompt('请输入模版名', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,9}$/,  // 自己写的
+          inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,10}$/,  // 自己写的
           inputErrorMessage: '模版名必须大于2不得超过9个字符'
         }).then(({ value }) => {
           this.$message({
@@ -242,41 +284,47 @@ export default {
         });
       },
 
+
+      getHtmlContent:()=>{
+          const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
+          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML;  // 获取对应的innerHTML  
+
+          const headStyleString = (()=>{
+            const arr = innerDoc.querySelectorAll('style[stylename]');
+            const newArr = []
+            for(let i=0, len=arr.length;i<len;i++){
+              newArr.push(this.strTrim(arr[i].innerHTML))
+            }
+            return newArr.join('')
+          })()  
+          return {
+            htmlContent,
+            headStyleString
+          }        
+      },
+
       // 保存真整页内容为模版
       saveHtmlContent: (val)=>{
 
-        const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
-        let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML;  // 获取对应的innerHTML  
+        const docContent = this.getHtmlContent()
+        console.log(docContent)
 
-        const headStyleString = (()=>{
-          const arr = innerDoc.querySelectorAll('style[stylename]');
-          const newArr = []
-          for(let i=0, len=arr.length;i<len;i++){
-            newArr.push(this.strTrim(arr[i].innerHTML))
-          }
-          return newArr.join('')
-        })()  
-        
         const newItem = {
             name: val,
             id: '',  // 因为是模版所以不设置了
-            styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-            content: htmlContent,
+            styleString: docContent.headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
+            content: docContent.htmlContent,
             scope: '全院',
             discribe: '描述', // 描述
+            tag: docContent.tag, // 模版类型
             // date: funs.nowtime(),          // 应该以后台返回数据为准
         }
 
         // 将原来的转为接口的格式
         const postData = this.font2back(newItem)
 
-        // let content = JSON.stringify(postData);
-        // console.log(content)
-
-        this.ajaxTemplate('Save',postData,`${value}模版，保存成功`,()=>{            
+        this.ajaxTemplate('Save',postData,`${val}模版，保存成功`,()=>{            
             this.templatelist.push(newItem);
-            // 设置localStorage
-            // localStorage.setItem('template',JSON.stringify(this.templatelist))
         });
         
       },   
@@ -293,7 +341,7 @@ export default {
         if(this.inSection===false){            
             const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
             
-            // 确保初始化时没有聚焦导致不能倒入模版
+            // 确保初始化时没有聚焦导致不能倒入模版            
             innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
 
             // 所有有stylename的属性的style标签，并最后一个中增加样式
@@ -307,6 +355,7 @@ export default {
             }
 
             this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
+            // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content
 
         }else{
             alert("请在【文档段】以外插入控件")
@@ -385,6 +434,49 @@ export default {
   },
   methods: {
     
+    // 调出编辑的弹窗
+    editWin(type){
+      console.log(window)
+      switch(type){
+        case "文本":
+            // 弹出窗
+            window.$EDITORUI["edui93"]._edit();
+
+
+      }
+      console.log(window.$EDITORUI["edui93"]._edit)
+      window.$EDITORUI["edui93"]._edit()
+    },
+    
+
+    // $EDITORUI["edui93"]._edit()   // 这是文本
+
+    // $EDITORUI["edui93"]._delete()
+    
+    // $EDITORUI["edui118"]._edit()  // 这是下拉
+
+//     <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+//     <img src="img_w3slogo.gif" draggable="true" ondragstart="drag(event)" id="drag1" width="88" height="31"></div>
+// <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+//     // 利用H5的draggable="true"来拖动控件
+//     function allowDrop(ev)
+// {
+// 	ev.preventDefault();
+// }
+
+// function drag(ev)
+// {
+// 	ev.dataTransfer.setData("Text",ev.target.id);
+// }
+
+// function drop(ev)
+// {
+// 	ev.preventDefault();
+// 	var data=ev.dataTransfer.getData("Text");
+// 	ev.target.appendChild(document.getElementById(data));
+// }
+    
     
     // 保存成功函数
     saveError(msg) {
@@ -417,7 +509,8 @@ export default {
           "templateName": newItem.name,
           "htmlContent": newItem.content,
           "styleContent": newItem.styleString,
-          "id": newItem.index!==0?newItem.index:0       // 可以默认0
+          "id": newItem.index!==0?newItem.index:0,       // 可以默认0
+          "tag": newItem.tag  
       }
     },
 
@@ -430,7 +523,8 @@ export default {
           name: newItem.templateName,
           content: newItem.htmlContent,
           styleContent: newItem.styleString,
-          index: newItem.id  // 将后台的顺序存到index中
+          index: newItem.id,  // 将后台的顺序存到index中
+          tag: newItem.tag
       }
     },
 
@@ -720,7 +814,10 @@ export default {
             this.addSection([],{
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
-              'ctrlStyle': `${ctrlStyle};display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box`
+              'ctrlStyle': ''
+              // `${ctrlStyle}
+              // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
+              // `
               })           
             break
         case 'WIDGET':
@@ -761,9 +858,7 @@ export default {
     // 插入Section区域控件（文档段）
     addSection(newDiv,domSet={ctrlId:null, ctrlName:null,ctrlStyle:null}){           
       let div = document.createElement('div');     
-      div.innerHTML = `
-         <div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: null} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value"></p></div>
-        `
+      div.innerHTML = `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: null} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value"></p></div>`
       div = div.firstElementChild; 
      
       let sp;
@@ -819,6 +914,7 @@ export default {
     templatelist: function (newTemplatelist, oldTemplatelist) {
       console.log('存local')
       localStorage.setItem("template",JSON.stringify(newTemplatelist.map(this.font2back)))  // 这样就要改变读取时的问题
+      console.log(newTemplatelist)
     }
   },
 
@@ -857,9 +953,10 @@ export default {
         const templataData = res.data.data;
         
         // 后端数组转为前端数组
-        const templateArr = templataData.map(this.back2font)        
+        const templateArr = templataData.map(this.back2font)       
+
         // 修改templatelist的数据
-        this.templatelist = [ ...templateArr]
+        this.templatelist.push(...templateArr)  // 需要保留原来this.templatelist的引用
          }).catch((err)=>{
          console.log(err)
     })
@@ -904,6 +1001,17 @@ export default {
         self.toolBtns = self.arrBtns.slice(0, self.arrBtns.length-1)
       }
 
+      if(arguments[0].target.tagName==="P"){ 
+          console.log(arguments[0].target)
+          // 用replaceChild来将当前节点替换。
+          let content = arguments[0].target.innerHTML;
+          const newNode = self.iframeWin.document.createElement("div");
+          newNode.innHTML =  content
+          newNode.style="display:inline-block;width:100%;contenteditable=true;" // 保证原来p的整行且居中
+          
+          arguments[0].target.parentNode.replaceChild(newNode,arguments[0].target)
+        }
+
       // 选择空白处自动聚焦
       if(arguments[0].path[0].className==="krcd-tmp-content"){  
 
@@ -922,7 +1030,8 @@ export default {
                 range.collapse(false);//光标移至最后
                 range.select();
             }
-        }        
+        }  
+        
       const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
       const len = editDOM.length;
       
@@ -1002,6 +1111,9 @@ export default {
         arguments[0].path[0].focus();
       }
     });
+
+
+   
     
     
   },
