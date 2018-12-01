@@ -12,10 +12,10 @@
             class="el-menu-vertical"            
             :collapse="isCollapse"            
             v-for="(item,index) in toolBtns"
-            :key="index" 
+            :key="index"
             >        
           <!-- el-submenu是含子菜单的菜单项。submenu 子菜单 -->
-          <el-submenu :index="index+1+''">              
+          <el-submenu :index="index+1+''" :hide-timeout="0" :show-timeout="0">              
               <template slot="title">
                 <!-- template中可以用click, 为了点击的区域变大而用样式定位来实现-->
                 <div @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`)" style="position: absolute;left: 0;right: 0;">

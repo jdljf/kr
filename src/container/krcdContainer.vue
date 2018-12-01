@@ -201,7 +201,7 @@ export default {
               groupItems: [
                   { 
                     name:'文档段', 
-                    content: `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id="krcd-section-default" style="display:inline-block;background-color: #006ffc14;border-width: 1px;border-style: solid;border-color: #006ffc7d;width: 92%;height: 90%;box-sizing: border-box;" krcd-isloadasyncdata="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%2C%22desc%22%3A%22%22%7D"><p contenteditable="true" class="krcd-value"><br></p></div>`
+                    content: `<div class="krcd-ctrl krcd-section" contenteditable="true" krcd-type="section" id="krcd-section-5" style="" krcd-isloadasyncdata="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%2C%22desc%22%3A%22%22%7D"><p contenteditable="true" class="krcd-value"><br></p></div>`
                   },
                   
                 ]  // 组项目
@@ -814,7 +814,7 @@ export default {
             this.addSection([],{
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
-              'ctrlStyle': ''
+              'ctrlStyle': 'border-width:1px;border-style:solid;border-color:#006ffc7d;'
               // `${ctrlStyle}
               // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
               // `
@@ -858,7 +858,7 @@ export default {
     // 插入Section区域控件（文档段）
     addSection(newDiv,domSet={ctrlId:null, ctrlName:null,ctrlStyle:null}){           
       let div = document.createElement('div');     
-      div.innerHTML = `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: null} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value"></p></div>`
+      div.innerHTML = `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></p></div>`
       div = div.firstElementChild; 
      
       let sp;
@@ -1000,17 +1000,18 @@ export default {
         self.inSection = false        
         self.toolBtns = self.arrBtns.slice(0, self.arrBtns.length-1)
       }
-
-      if(arguments[0].target.tagName==="P"){ 
-          console.log(arguments[0].target)
-          // 用replaceChild来将当前节点替换。
-          let content = arguments[0].target.innerHTML;
-          const newNode = self.iframeWin.document.createElement("div");
-          newNode.innHTML =  content
-          newNode.style="display:inline-block;width:100%;contenteditable=true;" // 保证原来p的整行且居中
+      
+      // // 当点中的元素是p但又是插入section的时候
+      // if(arguments[0].target.tagName==="P"){ 
+      //     console.log(arguments[0].target)
+      //     // 用replaceChild来将当前节点替换。
+      //     let content = arguments[0].target.innerHTML;
+      //     const newNode = self.iframeWin.document.createElement("div");
+      //     newNode.innHTML =  content
+      //     newNode.style="display:inline-block;width:100%;contenteditable=true;" // 保证原来p的整行且居中
           
-          arguments[0].target.parentNode.replaceChild(newNode,arguments[0].target)
-        }
+      //     arguments[0].target.parentNode.replaceChild(newNode,arguments[0].target)
+      //   }
 
       // 选择空白处自动聚焦
       if(arguments[0].path[0].className==="krcd-tmp-content"){  
@@ -1045,6 +1046,11 @@ export default {
 
       }else if (arguments[1]!==null&&arguments[1]['TYPE_NAME']!=='section'){      // 选中文档段中控件时隐藏工具条
          self.onOff = {...this.off}
+      }else if(arguments[0].target.className==="krcd-ctrl krcd-section"&&arguments[1]['TYPE_NAME']!=='section'){
+        if(arguments[0].target.querySelectorAll('p').length === 1 && !arguments[0].target.querySelector('p').className){
+          arguments[0].target.removeChild(arguments[0].target.querySelector('p'))
+        }
+        po_Last_Div(arguments[0].target.querySelector('p'), arguments[0].target)
       }
 
       // 根据点击对象的坐标给组件传值来定位
@@ -1082,7 +1088,7 @@ export default {
           // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
           //       // toolbtnH + 
           //       'px',  
-          'top': arguments[0].clientY - scrTop > (arguments[0].screenY*2/3) ? editorY + arguments[0].clientY - scrTop - 55 - toolsH +  // 为了要输入的时候不要被影响到
+          'top': arguments[0].clientY - scrTop > (arguments[0].screenY*1/2) ? editorY + arguments[0].clientY - scrTop - 55 - toolsH +  // 为了要输入的时候不要被影响到
                 // toolbtnH + 
                 'px':toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
           //       // toolbtnH + 
