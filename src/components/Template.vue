@@ -16,6 +16,8 @@
         :highlight-current-row='true'
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
+        max-height="500px"
+        size="small"
         >       
             <!-- 这是多选 -->
             <el-table-column

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import index from '../view/index'
 import loginContainer from '../container/loginContainer'
+import home from '../container/home'
 
 Vue.use(Router)
 
@@ -21,6 +22,11 @@ export default new Router({
     path: '/home',
     name: 'home',
     component: index
+  },
+  {
+    path: '/home2',
+    name: 'home2',
+    component: home
   }
 ]
 })

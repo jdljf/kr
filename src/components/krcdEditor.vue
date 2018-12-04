@@ -165,10 +165,10 @@ export default {
         resettingPrint(opt, viewDom) {}, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
         resetedPrint(opt, viewDom) {}, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
         renderHeader(index, page) {
-          return `<div style="line-height:55px;background:red;border:1px solid yellow;">这里是header</div>`;
+          return `<div style="line-height:55px;background:#c23a3a78;border:1px solid yellow;">这里是header</div>`;
         }, //返回要渲染的页眉。默认从零开始
         renderFooter(index, page) {
-          return `<div style="line-height:35px;background:blue;border:1px solid green;"><center>第${index +
+          return `<div style="line-height:35px;background:#3a65c278;border:1px solid green;"><center>第${index +
             1}页<center></div>`;
         }, //返回要渲染的页脚。默认从零开始
         renderedHeader(index, count, page, header) {}, //渲染后

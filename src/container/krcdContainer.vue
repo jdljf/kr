@@ -60,8 +60,12 @@ export default {
             newTools.push(this.arrBtns[this.arrBtns.length-2])
             return newTools
             break
-          default:
+          case 'normal':
             return [...this.arrBtns.slice(0, this.arrBtns.length-2)]
+            break
+          default:
+            return []
+            // [...this.arrBtns.slice(0, this.arrBtns.length-2)]
             break
         }        
       }
@@ -737,7 +741,7 @@ export default {
             "strictverify": 0,//是否强制校验（不符合要求既不允许输入），默认为0不强制校验
             "verify": "",//验证输入是否符合要求，可自己定义表达式
             "required": 0,//是否必填
-            "desc":  desc,//控件描述值
+            "desc":  desc.length!==0?desc:"文本",//控件描述值
         })
         return newDiv
     },
@@ -753,7 +757,7 @@ export default {
             "strictverify":0,//强制校验
             "required":0,//是否必填
             "multi":0,//是否多选，默认0为单选，1为多选
-            "desc":desc,//描述值
+            "desc":desc.length!==0?desc:"单选",//描述值
             "bindingdata":[//默认绑定数据。
               {label:'男',value:'1'},
               {label:'女',value:'2'},
@@ -822,7 +826,7 @@ export default {
                 "mode":"EDITOR",//当前模式
                 "notdel":0,//不许删除
                 "strictverify":0,//强制校验
-                "desc":desc,//描述
+                "desc":desc.length!==0?desc:"多选",//描述
                 "bindingdata":[//绑定数据
                     {
                         "label":"感觉很好",
@@ -875,7 +879,7 @@ export default {
           "notdel":0,//是否可以删除
           "strictverify":0,//是否强制校验
           "required":0,//是否必填
-          "desc":desc,//描述
+          "desc": desc.length!==0?desc:"日历",//描述
           "defvalue":funs.timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
           "format":"{yyyy}-{MM}-{dd} {hh}:{mm}:{ss}",//格式化要求。必须以大括号包裹。
           "min":"",//最小日期
@@ -1028,9 +1032,8 @@ export default {
     // 插入Section区域控件（文档段）
     addSection(newDiv,domSet={ctrlId:null, ctrlName:null,ctrlStyle:null,selectedText:null}){           
       let div = document.createElement('div');     
-      div.innerHTML = `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></p></div>`
+      div.innerHTML = `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;">${domSet.selectedText}</p></div>`
       div = div.firstElementChild; 
-      div.innerHTML = domSet.selectedText;  // 将选中的html传进去
      
       let sp;
       if(newDiv){
@@ -1193,7 +1196,7 @@ export default {
       }else if(arguments[1]===null){
         self.inCtrl = false;    
         self.inSection = false;
-        self.saveAble = null;
+        self.saveAble = 'normal';
 
         // 回复原始状态的工具栏
 
@@ -1318,8 +1321,7 @@ export default {
     });
 
     this.krcd.addListener("ready", function() {
-      console.log("krcd 初始化完成！");
-      
+      console.log("krcd 初始化完成！");      
     });
 
    
