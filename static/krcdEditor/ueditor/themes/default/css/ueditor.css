@@ -1264,6 +1264,8 @@ div.edui-box {
 
 .edui-default .edui-dialog-foot {
     height: 40px;
+    padding-top: 10px;
+    box-sizing: border-box;
 }
 
 .edui-default .edui-dialog-buttons {
@@ -1294,6 +1296,7 @@ div.edui-box {
     padding: 0;
     margin: 0;
     vertical-align: top;
+    border-bottom:1px solid #ddd;
 }
 
 .edui-default .edui-dialog-modalmask {

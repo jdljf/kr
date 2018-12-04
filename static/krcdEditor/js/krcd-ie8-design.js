@@ -21086,6 +21086,13 @@
           w: 600,
           h: 480
         }), [{
+          className: "edui-pre-btn",
+          label: "保存",
+          onclick: function () {
+            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
+            thisIFR.document.getElementById("pre-btn").click();
+          }
+        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -21163,6 +21170,13 @@
           w: 600,
           h: 600
         }), [{
+          className: "edui-pre-btn",
+          label: "保存",
+          onclick: function () {
+            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
+            thisIFR.document.getElementById("pre-btn").click();
+          }
+        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -21237,9 +21251,17 @@
     plugin: function (e) {
       var t = this.name,
         n = a["default"].getDialog(e, t, "checkbox/index.html", "复选框", a["default"].getWidthHeight({
-          w: 600,
+          w: 900,
           h: 600
         }), [{
+          className: "edui-pre-btn",
+          label: "保存",
+          onclick: function () {
+            
+            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
+            thisIFR.document.getElementById("pre-btn").click();
+          }
+        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -21317,6 +21339,13 @@
           w: 600,
           h: 600
         }), [{
+          className: "edui-pre-btn",
+          label: "保存",
+          onclick: function () {
+            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
+            thisIFR.document.getElementById("pre-btn").click();
+          }
+        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {

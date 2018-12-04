@@ -116,6 +116,7 @@
         </tr>
 
       </table>
+      <button id="pre-btn" hidden>保存字典</button>
     </div>
     <style>
       .popover {
@@ -127,6 +128,9 @@
       }
     </style>
     <script>
+      $("#pre-btn").click(function(){
+        alert("111111")
+      });
       /*
       select运行时结构：
       <span class="krcd-ctrl" krcd-value='[{ "label": "男", "value": 1 }]' krcd-type="select" krcd-updatetime="2018-5-3 14:13:02" krcd-right="." id="abc-select" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22multi%22%3A0%2C%22desc%22%3A%22%E6%80%A7%E5%88%AB%22%2C%22bindingdata%22%3A%5B%5D%2C%22remotedata%22%3A%7B%22url%22%3A%22%2Fdata%2Fsex.json%22%2C%22method%22%3A%22get%22%2C%22headers%22%3A%7B%7D%2C%22data%22%3A%7B%7D%7D%7D"

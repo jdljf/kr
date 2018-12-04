@@ -18,4 +18,8 @@ html,body{padding: 0;margin: 0;border: 0;height:100%;width:100%;}
   width:100%;
   overflow: hidden;
 }
+.ctrls-leftWrap{
+  height:600px;
+  box-sizing: border-box;
+}
 </style>

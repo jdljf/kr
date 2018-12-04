@@ -19344,12 +19344,7 @@
         return this._backCtrl
       }, t.prototype.exportXML = function () {
         var e = {};
-        // console.log(this)
-        console.log(this.getControlById())
-        // console.log(_["default"])
-        // var ctrls = [];
         e.controls = [], _["default"].each(this.getControlById(), function (t) {
-          console.log(t.getCtrlElement())
           var thisParent2 = t.getCtrlElement().parentNode.parentNode,
               divText='',
               sectionHTML=[],//控件的描述
@@ -19388,7 +19383,7 @@
             id: t.getCtrlElement().getAttribute("id"),
             type: t.TYPE_NAME,
             parentID: (thisParent2.getAttribute("krcd-type") == 'section' || thisParent3.getAttribute("krcd-type") == 'section') ? (thisParent2.getAttribute("id") || thisParent3.getAttribute("id")) : '',
-            value: t.getValue(),
+            value: t.TYPE_NAME=="section"?t.getCtrlElement().outerHTML:t.getValue(),
             text:divText,
             ctrlsDesc:t.TYPE_NAME=="section"?sectionHTML:''
           });
