@@ -50,7 +50,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="类型"
+              label="权限分配"
               width="150">
               <template slot-scope="scope">
                 <el-popover trigger="hover" placement="top">
@@ -126,7 +126,8 @@ import funs from '../common/funs';
         list: Array,
         fun: Function,
         savetemple: Function,  
-        savewidget: Function,  
+        savewidget: Function, 
+        savectrl: Function,   
         ajaxtemple: Function,
         back2font: Function,
         getHtmlContent: Function,

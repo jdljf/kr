@@ -7,6 +7,8 @@ import Models from '../components/Template'
 import NavMenu from '../components/NavMenu'
 import {ajax} from '../common'
 
+import Clipboard from 'clipboard'; // 引入插件，用于获取选中文本来复制
+
 
 import funs from '../common/funs'
 
@@ -39,18 +41,50 @@ export default {
       tabContainer,
       NavMenu
   },
+  computed:{
+      // 这是控制工具栏开关的
+      onOff: function(){
+        let temp = this.onOffStatus
+        this.onOffStatus = !temp
+        return !temp 
+        // this.inCtrl===true?{'opacity':'0','width':'0','height':'0'}:{'opacity':'1'}   // 在控件中并且不是section内控件的都会隐藏工具        
+      },
+      // 工具栏展示状态
+      toolBtns: function(){
+        switch(this.saveAble){    
+          case 'ctrlAble':
+            return [...this.arrBtns.slice(this.arrBtns.length-1)]
+            break     
+          case 'sectionAble':
+            const newTools = [...this.arrBtns.slice(0,this.arrBtns.length-3)];  
+            newTools.push(this.arrBtns[this.arrBtns.length-2])
+            return newTools
+            break
+          default:
+            return [...this.arrBtns.slice(0, this.arrBtns.length-2)]
+            break
+        }        
+      }
+  },
   data() {
     return {  
       /* 初始化数据 */
+      selectedText: '', // 用来存储选中文字的数据
+      selectedHtml: '',
+      saveAble: null,  // 保存允许状态。 只允许ctrlAble和sectionAble
+      notInSectionCtrl: false,
+      inSectionCtrl: false, 
+      inCtrl: false,  // 聚焦点是否在非文档的控件中
       inSection: false,   // 聚焦点是否在文档段
       tarEl: null,   // 每次点击获取的DOM对象
-      tarType: null,  // 每次点击获取的TYPE_NAME
+      tarCtrl: null,  // 每次点击获取的控件
       self: this,    // 让this.self可以引用this
       iframeWin: null,  // 将iframe下的window对象
       krcd: null,   // krcd
-      on: {'opacity':'1'},
-      off: {'opacity':'0','width':'0','height':'0'},
-      onOff: {'opacity':'0','width':'0','height':'0'}, // 工具条显示隐藏开关      
+      onOffStatus: true,
+      // on: {'opacity':'1'},
+      // off: {'opacity':'0','width':'0','height':'0'},
+      // onOff: {'opacity':'0','width':'0','height':'0'}, // 工具条显示隐藏开关      
       toolStyle: {},    // 初始化工具条样式
 
       // 模版类型
@@ -94,10 +128,19 @@ export default {
       ],
 
       // 初始化工具条按钮数组
-      toolBtns: null,
+      // toolBtns: null,
       
       // 工具条所有可用按钮数组
       arrBtns: [{
+          name: '粘贴', 
+          type: 'PASTE',
+          iconCls: 'el-icon-refresh',
+          // 预留每个类型的字典
+          dic: [
+            
+          ]
+        },
+        {
           name: '文本', 
           type: 'TEXT',
           iconCls: 'el-icon-edit',
@@ -210,9 +253,15 @@ export default {
           ]
         },
         {
-          name: '存控件', 
+          name: '存文档段模版', 
           type: 'WIDGET',
           iconCls: 'el-icon-document',
+          dic:[]
+        },
+        {
+          name: '存元素模版', 
+          type: 'CTRLS',
+          iconCls: 'el-icon-news',
           dic:[]
         }],
 
@@ -231,6 +280,9 @@ export default {
       //                   JSON.parse(localStorage.getItem('template')):
       //                   []:
       //               [],
+      ,
+
+      ctrlist: []
       ,
 
       // 左方病人的共有列表格式（暂时就这样）
@@ -529,7 +581,7 @@ export default {
     },
 
       // 保存文档段为控件
-    saveSection2Widget(itemName="哈哈哈哈", callback=()=>{}){     
+    saveSection2Widget(itemName="文档段模版", callback=()=>{}){     
       let target;
       if(this.tarEl.className ==='krcd-value'&&this.tarEl.parentNode.className==='krcd-ctrl krcd-section'){
           target = this.tarEl.parentNode
@@ -553,6 +605,8 @@ export default {
         }
         return newArr.join('')
       })()  
+
+      
       
       // 创建需要存到模版的对象
       const newItem = {
@@ -574,7 +628,57 @@ export default {
       // this.saveSuccess('组件');
       
       return callback() 
-    },  
+    }, 
+    
+      // 保存元素模版
+    saveCtrl2Widget(itemName="元素模版", callback=()=>{}){     
+      let target;
+      if(this.tarEl.className ==='krcd-value'&&this.tarEl.parentNode.className==='krcd-ctrl'){
+          target = this.tarEl.parentNode
+      }else if(this.tarEl.className==='krcd-ctrl'){
+          target = this.tarEl
+      }     
+      const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; 
+
+      // 克隆dom内容，移动到临时创建的div
+      const newDOM = innerDoc.createElement('div');  
+      const cloneTaget = target.cloneNode(true);
+      newDOM.appendChild(cloneTaget); 
+      let htmlContent = newDOM.innerHTML; 
+
+      // 获取style标签中样式函数
+      const headStyleString = (()=>{
+        const arr = innerDoc.querySelectorAll(`style[stylename]`); 
+        const newArr = []
+        for(let i=0, len=arr.length;i<len;i++){
+          newArr.push(this.strTrim(arr[i].innerHTML))
+        }
+        return newArr.join('')
+      })()  
+
+      
+      
+      // 创建需要存到模版的对象
+      const newItem = {
+          name: target.id,
+          id: target.id,
+          styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
+          content: htmlContent,
+          scope: '全院',
+          discribe: '描述', // 描述
+          date: funs.nowtime(),  //  存起来保存时间
+      }
+      
+      // 将模版push到widgetlist数组中
+      this.ctrlist.push(newItem);
+
+      // 保存到localStorage
+      // localStorage.setItem('widget',JSON.stringify(this.widgetlist))
+
+      // this.saveSuccess('组件');
+      
+      return callback() 
+    }, 
     
     // // 保存真整页内容为模版
     // saveHtmlContent(itemName="哈哈哈哈", callback=()=>{}){
@@ -623,7 +727,7 @@ export default {
     /**
      * 创建控件text
      */
-    createText(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
+    createText(domSet={ctrlId:null,ctrlStyle:null}, defOpt, desc){
         let div = document.createElement('span');
         div.innerHTML = `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true" ></span></span>`;
         div = div.firstElementChild; 
@@ -633,13 +737,13 @@ export default {
             "strictverify": 0,//是否强制校验（不符合要求既不允许输入），默认为0不强制校验
             "verify": "",//验证输入是否符合要求，可自己定义表达式
             "required": 0,//是否必填
-            "desc": "文本输入",//控件描述值
+            "desc":  desc,//控件描述值
         })
         return newDiv
     },
 
     // 增加select
-    createSelect(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
+    createSelect(domSet={ctrlId:null,ctrlStyle:null}, defOpt, desc){
         let div = document.createElement('span');
         div.innerHTML = `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-select'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null}><span contenteditable="true" class="krcd-value"></span></span>`;  // 这里有个bug，内部标签不能用p要用span
         div = div.firstElementChild; 
@@ -649,7 +753,7 @@ export default {
             "strictverify":0,//强制校验
             "required":0,//是否必填
             "multi":0,//是否多选，默认0为单选，1为多选
-            "desc":"性别",//描述值
+            "desc":desc,//描述值
             "bindingdata":[//默认绑定数据。
               {label:'男',value:'1'},
               {label:'女',value:'2'},
@@ -675,7 +779,7 @@ export default {
       return newDiv
     },
     // 增加点选
-    createRadio(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
+    createRadio(domSet={ctrlId:null,ctrlStyle:null}, defOpt, desc){
       let div = document.createElement('span');   
       div.innerHTML = `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="radio" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
       div = div.firstElementChild;
@@ -683,7 +787,7 @@ export default {
           "mode":"EDITOR",//当前模式
           "notdel":0,//不许删除
           "strictverify":0,//强制校验
-          "desc":"",//描述
+          "desc":desc,//描述
           "required": 0, // 必须的
           "strictverify": 0,  // 严格模式
           "multi": 1,          
@@ -710,7 +814,7 @@ export default {
       return newDiv
     },
 
-    createCheckbox(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
+    createCheckbox(domSet={ctrlId:null,ctrlStyle:null}, defOpt,desc){
       let div = document.createElement('span');  
       div.innerHTML = `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-checkbox'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
       div = div.firstElementChild;
@@ -718,7 +822,7 @@ export default {
                 "mode":"EDITOR",//当前模式
                 "notdel":0,//不许删除
                 "strictverify":0,//强制校验
-                "desc":'多选框',//描述
+                "desc":desc,//描述
                 "bindingdata":[//绑定数据
                     {
                         "label":"感觉很好",
@@ -760,7 +864,7 @@ export default {
      * 
      * params2{object}: defOpt  (不传入即按照默认值)
      */
-    createDate(domSet={ctrlId:null,ctrlStyle:null}, defOpt){
+    createDate(domSet={ctrlId:null,ctrlStyle:null}, defOpt,desc){
       let div = document.createElement('span');      
       div.innerHTML = `<span class="krcd-ctrl" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-date'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-type="date"><span class="krcd-value" contenteditable="true" krcd-left="[" krcd-right="]"></span></span>`     
       div = div.firstElementChild;   
@@ -771,7 +875,7 @@ export default {
           "notdel":0,//是否可以删除
           "strictverify":0,//是否强制校验
           "required":0,//是否必填
-          "desc":"日期控件",//描述
+          "desc":desc,//描述
           "defvalue":funs.timestampToTime(Math.round(new Date().getTime()/1000)),//默认值
           "format":"{yyyy}-{MM}-{dd} {hh}:{mm}:{ss}",//格式化要求。必须以大括号包裹。
           "min":"",//最小日期
@@ -782,10 +886,64 @@ export default {
     },
 
     /**
+     * 获取选中字体的方法来调出工具栏并用函数插进去对应控件
+     * 获取text和html
+     */
+    selectText(iframeObj){
+          if(iframeObj.document.selection){
+            
+            let selectionObj = iframeObj.document.selection;
+　　　　　　　let rangeObj = selectionObj.createRange();
+　　　　　　　let selectedText = rangeObj.text;
+　　　　　　　let selectedHtml = rangeObj.htmlText;
+
+            //ie浏览器
+            return {
+              selectedText,
+              selectedHtml
+            }
+
+          }else if(iframeObj.getSelection){    
+            //标准浏览器
+
+            let selectionObj = iframeObj.getSelection();
+　　　　　　　let selectedText = selectionObj.toString();
+
+　　　　　　　let rangeObj = selectionObj.getRangeAt(0);
+　　　　　　　let docFragment = rangeObj.cloneContents();
+　　　　　　  let tempDiv = document.createElement("div");
+　　　　　　　tempDiv.appendChild(docFragment);
+　　　　　　　let selectedHtml = tempDiv.innerHTML;    
+
+            return {
+              selectedText,
+              selectedHtml
+            }
+          }	 
+    },
+    
+
+    /**
      * 专门做插入控件之用
      * params1{object}: newDiv（基本来自createDate）
      */
-    addCtrl(type, ctrlName, ctrlId='', ctrlStyle='', Opt=null){          
+    addCtrl(type, ctrlName, ctrlId='', ctrlStyle='', Opt=null){      
+      
+      // 获取选中的文字
+      function selectText(){
+        if(document.Selection){       
+          //ie浏览器
+          return document.selection.createRange().text;     	 
+        }else{    
+          //标准浏览器
+          return window.getSelection().toString();	 
+        }	 
+      }
+      
+      let selResult = selectText();
+      if(selResult.length!==0){
+        alert(selResult)
+      }
      
       let domSet = {
         'ctrlName': ctrlName,
@@ -795,26 +953,31 @@ export default {
       // 判断
       let newDiv;  
       switch(type){
+        case "PASTE":            
+            console.log(this.selectedHtml)
+            this.krcd.execCommand('inserthtml', this.selectedHtml);
+            break
         case "DATE":
-            newDiv=this.createDate(domSet,Opt)
+            newDiv=this.createDate(domSet,Opt, this.selectedHtml)
             break
         case "SELECT":
-            newDiv=this.createSelect(domSet,Opt)
+            newDiv=this.createSelect(domSet,Opt, this.selectedText)
             break
         case "RADIO":
-            newDiv=this.createRadio(domSet,Opt)
+            newDiv=this.createRadio(domSet,Opt, this.selectedText)
             break
         case "CHECKBOX":
-            newDiv=this.createCheckbox(domSet,Opt)
+            newDiv=this.createCheckbox(domSet,Opt, this.selectedText)
             break
         case "TEXT":
-            newDiv=this.createText(domSet,Opt)
+            newDiv=this.createText(domSet, Opt, this.selectedText)
             break
         case "SECTION":
             this.addSection([],{
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
-              'ctrlStyle': 'border-width:1px;border-style:solid;border-color:#006ffc7d;'
+              'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
+              'selectedText': this.selectedHtml
               // `${ctrlStyle}
               // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
               // `
@@ -826,7 +989,14 @@ export default {
             }else{
               alert('请点击文档段')
             }            
-            break            
+            break   
+        case 'CTRLS':
+            if(this.inCtrl===true){
+              this.saveCtrl2Widget()
+            }else{
+              alert('请点击元素')
+            }     
+            break        
         default:
             alert('请选择正确的type')
             return
@@ -844,7 +1014,7 @@ export default {
       headerTag.appendChild(styleDOM);
 
       
-      if(type !== "SECTION"&&type !== "WIDGET"){
+      if(type !== "SECTION"&&type !== "WIDGET"&&type !== "CTRLS"&&type !== "PASTE"){
         this.krcd.insertControl(
           newDiv.getCtrlElement(),  //  获取会对应的Element
           newDiv.getOpt()     //  获取会对应的opt
@@ -852,14 +1022,15 @@ export default {
       }
       
       // 插入后隐藏工具条
-      this.onOff = {...this.off}
+      // this.onOff = {...this.off}
     },
 
     // 插入Section区域控件（文档段）
-    addSection(newDiv,domSet={ctrlId:null, ctrlName:null,ctrlStyle:null}){           
+    addSection(newDiv,domSet={ctrlId:null, ctrlName:null,ctrlStyle:null,selectedText:null}){           
       let div = document.createElement('div');     
       div.innerHTML = `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></p></div>`
       div = div.firstElementChild; 
+      div.innerHTML = domSet.selectedText;  // 将选中的html传进去
      
       let sp;
       if(newDiv){
@@ -915,32 +1086,28 @@ export default {
       console.log('存local')
       localStorage.setItem("template",JSON.stringify(newTemplatelist.map(this.font2back)))  // 这样就要改变读取时的问题
       console.log(newTemplatelist)
+    },
+    widgetlist: function (newWidgetlist, oldWidgetlist) {
+      console.log('存local')
+      localStorage.setItem("template",JSON.stringify(newWidgetlist.map(this.font2back)))  // 这样就要改变读取时的问题
+      console.log(newWidgetlist)
+    },
+    ctrlist: function (newCtrlist, oldCtrlist) {
+      console.log('存local')
+      localStorage.setItem("template",JSON.stringify(newCtrlist.map(this.font2back)))  // 这样就要改变读取时的问题
+      console.log(newCtrlist)
     }
   },
 
   mounted() {   
     console.log(funs)
     
-    let self = this;
+    const self = this;
 
-    // // 为什么不能这样？！
-    // let content = {
-    //       "deptCode": "",
-    //       "creatorUserId": 0,
-    //        "id": 0
-    //    }
-    
-    // this.ajaxTemplate('GetList', content ,()=>{
-    //     console.log('成功了！',typeof res.data.data) 
 
-    //     const templataData = res.data.data;
-        
-    //     // 后端数组转为前端数组
-    //     const templateArr = templataData.map(this.back2font)        
-    //     // 修改templatelist的数据
-    //     this.templatelist = [ ...templateArr]
-    //      });
-
+    /**
+     * 请求模版数据
+     */
     ajax.post(
       '/DocumentTemplate/GetList',
        {
@@ -960,45 +1127,77 @@ export default {
          }).catch((err)=>{
          console.log(err)
     })
+
+    // // 为什么不能这样？！
+    // const content = {
+    //       "deptCode": "",
+    //       "creatorUserId": 0,
+    //        "id": 0
+    //    }
+    
+    // this.ajaxTemplate('GetList', content ,()=>{
+    //     console.log('成功了！',typeof res.data.data) 
+
+    //     const templataData = res.data.data;
+        
+    //     // 后端数组转为前端数组
+    //     const templateArr = templataData.map(this.back2font)  
+
+    //     // 修改templatelist的数据
+    //     this.templatelist.push(...templateArr)
+    // });
+
+    
+    /**
+     * 点击编辑区获取聚焦的控制
+     */
     
     // 点击聚焦
     this.krcd.addListener('click', function(event) {
 
-       console.log(arguments);
+      console.log(arguments);
 
       // 获取ifame中的window
-      self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow
-
-      let e = event || window.event;    
-      
+      self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+      const e = event || window.event;          
       self.tarEl = arguments[0].target;  // 获取点中的对象
+      self.tarCtrl = arguments[1];  //  控件类型名           self.tarCtrl.TYPE_NAME对应的是就是组件
       
-      self.onOff = {...this.on}   // 点击让工具条显示
-
       // 判断点击的控件是否在section中，并控制工具条呈现的功能
       if(arguments[1]!==null){  
-        if(arguments[1]['TYPE_NAME']==='section'){  
-          self.inSection = true;
-          // 切割成这样，不显示插入文档段
-          // console.log('找到有section')
-          self.toolBtns = self.arrBtns.slice(0,self.arrBtns.length-2);  
-          self.toolBtns.push(self.arrBtns[self.arrBtns.length-1]); 
-        }else{       
+
+        // inSection或inCtrl 的情况
+        if(arguments[1]['TYPE_NAME']!=='section'){  
+
+          // 情况1: inCtrl
+          self.inCtrl = true;     // 为了显示与否服务
+          self.inSection = false;  // 是否在section中
+          
+          self.saveAble = 'ctrlAble';  // 调整工具栏用的
+
+          // 情况2: inSectionCtrl,在情况1下的一种特殊情况
           for(let i=0, arr = arguments[0].path, len = arr.length;i<len;i++){
               if(arr[i].className==="krcd-ctrl krcd-section"){   
-                console.log('找到有section')
-                self.inSection = true
-                self.toolBtns = self.arrBtns.slice(0,self.arrBtns.length-2);  
-                self.toolBtns.push(self.arrBtns[self.arrBtns.length-1]);   
+                self.saveAble = 'sectionAble';
                 return  // 跳出循环
               }                                
-          }
-          self.inSection = false
-          self.toolBtns = self.arrBtns.slice(0, self.arrBtns.length-1)   
+          }       
+
+        }else{  
+          self.inCtrl = false;  // 为了显示与否服务
+          self.inSection = true;   // 是否在section中
+
+          self.saveAble = 'sectionAble';   // 调整工具栏用的
+         
         }            
       }else if(arguments[1]===null){
-        self.inSection = false        
-        self.toolBtns = self.arrBtns.slice(0, self.arrBtns.length-1)
+        self.inCtrl = false;    
+        self.inSection = false;
+        self.saveAble = null;
+
+        // 回复原始状态的工具栏
+
+        // self.toolBtns = self.arrBtns.slice(0, self.arrBtns.length-1)
       }
       
       // // 当点中的元素是p但又是插入section的时候
@@ -1033,26 +1232,30 @@ export default {
             }
         }  
         
-      const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
-      const len = editDOM.length;
-      
-      if(editDOM.querySelectorAll('p').length === 1 && !editDOM.querySelector('p').className){
-          editDOM.removeChild(editDOM.querySelector('p'))
-      }
+        const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
+        const len = editDOM.length;
         
-      // 聚焦到最后
-      po_Last_Div(editDOM, self.iframeWin)
-        
-
-      }else if (arguments[1]!==null&&arguments[1]['TYPE_NAME']!=='section'){      // 选中文档段中控件时隐藏工具条
-         self.onOff = {...this.off}
-      }else if(arguments[0].target.className==="krcd-ctrl krcd-section"&&arguments[1]['TYPE_NAME']!=='section'){
-        if(arguments[0].target.querySelectorAll('p').length === 1 && !arguments[0].target.querySelector('p').className){
-          arguments[0].target.removeChild(arguments[0].target.querySelector('p'))
+        // 初始化的时候只有一个p
+        if(editDOM.querySelectorAll('p').length === 1 && !editDOM.querySelector('p').className){
+            editDOM.removeChild(editDOM.querySelector('p'))
         }
-        po_Last_Div(arguments[0].target.querySelector('p'), arguments[0].target)
+          
+        // 聚焦到最后
+        po_Last_Div(editDOM, self.iframeWin)
+        
+
+      // }else if (arguments[1]!==null&&arguments[1]['TYPE_NAME']!=='section'){      // 选中文档段中控件时隐藏工具条
+      //   //  self.onOff = {...this.off}
+      // }else if(arguments[0].target.className==="krcd-ctrl krcd-section"&&arguments[1]['TYPE_NAME']!=='section'){
+      //   if(arguments[0].target.querySelectorAll('p').length === 1 && !arguments[0].target.querySelector('p').className){
+      //     arguments[0].target.removeChild(arguments[0].target.querySelector('p'))
+      //   }
+      //   po_Last_Div(arguments[0].target.querySelector('p'), arguments[0].target)
       }
 
+      /**
+       * 这是为工具栏定位用
+       */
       // 根据点击对象的坐标给组件传值来定位
       const getPositon = ()=>{
         let editorX = document.querySelector('.krcd-editor-inner').offsetLeft
@@ -1063,13 +1266,6 @@ export default {
         let toolbtnW = document.querySelector('.tools-btn').offsetWidth
         let toolbtnH = document.querySelector('.tools-btn').offsetHeightd
 
-        console.log(document.body.scrollTop)
-
-        console.log(scrTop)
-        console.log(editorY)
-
-        // alert(toolbtnH)
-
         // 设定工具条的样式
         const sources = {
           "flex": 1,
@@ -1077,25 +1273,20 @@ export default {
           "align-items": "center",
           "flex-direction": "column",  // 改变column再扩展字典
           "line-height": "30px",
-          "background-color": "white",        
-          // "padding": "4px",
+          "background-color": "white",   
           'position': 'absolute',
-          // 'width': '72px',
-          // 'height': 56*6 + 'px',
           'left': editorX + arguments[0].clientX + 
                 toolbtnW + 144 +
                 'px',
           // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
           //       // toolbtnH + 
           //       'px',  
-          'top': arguments[0].clientY - scrTop > (arguments[0].screenY*1/2) ? editorY + arguments[0].clientY - scrTop - 55 - toolsH +  // 为了要输入的时候不要被影响到
+          'top': arguments[0].clientY - scrTop > (arguments[0].screenY*1/2) ? editorY + arguments[0].clientY - scrTop - 55*2 - toolsH +  // 为了要输入的时候不要被影响到
                 // toolbtnH + 
                 'px':toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
           //       // toolbtnH + 
                 'px'                
-                ,   
-          // 'border':"1px solid #d3d3d3",
-          // 'height':'30px',
+                ,             
           "margin-top": "-30px",
           'z-index': '1005',
           'box-shadow': '1px 1px 4px #00000033'
@@ -1116,8 +1307,20 @@ export default {
         arguments[0].path[0].className = 'krcd-value';
         arguments[0].path[0].focus();
       }
+      
+      // 输出点击时获取的数据
+      let selText = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedText;
+      let selHtml = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedHtml;
+      // 防止被无聊的点击覆盖了
+      self.selectedText = selText.length!==0?selHtml:self.selectedText;   
+      self.selectedHtml = selHtml.length!==0?selHtml:self.selectedHtml;
+
     });
 
+    this.krcd.addListener("ready", function() {
+      console.log("krcd 初始化完成！");
+      
+    });
 
    
     

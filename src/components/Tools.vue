@@ -7,6 +7,7 @@
           :index="index"
           :style="item.type==='WIDGET'?widgetBtnStyle:btnStyle" 
           @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`)"
+          class="tools-btn"
           readonly="readonly"
        >{{item.name}}</span>
   </span>
@@ -43,13 +44,9 @@ export default {
   mounted(){
     
   },
-  methods: {
-    // 赋予到自身的函数中
-    // addCtrl(type){     
-    //   console.log(this.add) ;
-    //   ()=>this.props.addCtrl(type)
-    // }
-  }   
+  methods:{  
+
+  }, 
 };
 </script>
 

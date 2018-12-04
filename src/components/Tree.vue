@@ -8,9 +8,8 @@
             class='input-box'
             >
         </el-input>
-
-        <el-tree
-            class="tree"
+        <div class="tree">
+          <el-tree            
             :props="treeProps"
             :load="loadNode"
             lazy
@@ -22,7 +21,10 @@
             default-expand-all
             ref='list'
             >
-        </el-tree>    
+          </el-tree>    
+        </div>
+
+        
     </div>    
 </template>
 
@@ -148,21 +150,24 @@
 <style scoped>
     .tree-box{
         width: 100%;
-        height: 100%;
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        flex-shrink: 0;
     }
     .tree{
         width: 100%;
+        flex-grow:1;
+        overflow: auto;
         padding-right: 20px;
         box-sizing: border-box;
+        padding-bottom: 8px;
     }
     .input-box{
         box-sizing: border-box;
         width: 100%;
         padding: 8px;
+        flex-shrink: 0
     }
     /* 自定义工具样式 */
     .custom-tree-node {

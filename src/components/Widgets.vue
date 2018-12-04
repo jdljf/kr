@@ -1,5 +1,6 @@
 <template>  
-  <div>
+  <div style="height:100%;display: flex;
+    flex-direction: column;">
     <div class='title'>列表</div>
     <slot></slot>
     <ul v-if="type!=='pat-list'" class='content'>
