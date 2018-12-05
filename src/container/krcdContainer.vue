@@ -7,7 +7,6 @@ import Models from '../components/Template'
 import NavMenu from '../components/NavMenu'
 import {ajax} from '../common'
 
-import Clipboard from 'clipboard'; // 引入插件，用于获取选中文本来复制
 
 
 import funs from '../common/funs'
