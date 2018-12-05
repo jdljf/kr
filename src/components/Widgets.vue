@@ -1,7 +1,7 @@
 <template>  
   <div style="height:100%;display: flex;
     flex-direction: column;">
-    <div class='title'>列表</div>
+    <!-- <div class='title'>列表</div> -->
     <slot></slot>
     <ul v-if="type!=='pat-list'" class='content'>
       <li class='content-item'  v-for="(item,index) in list" :key="index" :index="index" content="item.content?item.content:''" @click="todo(fun,item.content,item.styleString)">

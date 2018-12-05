@@ -1,11 +1,11 @@
 <template>  
-    <div class="krcd-root height-ful">
-      
-    <div class="widget-list">
-      <!-- <button @click="editWin">sdfdsfds</button> -->
-      <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>
-      
-    </div>
+  <el-container style="height: 100%; border: 1px solid #eee;" class="krcd-root height-ful">
+    <el-aside>
+      <el-header style="background-color:#409EFF;color:#F2F6FC;height:32px;line-height:32px;">列表</el-header>
+      <div class="widget-list">
+        <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>        
+      </div>
+    </el-aside>
     <div class="tools" :style="onOff">  
       <NavMenu 
         class="tools-btn" 
@@ -24,7 +24,7 @@
       <!-- <Models :list="widgetlist" :fun="insert"/> -->
       <tabContainer :ctrlist="ctrlist" :ctrlfun="insert" :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
     </div>    
-  </div>
+  </el-container>
 </template>
 <script>
 import "../../static/krcdEditor/krcd.config.js?t=88";

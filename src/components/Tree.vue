@@ -31,6 +31,7 @@
 <script>
   let id = 0;
   export default {
+    name: 'Tree',
     data() {
       // props属性绑定的数据就是设定树形节点标签的。label是当前节点标签标题，而children就是子节点，一直嵌套就能一直延伸树状图
       return { 
