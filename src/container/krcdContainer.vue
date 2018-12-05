@@ -61,7 +61,7 @@ export default {
             return newTools
             break
           case 'normal':
-            return [...this.arrBtns.slice(0, this.arrBtns.length-2)]
+            return [...this.arrBtns.slice(1, this.arrBtns.length-2)]
             break
           default:
             return []
@@ -85,10 +85,7 @@ export default {
       self: this,    // 让this.self可以引用this
       iframeWin: null,  // 将iframe下的window对象
       krcd: null,   // krcd
-      onOffStatus: true,
-      // on: {'opacity':'1'},
-      // off: {'opacity':'0','width':'0','height':'0'},
-      // onOff: {'opacity':'0','width':'0','height':'0'}, // 工具条显示隐藏开关      
+      onOffStatus: true,   
       toolStyle: {},    // 初始化工具条样式
 
       // 模版类型
@@ -1316,7 +1313,7 @@ export default {
       let selHtml = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedHtml;
       // 防止被无聊的点击覆盖了
       self.selectedText = selText.length!==0?selHtml:self.selectedText;   
-      self.selectedHtml = selHtml.length!==0?selHtml:self.selectedHtml;
+      self.selectedHtml = selHtml.length!==0&&selHtml.indexOf('krcd-ctrl krcd-section')===-1?selHtml:self.selectedHtml;
 
     });
 

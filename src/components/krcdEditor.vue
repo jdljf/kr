@@ -1,10 +1,7 @@
 <template>  
   <el-container style="height: 100%; border: 1px solid #eee;" class="krcd-root height-ful">
-    <el-aside>
-      <el-header style="background-color:#409EFF;color:#F2F6FC;height:32px;line-height:32px;">列表</el-header>
-      <div class="widget-list">
-        <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>        
-      </div>
+    <el-aside style="width:auto">      
+      <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>    
     </el-aside>
     <div class="tools" :style="onOff">  
       <NavMenu 
@@ -17,13 +14,24 @@
         />
       <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
     </div>  
-    <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
-    </div>
-    <div class="widget-list">
-      <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
-      <!-- <Models :list="widgetlist" :fun="insert"/> -->
-      <tabContainer :ctrlist="ctrlist" :ctrlfun="insert" :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
-    </div>    
+    <el-main style="overflow: hidden;">
+      <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
+      </div>
+    </el-main>
+    <el-aside style="width:auto;">
+      <div class="widget-list">
+        <el-header style="height:auto;padding:12px;border: 1px solid #dcdfe6;border-bottom:none;">
+          <div class="nav-tools">
+            <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
+            <el-button type="success" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
+            <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>
+          </div>  
+        </el-header>    
+        <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
+        <!-- <Models :list="widgetlist" :fun="insert"/> -->
+        <tabContainer :ctrlist="ctrlist" :ctrlfun="insert" :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
+      </div>
+    </el-aside>    
   </el-container>
 </template>
 <script>
@@ -1202,6 +1210,18 @@ export default {
 .height-ful{
   height: 100%;
 }
+
+.nav-tools{
+  display: flex;
+  flex-direction: flex-start;
+  align-items: center
+}
+
+.nav-tools>*{
+  padding:8px;
+}
+
+
 
 </style>
 
