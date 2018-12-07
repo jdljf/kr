@@ -40,7 +40,7 @@
                   :key="(index+1)+'-'+(groupIdx+1)"                 
                   >                   
                     <el-card shadow="hover"  style="margin-bottom:12px;" class="card-style">                      
-                      <el-menu-item :index="(index+1)+'-'+(groupIdx+1)" @click="addDic(groupItem.content)" v-html="`<span style='color:#999'>${groupItem.name} | </span>`+groupItem.content" ></el-menu-item>
+                      <el-menu-item :index="(index+1)+'-'+(groupIdx+1)" @click="addDic(item,index)" v-html="`<span style='color:#999;padding-right:8px;'>${groupItem.name} | </span>`+groupItem.content" ></el-menu-item>
                     </el-card>
                   </el-col>                  
                 </el-row>
@@ -121,10 +121,12 @@
         console.log("大佬")
       },
       // 点击插入对应字典
-      addDic(item){
+      addDic(item,index){
         // 调用对应的插入方法
-        this.self.krcd.execCommand('inserthtml',item)
-        this.self.onOff = {...this.self.off};
+        // this.self.krcd.execCommand('inserthtml',item)
+        // this.self.onOff = {...this.self.off};
+        // console.log(this.self.createText({ctrlId:null,ctrlStyle:null}, null, "1231232").newDiv.getCtrlElement())
+        this.self.addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`,'',null,true)
       },
       
     }

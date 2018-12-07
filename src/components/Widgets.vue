@@ -1,7 +1,14 @@
 <template>  
   <div style="height:100%;display: flex;
     flex-direction: column;">
-    <el-header style="background-color:#409EFF;color:#F2F6FC;height:32px;line-height:32px;">列表</el-header>
+    <el-header style="height: 30px;
+      box-sizing: border-box;
+      background-color: #409EFF;
+      color: #F2F6FC;
+      line-height: 30px;
+      font-size: 13px;
+      text-align: left;
+      padding: 0px 12px;"><i class="el-icon-tickets"></i>&nbsp;&nbsp;列表</el-header>
     <slot></slot>
       <ul v-if="type!=='pat-list'" class='content'>
         <li class='content-item'  v-for="(item,index) in list" :key="index" :index="index" content="item.content?item.content:''" @click="todo(fun,item.content,item.styleString)">

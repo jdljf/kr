@@ -1,9 +1,9 @@
 <template>  
-  <el-container style="height: 100%; border: 1px solid #eee;" class="krcd-root height-ful">
-    <el-aside style="width:auto">      
+  <el-container style="height: 100%;" class="krcd-root height-ful">
+    <el-aside style="width:auto;border:none;border-right: 1px solid rgb(220, 223, 230);">      
       <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>    
     </el-aside>
-    <div class="tools" :style="onOff">  
+    <div class="tools">  
       <NavMenu 
         class="tools-btn" 
         :addCtrl="addCtrl" 
@@ -19,12 +19,23 @@
       </div>
     </el-main>
     <el-aside style="width:auto;">
+      <el-header style="height: 30px;
+        box-sizing: border-box;
+        background-color: #409EFF;
+        color: #F2F6FC;
+        line-height: 30px;
+        font-size: 13px;
+        text-align: left;
+        padding: 0px 12px;"></el-header>
       <div class="widget-list">
-        <el-header style="height:auto;padding:12px;border: 1px solid #dcdfe6;border-bottom:none;">
+        <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;">
           <div class="nav-tools">
             <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
-            <el-button type="success" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
-            <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>
+            <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
+            <el-button v-show="this.saveAble==='ctrlAble'" type="success" size="mini" plain @click="commitShow=true">保存动态模版</el-button>
+            <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>            
+            <!-- 这里是保存模版用的隐藏按钮 -->
+            <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData"/>     
           </div>  
         </el-header>    
         <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
@@ -1177,11 +1188,7 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.widget-list{
-  flex-basis: 150px;
-  flex-shrink: 0;
-  box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px, rgb(204, 204, 204) 0px 0px 3px 1px;
-}
+
 .editor-box{
   display: flex;
   flex-direction: column;
@@ -1201,7 +1208,7 @@ export default {
 .widget-list{
   flex-basis: 150px;
   flex-shrink: 0;
-  box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px, rgb(204, 204, 204) 0px 0px 3px 1px;
+  /* box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px, rgb(204, 204, 204) 0px 0px 3px 1px; */
 }
 .editor-box{
   display: flex;

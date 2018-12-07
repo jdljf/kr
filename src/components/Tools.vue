@@ -6,7 +6,7 @@
           :key="index"         
           :index="index"
           :style="item.type==='WIDGET'?widgetBtnStyle:btnStyle" 
-          @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`)"
+          @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`,'',null,false)"
           class="tools-btn"
           readonly="readonly"
        >{{item.name}}</span>

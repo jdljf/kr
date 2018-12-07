@@ -5,12 +5,10 @@ import krcdEditor from '../components/krcdEditor'
 import Tree from '../components/Tree'
 import Models from '../components/Template'
 import NavMenu from '../components/NavMenu'
+import CommitTable from '../components/CommitTable'
 import {ajax} from '../common'
 
-
-
 import funs from '../common/funs'
-
 import tabContainer from './tabContainer'
 
 export default {
@@ -38,21 +36,23 @@ export default {
       Tree,
       Models,
       tabContainer,
-      NavMenu
+      NavMenu,
+      CommitTable
   },
   computed:{
-      // 这是控制工具栏开关的
-      onOff: function(){
-        let temp = this.onOffStatus
-        this.onOffStatus = !temp
-        return !temp 
-        // this.inCtrl===true?{'opacity':'0','width':'0','height':'0'}:{'opacity':'1'}   // 在控件中并且不是section内控件的都会隐藏工具        
-      },
+      // // 这是控制工具栏开关的
+      // onOff: function(){
+      //   let temp = this.onOffStatus;
+      //   this.onOffStatus = !temp
+      //   return !temp 
+      //   // this.inCtrl===true?{'opacity':'0','width':'0','height':'0'}:{'opacity':'1'}   // 在控件中并且不是section内控件的都会隐藏工具        
+      // },
       // 工具栏展示状态
       toolBtns: function(){
         switch(this.saveAble){    
           case 'ctrlAble':
-            return [...this.arrBtns.slice(this.arrBtns.length-1)]
+            return []
+            // [...this.arrBtns.slice(this.arrBtns.length-1)]
             break     
           case 'sectionAble':
             const newTools = [...this.arrBtns.slice(0,this.arrBtns.length-3)];  
@@ -67,11 +67,24 @@ export default {
             // [...this.arrBtns.slice(0, this.arrBtns.length-2)]
             break
         }        
+      },
+      arrBtns: function(){
+        console.log(this.selectedHtml)
+        return this.arrBtnsFun(this)
       }
   },
   data() {
     return {  
       /* 初始化数据 */
+      commitShow: false, // 给初始化弹窗保存动态模版用的
+      saveDynamicData: null,
+
+      // 返回提交数据的函数
+      returnCommitData: (data)=>{
+          this.saveDynamicData = {...data};
+          this.saveCtrl2Widget(this.saveDynamicData)
+      },
+
       selectedText: '', // 用来存储选中文字的数据
       selectedHtml: '',
       saveAble: null,  // 保存允许状态。 只允许ctrlAble和sectionAble
@@ -131,7 +144,9 @@ export default {
       // toolBtns: null,
       
       // 工具条所有可用按钮数组
-      arrBtns: [{
+      arrBtnsFun: (self)=>{return [
+        // 暂时不要它
+        {
           name: '粘贴', 
           type: 'PASTE',
           iconCls: 'el-icon-refresh',
@@ -147,12 +162,12 @@ export default {
           // 预留每个类型的字典
           dic: [
             {
-              group: "文本字典1", // 分组名
+              group: "粘贴嵌套模块", // 分组名
               groupItems: [
                   { 
-                    name:'默认字典', 
-                    content: `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id="krcd-text-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22verify%22%3A%22%22%2C%22required%22%3A0%2C%22desc%22%3A%22%E6%96%87%E6%9C%AC%E8%BE%93%E5%85%A5%22%7D"><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true" title="文本输入">文本输入</span></span>` ,
-                    date: "2018-11-25 21:04:10",
+                    name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
+                    content: '['+ self.createText({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    date: "",
                   }
                 ]  // 组项目
             },
@@ -164,16 +179,13 @@ export default {
           iconCls: 'el-icon-location',
            dic: [
             {
-              group: "下拉字典1", // 分组名
+              group: "粘贴嵌套模块", // 分组名
               groupItems: [
                   { 
-                    name:'下拉1', 
-                    content: `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id="krcd-select-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22multi%22%3A0%2C%22desc%22%3A%22%E6%80%A7%E5%88%AB%22%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%94%B7%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E5%A5%B3%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%9C%AA%E7%9F%A5%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="[{&quot;value&quot;:&quot;1&quot;,&quot;label&quot;:&quot;男&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;2&quot;,&quot;label&quot;:&quot;女&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;3&quot;,&quot;label&quot;:&quot;未知&quot;,&quot;selected&quot;:0}]" krcd-updatetime="2018-11-26T10:22:28.332Z"><span contenteditable="true" class="krcd-value krcd-select" title="性别">性别</span></span>`
-                  },
-                  { 
-                    name:'下拉2', 
-                    content: `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id="krcd-select-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22multi%22%3A0%2C%22desc%22%3A%22%E5%B2%97%E4%BD%8D%22%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E5%8C%BB%E7%94%9F%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%8A%A4%E5%A3%AB%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%9C%AA%E7%9F%A5%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="[{&quot;value&quot;:&quot;1&quot;,&quot;label&quot;:&quot;医生&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;2&quot;,&quot;label&quot;:&quot;护士&quot;,&quot;selected&quot;:0},{&quot;value&quot;:&quot;3&quot;,&quot;label&quot;:&quot;未知&quot;,&quot;selected&quot;:0}]" krcd-updatetime="2018-11-26T10:45:22.721Z"><span contenteditable="true" class="krcd-value krcd-select" title="岗位">岗位</span></span>`
-                  },
+                    name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
+                    content: '['+ self.createSelect({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    date: "",
+                  }
                 ]  // 组项目
             },
           ]
@@ -183,17 +195,14 @@ export default {
           type: 'RADIO',
           iconCls: 'el-icon-more-outline',
           dic:[
-            {
-              group: "单选字典1", // 分组名
+           {
+              group: "粘贴嵌套模块", // 分组名
               groupItems: [
                   { 
-                    name:'病人的感觉', 
-                    content: `<span id="krcd-radio-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-right="." krcd-type="radio" class="krcd-ctrl" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22desc%22%3A%22%E7%97%85%E4%BA%BA%E7%9A%84%E6%84%9F%E8%A7%89%22%2C%22required%22%3A0%2C%22multi%22%3A1%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E5%BE%88%E5%A5%BD%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E4%B8%80%E8%88%AC%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%97%A0%E6%84%9F%E8%A7%89%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E7%B3%9F%E7%B3%95%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E5%BE%88%E5%A5%BD%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E4%B8%80%E8%88%AC%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%97%A0%E6%84%9F%E8%A7%89%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E7%B3%9F%E7%B3%95%22%2C%22selected%22%3A0%7D%5D" krcd-updatetime="2018-11-26T11:13:43.578Z"><span contenteditable="true" krcd-left="[" krcd-right="]" class="krcd-value"><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E5%BE%88%E5%A5%BD%22%2C%22selected%22%3A0%7D">感觉很好</label><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E4%B8%80%E8%88%AC%22%2C%22selected%22%3A0%7D">感觉一般</label><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%97%A0%E6%84%9F%E8%A7%89%22%2C%22selected%22%3A0%7D">无感觉</label><label contenteditable="false"><input name="radio_84da6b15" type="radio" value="%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E6%84%9F%E8%A7%89%E7%B3%9F%E7%B3%95%22%2C%22selected%22%3A0%7D">感觉糟糕</label></span></span>`
-                  },
-                  { 
-                    name:'费用类型', 
-                    content: `<span id="krcd-radio-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-right="." krcd-type="radio" class="krcd-ctrl" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22desc%22%3A%22%E8%B4%B9%E7%94%A8%E7%B1%BB%E5%9E%8B%22%2C%22required%22%3A0%2C%22multi%22%3A1%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E8%87%AA%E8%B4%B9%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E7%A4%BE%E4%BF%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E8%AE%B0%E8%B4%A6%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%85%B6%E4%BB%96%22%2C%22selected%22%3A0%7D%5D%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E8%87%AA%E8%B4%B9%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E7%A4%BE%E4%BF%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E8%AE%B0%E8%B4%A6%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%85%B6%E4%BB%96%22%2C%22selected%22%3A0%7D%5D" krcd-updatetime="2018-11-26T11:20:35.048Z"><span contenteditable="true" krcd-left="[" krcd-right="]" class="krcd-value" title="病人的感觉"><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E8%87%AA%E8%B4%B9%22%2C%22selected%22%3A0%7D">自费</label><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E7%A4%BE%E4%BF%9D%22%2C%22selected%22%3A0%7D">社保</label><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E8%AE%B0%E8%B4%A6%22%2C%22selected%22%3A0%7D">记账</label><label contenteditable="false"><input name="radio_7d923459" type="radio" value="%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%85%B6%E4%BB%96%22%2C%22selected%22%3A0%7D">其他</label></span></span>`
-                  },
+                    name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
+                    content: '['+ self.createRadio({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    date: "",
+                  }
                 ]  // 组项目
             },
           ]
@@ -263,7 +272,9 @@ export default {
           type: 'CTRLS',
           iconCls: 'el-icon-news',
           dic:[]
-        }],
+        }]
+      }
+      ,
 
       // 从localStorage中取组件数据存起来
       widgetlist: localStorage.getItem('widget')?
@@ -273,16 +284,15 @@ export default {
                     []
       ,
 
-      // 从localStorage中取模版数据存起来
-      templatelist: []
-      // localStorage.getItem('template')?
-      //               JSON.parse(localStorage.getItem('template'))&&JSON.parse(localStorage.getItem('template')).length!==0?
-      //                   JSON.parse(localStorage.getItem('template')):
-      //                   []:
-      //               [],
+      // 模版列表
+      templatelist: []      
       ,
 
-      ctrlist: []
+      ctrlist: localStorage.getItem('ctrlist')?
+                    JSON.parse(localStorage.getItem('ctrlist'))&&JSON.parse(localStorage.getItem('ctrlist')).length!==0?
+                        JSON.parse(localStorage.getItem('ctrlist')):
+                        []:
+                    []
       ,
 
       // 左方病人的共有列表格式（暂时就这样）
@@ -317,7 +327,7 @@ export default {
 
       // 提示输入模版名称弹窗
       inputName:(fun)=>{
-        this.$prompt('请输入模版名', '提示', {
+        this.$prompt('请输入模版名', '保存模版', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,10}$/,  // 自己写的
@@ -336,7 +346,7 @@ export default {
         });
       },
 
-
+      // 获取整个文档的html
       getHtmlContent:()=>{
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
           let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML;  // 获取对应的innerHTML  
@@ -467,7 +477,8 @@ export default {
         //       border-top-left-radius: 4px;
         //     }`
       },
-
+      
+      // 请求接口
       ajaxTemplate: (type,content,successMsg,sucessFun)=>{ 
         ajax.post(
           `/DocumentTemplate/${type}`,
@@ -481,6 +492,25 @@ export default {
           this.saveError('请查看控制台错误')
         })
       },  
+
+      // 需要整合的数据（动态模版的数据结构）
+      /**
+       * id  后台自动生成
+       * Code  元素id存到这里
+       * ElementDesc  元素描述
+       * HtmlContent  元素的html内容
+       * IsDynamic  是动态元素
+       * Command  查数据库命令内容
+       * TypeId   类型id（术语那个表类型中）
+       */
+      dynamicTemplate: (ElementDesc,TypeId)=>{
+        return {
+          ElementDesc: ElementDesc,          
+          TypeId: TypeId,
+          type: TEXT,
+          isDynamic: true, // 是动态元素
+        }
+      }
       
     }
   },
@@ -553,7 +583,7 @@ export default {
 
     // 数据值转换为后端的
     font2back(newItem){
-      return{
+      return{          
           "code": newItem.id,   // 组件id
           "discribe": newItem.discribe,  // 描述
           "deptCode": newItem.scope,
@@ -562,30 +592,35 @@ export default {
           "htmlContent": newItem.content,
           "styleContent": newItem.styleString,
           "id": newItem.index!==0?newItem.index:0,       // 可以默认0
-          "tag": newItem.tag  
+          "tag": newItem.tag,
+          'elementDesc': newItem.describe,
+          'command': newItem.command,
+          'typeId': newItem.classified,
       }
     },
 
     back2font(newItem){      
       return{
           id: newItem.code,   // 组件id
-          discribe: newItem.discribe,  // 描述
+          discribe: newItem.discribe || newItem.elementDesc,  // 描述
           scope: newItem.deptCode,
           "creatorUserId": 0,     // 可以默认0
           name: newItem.templateName,
           content: newItem.htmlContent,
           styleContent: newItem.styleString,
           index: newItem.id,  // 将后台的顺序存到index中
-          tag: newItem.tag
+          tag: newItem.tag,
+          command: newItem.command,
+          classified: newItem.typeId,
       }
     },
 
       // 保存文档段为控件
     saveSection2Widget(itemName="文档段模版", callback=()=>{}){     
       let target;
-      if(this.tarEl.className ==='krcd-value'&&this.tarEl.parentNode.className==='krcd-ctrl krcd-section'){
+      if(this.tarEl.className.indexOf('krcd-value')!==-1&&this.tarEl.parentNode.className.indexOf('krcd-ctrl krcd-section')!==-1){
           target = this.tarEl.parentNode
-      }else if(this.tarEl.className==='krcd-ctrl krcd-section'){
+      }else if(this.tarEl.className.indexOf('krcd-ctrl krcd-section')!==-1){
           target = this.tarEl
       }     
       const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; 
@@ -605,8 +640,6 @@ export default {
         }
         return newArr.join('')
       })()  
-
-      
       
       // 创建需要存到模版的对象
       const newItem = {
@@ -623,25 +656,25 @@ export default {
       this.widgetlist.push(newItem);
 
       // 保存到localStorage
-      // localStorage.setItem('widget',JSON.stringify(this.widgetlist))
+      localStorage.setItem('widget',JSON.stringify(this.widgetlist))
 
       // this.saveSuccess('组件');
       
       return callback() 
     }, 
     
-      // 保存元素模版
-    saveCtrl2Widget(itemName="元素模版", callback=()=>{}){     
+      // 保存元素模版(作为动态模版)
+    saveCtrl2Widget(inputInfo={}, callback=()=>{}){     
       let target;
-      if(this.tarEl.className ==='krcd-value'&&this.tarEl.parentNode.className==='krcd-ctrl'){
+      if(this.tarEl.className.indexOf('krcd-value')!==-1&&this.tarEl.parentNode.className.indexOf('krcd-ctrl')!==-1){
           target = this.tarEl.parentNode
-      }else if(this.tarEl.className==='krcd-ctrl'){
+      }else if(this.tarEl.className.indexOf('krcd-ctrl')!==-1){
           target = this.tarEl
       }     
       const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; 
 
       // 克隆dom内容，移动到临时创建的div
-      const newDOM = innerDoc.createElement('div');  
+      const newDOM = innerDoc.createElement('div');    
       const cloneTaget = target.cloneNode(true);
       newDOM.appendChild(cloneTaget); 
       let htmlContent = newDOM.innerHTML; 
@@ -656,69 +689,51 @@ export default {
         return newArr.join('')
       })()  
 
-      
-      
+      // 传入的数据是
+
+      /**
+       *
+        describe:'',
+        command: '',
+        classified: ''  , // 归属于
+       */
+
+      // 需要整合的数据（动态模版的数据结构）
+      /**
+       * id  后台自动生成
+       * Code  元素id存到这里
+       * ElementDesc  元素描述
+       * HtmlContent  元素的html内容
+       * IsDynamic  是动态元素
+       * Command  查数据库命令内容
+       * TypeId   类型id（术语那个表类型中）
+       */
+      console.log(target)
+
       // 创建需要存到模版的对象
-      const newItem = {
-          name: target.id,
-          id: target.id,
-          styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent,
-          scope: '全院',
-          discribe: '描述', // 描述
-          date: funs.nowtime(),  //  存起来保存时间
+      const newItem = {  
+          index : 0 ,
+          name : target.id,
+          describe: inputInfo.describe,
+          command: inputInfo.command,
+          classified: inputInfo.classified,          
+          htmlContent: htmlContent,
+          styleContent: headStyleString,// style标签中的样式存起来插到模版对应的style标签中      
       }
+      console.log(newItem)
       
       // 将模版push到widgetlist数组中
       this.ctrlist.push(newItem);
 
       // 保存到localStorage
-      // localStorage.setItem('widget',JSON.stringify(this.widgetlist))
+      localStorage.setItem('ctrlist',JSON.stringify(this.ctrlist))
 
       // this.saveSuccess('组件');
+
+      this.commitShow = false
       
       return callback() 
     }, 
-    
-    // // 保存真整页内容为模版
-    // saveHtmlContent(itemName="哈哈哈哈", callback=()=>{}){
-
-    //   const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;  // 通过这样来获取iframe中的document
-    //   let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML;  // 获取对应的innerHTML  
-    //   // let htmlContent = this.getHTML()
-    //   console.log(htmlContent)
-    //   // console.log(innerDoc.querySelectorAll('style[stylename]'))
-
-    //   const headStyleString = (()=>{
-    //     const arr = innerDoc.querySelectorAll('style[stylename]');
-    //     const newArr = []
-    //     for(let i=0, len=arr.length;i<len;i++){
-    //       newArr.push(this.strTrim(arr[i].innerHTML))
-    //     }
-    //     return newArr.join('')
-    //   })()  
-      
-    //   const newItem = {
-    //       name: itemName,
-    //       id: '',  // 因为是模版所以不设置了
-    //       styleString: headStyleString,// style标签中的样式存起来插到模版对应的style标签中  
-    //       content: htmlContent,
-    //       scope: '全院',
-    //       date: funs.nowtime(),          
-    //   }
-
-    //   // 将原来的转为接口的格式
-    //   const postData = this.font2back(newItem)
-
-    //   this.templatelist.push(newItem);
-
-    //   // 设置localStorage
-    //   localStorage.setItem('template',JSON.stringify(this.templatelist))
-
-    //   this.ajaxTemplate(content);
-      
-    //   return callback(JSON.stringify(postData))
-    // },     
 
     /************************
      * 以下为每个工具栏中的方法
@@ -729,7 +744,7 @@ export default {
      */
     createText(domSet={ctrlId:null,ctrlStyle:null}, defOpt, desc){
         let div = document.createElement('span');
-        div.innerHTML = `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true" ></span></span>`;
+        div.innerHTML = `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true"></span></span>`;
         div = div.firstElementChild; 
         let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
             "mode":"EDITOR",//控件状态。EDITOR编辑;READONLY只读
@@ -737,9 +752,12 @@ export default {
             "strictverify": 0,//是否强制校验（不符合要求既不允许输入），默认为0不强制校验
             "verify": "",//验证输入是否符合要求，可自己定义表达式
             "required": 0,//是否必填
-            "desc":  desc.length!==0?desc:"文本",//控件描述值
+            "desc": desc.length!==0?desc:"文本",//控件描述值
         })
-        return newDiv
+        return {
+          newDiv,
+          show: newDiv.getValueElement().parentNode.innerHTML  // 为模版展示用, 取出生成的html
+        }
     },
 
     // 增加select
@@ -747,18 +765,25 @@ export default {
         let div = document.createElement('span');
         div.innerHTML = `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-select'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null}><span contenteditable="true" class="krcd-value"></span></span>`;  // 这里有个bug，内部标签不能用p要用span
         div = div.firstElementChild; 
+        const bindingdata = desc.length!==0?            
+            [//默认绑定数据。
+              {label:desc,value:'0'},
+            ]
+            :
+            [//默认绑定数据。
+              {label:'默认值',value:'0'},
+              {label:'男',value:'1'},
+              {label:'女',value:'2'},
+              {label:'未知',value:'3'}
+            ];
         let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
             "mode":"EDITOR",//控件状态。EDITOR编辑;READONLY只读
             "notdel":0,//不许删除
             "strictverify":0,//强制校验
             "required":0,//是否必填
             "multi":0,//是否多选，默认0为单选，1为多选
-            "desc":desc.length!==0?desc:"单选",//描述值
-            "bindingdata":[//默认绑定数据。
-              {label:'男',value:'1'},
-              {label:'女',value:'2'},
-              {label:'未知',value:'3'}
-            ],
+            "desc":desc.length!==0?desc:"下拉",//描述值
+            "bindingdata": bindingdata,
             // 下放注释预留请求接口用的
 
             //bindingdata和remotedata为二选一，如果remotedata存在的话则优先取remotedata值。
@@ -772,26 +797,38 @@ export default {
         })
       
       newDiv.refreshData([true])
-      
+      let  aaa = 
       // 设置默认值
-      newDiv.setValue([{label:'男',value:'1'}])
+      // desc.length!==0?newDiv.setValue([{label:desc,value:'0'}]):newDiv.setValue([{label:'默认值',value:'0'}]);
+      newDiv.setValue(encodeURIComponent(JSON.stringify(bindingdata[0])));
+      console.log(newDiv.getCtrlElement())
      
-      return newDiv
+      return {
+          newDiv,
+          show: newDiv.getValueElement().parentNode.innerHTML,  // 为模版展示用, 取出生成的html
+          html: newDiv.getCtrlElement()
+        }
     },
     // 增加点选
     createRadio(domSet={ctrlId:null,ctrlStyle:null}, defOpt, desc){
       let div = document.createElement('span');   
-      div.innerHTML = `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="radio" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
+      div.innerHTML = `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
       div = div.firstElementChild;
       let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
           "mode":"EDITOR",//当前模式
           "notdel":0,//不许删除
           "strictverify":0,//强制校验
-          "desc":desc,//描述
+          "desc":desc.length!==0?desc:"单选",//描述值
           "required": 0, // 必须的
           "strictverify": 0,  // 严格模式
-          "multi": 1,          
-          "bindingdata": [
+          "multi": 1,   
+          "bindingdata": desc.length!==0?
+          [
+            { "value":"0","label":desc,"selected":0 }
+          ]
+          :
+          [
+            { "value":"0","label":"默认单选","selected":0 },
             { "value":"1","label":"感觉很好","selected":0 },
             { "value":"2","label":"感觉一般","selected":0 }, 
             { "value":"3","label":"无感觉","selected":0}, 
@@ -806,12 +843,15 @@ export default {
           //     }
           // }
       })
-
+      
       newDiv.refreshData([true]) 
 
-      newDiv.setValue({ "label": "感觉很好", "value": 1 }) // 设置默认值但是貌似不成功
-
-      return newDiv
+      desc.length!==0?newDiv.setValue({ "value":"0","label":desc,"selected":0 }):newDiv.setValue({ "value":"0","label":"默认单选","selected":0 }) // 设置默认值但是貌似不成功
+      console.log(newDiv.getCtrlElement())
+      return {
+          newDiv,
+          show: newDiv.getValueElement().parentNode.innerHTML  // 为模版展示用, 取出生成的html
+        }
     },
 
     createCheckbox(domSet={ctrlId:null,ctrlStyle:null}, defOpt,desc){
@@ -853,7 +893,10 @@ export default {
                   "value":2
               }
           ])
-      return newDiv
+      return {
+          newDiv,
+          show: newDiv.getValueElement().parentNode.innerHTML  // 为模版展示用, 取出生成的html
+        }
     },
 
     // Date控件
@@ -882,8 +925,13 @@ export default {
           "max":""//最大日期
       })
        
-      return newDiv 
-    },
+      // let tempDiv = document.createElement('div');
+      // tempDiv.appendChild(newDiv);
+      return {
+          newDiv,
+          show: newDiv.getValueElement().parentNode.innerHTML  // 为模版展示用, 取出生成的html
+        }
+    },    
 
     /**
      * 获取选中字体的方法来调出工具栏并用函数插进去对应控件
@@ -927,7 +975,7 @@ export default {
      * 专门做插入控件之用
      * params1{object}: newDiv（基本来自createDate）
      */
-    addCtrl(type, ctrlName, ctrlId='', ctrlStyle='', Opt=null){      
+    addCtrl( type, ctrlName, ctrlId='', ctrlStyle='', Opt=null,  paste=false,){      
       
       // 获取选中的文字
       function selectText(){
@@ -952,25 +1000,28 @@ export default {
       }
       // 判断
       let newDiv;  
+      // let selectedHtml = this.selectedHtml;
+      // let selectedText = this.selectedText;
+      let selectedHtml = paste?this.selectedHtml:'';
+      let selectedText = paste?this.selectedText:'';
       switch(type){
-        case "PASTE":            
-            console.log(this.selectedHtml)
-            this.krcd.execCommand('inserthtml', this.selectedHtml);
+        case "PASTE":         
+            this.krcd.execCommand('inserthtml', selectedHtml).newDiv;
             break
         case "DATE":
-            newDiv=this.createDate(domSet,Opt, this.selectedHtml)
+            newDiv=this.createDate(domSet,Opt, selectedHtml).newDiv
             break
         case "SELECT":
-            newDiv=this.createSelect(domSet,Opt, this.selectedText)
+            newDiv=this.createSelect(domSet,Opt, selectedText).newDiv
             break
         case "RADIO":
-            newDiv=this.createRadio(domSet,Opt, this.selectedText)
+            newDiv=this.createRadio(domSet,Opt, selectedText).newDiv            
             break
         case "CHECKBOX":
-            newDiv=this.createCheckbox(domSet,Opt, this.selectedText)
+            newDiv=this.createCheckbox(domSet,Opt, selectedText).newDiv
             break
         case "TEXT":
-            newDiv=this.createText(domSet, Opt, this.selectedText)
+            newDiv=this.createText(domSet, Opt, selectedText).newDiv
             break
         case "SECTION":
             this.addSection([],{
@@ -1014,7 +1065,7 @@ export default {
       headerTag.appendChild(styleDOM);
 
       
-      if(type !== "SECTION"&&type !== "WIDGET"&&type !== "CTRLS"&&type !== "PASTE"){
+      if(type !== "SECTION"&&type !== "WIDGET"&&type !== "CTRLS"&&type !== "PASTE"){     
         this.krcd.insertControl(
           newDiv.getCtrlElement(),  //  获取会对应的Element
           newDiv.getOpt()     //  获取会对应的opt
@@ -1088,14 +1139,16 @@ export default {
     },
     widgetlist: function (newWidgetlist, oldWidgetlist) {
       console.log('存local')
-      localStorage.setItem("template",JSON.stringify(newWidgetlist.map(this.font2back)))  // 这样就要改变读取时的问题
+      localStorage.setItem("widgetlist",JSON.stringify(newWidgetlist.map(this.font2back)))  // 这样就要改变读取时的问题
       console.log(newWidgetlist)
     },
     ctrlist: function (newCtrlist, oldCtrlist) {
       console.log('存local')
-      localStorage.setItem("template",JSON.stringify(newCtrlist.map(this.font2back)))  // 这样就要改变读取时的问题
+      localStorage.setItem("ctrlist",JSON.stringify(newCtrlist.map(this.font2back)))  // 这样就要改变读取时的问题
       console.log(newCtrlist)
-    }
+    },
+    // 为了不断的监控
+    // arrBtns
   },
 
   mounted() {   
@@ -1160,6 +1213,7 @@ export default {
       self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
       const e = event || window.event;          
       self.tarEl = arguments[0].target;  // 获取点中的对象
+      console.log(self.tarEl)
       self.tarCtrl = arguments[1];  //  控件类型名           self.tarCtrl.TYPE_NAME对应的是就是组件
       
       // 判断点击的控件是否在section中，并控制工具条呈现的功能
