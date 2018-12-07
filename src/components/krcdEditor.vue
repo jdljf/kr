@@ -4,7 +4,7 @@
       <el-aside style="width:auto;border:none;border-right: 1px solid rgb(220, 223, 230);">      
         <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>    
       </el-aside>
-      <div class="tools">  
+      <div class="tools" v-show="toolsShow">  
         <NavMenu 
           class="tools-btn" 
           :addCtrl="addCtrl" 
@@ -25,7 +25,7 @@
                 3. STRICT 严格模式（表单模式）；
                 4. READONLY 只读模式； -->
             <el-tooltip v-for="(item,index) in modelsData" :key="index" class="item" effect="dark" :content="item.tip" placement="top">
-              <el-button size="mini" round @click="mode(item)">{{item.name}}</el-button>
+              <el-button size="mini" round @click="mode(modelsData,index)" :type="item.type" ref="modstyle">{{item.name}}</el-button>
             </el-tooltip>
           </el-row>
         </el-footer>
@@ -52,7 +52,7 @@
           </el-header>    
           <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
           <!-- <Models :list="widgetlist" :fun="insert"/> -->
-          <tabContainer :ctrlist="ctrlist" :ctrlfun="insert" :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
+          <tabContainer :templeCtrl="templeCtrl" :ctrlist="ctrlist" :ctrlfun="insert" :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
         </div>
       </el-aside>          
      </el-container>    

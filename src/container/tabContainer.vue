@@ -3,16 +3,16 @@
         <el-tab-pane style="padding:0">
             <!-- slot 属性可以自定义标签内容而不像下面那些那样 -->
             <span slot="label"><i class="el-icon-document"></i>  文档模版<i class="circle circle-template">{{templatelist.length}}</i></span> 
-            <Template :list="templatelist" :fun="templatefun" :savetemple="savetemplefun" :savewidget="savewidgetfun" :savectrl="savectrlfun" :ajaxtemple="ajaxtemple" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
+            <Template :templeCtrl="templeCtrl" :list="templatelist" :fun="templatefun" :savetemple="savetemplefun" :savewidget="savewidgetfun" :savectrl="savectrlfun" :ajaxtemple="ajaxtemple" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
             <!-- 这里就是内容部分 -->
         </el-tab-pane>
         <el-tab-pane style="padding:0">
             <span slot="label"><i class="el-icon-tickets"></i>  段落模版<i class="circle circle-widget">{{widgetlist.length}}</i></span> 
-            <Template :list="widgetlist" :fun="widgetfun" :savetemple="savetemplefun" :savewidget="savewidgetfun" :savectrl="savectrlfun" :ajaxtemple="ajaxtemple" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
+            <Template :templeCtrl="templeCtrl" :list="widgetlist" :fun="widgetfun" :savetemple="savetemplefun" :savewidget="savewidgetfun" :savectrl="savectrlfun" :ajaxtemple="ajaxtemple" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
         </el-tab-pane>   
         <el-tab-pane style="padding:0">            
             <span slot="label"><i class="el-icon-edit-outline"></i>  元素（动态）模版<i class="circle circle-ctrl">{{ctrlist.length}}</i></span> 
-            <Template :list="ctrlist" :fun="ctrlfun" :savetemple="savetemplefun" :savewidget="savewidgetfun" :savectrl="savectrlfun" :ajaxtemple="ajaxtemple" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
+            <Template :templeCtrl="templeCtrl" :list="ctrlist" :fun="ctrlfun" :savetemple="savetemplefun" :savewidget="savewidgetfun" :savectrl="savectrlfun" :ajaxtemple="ajaxtemple" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
         </el-tab-pane>            
     </el-tabs>
 </template>
@@ -35,6 +35,7 @@ export default {
     },
     // 设置来纯粹做传递属性的
     props:{
+        templeCtrl: Boolean,
         widgetlist: Array,
         widgetfun: Function,
         templatelist: Array,

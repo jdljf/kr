@@ -78,6 +78,8 @@ export default {
   },
   data() {
     return { 
+      templeCtrl: false, // 整个模版的编辑和删除的控制
+      toolsShow: false,  // 工具的隐藏
       /**
        * 切换模式的数据
        * 1. DESIGN 设计模式；
@@ -89,18 +91,22 @@ export default {
         {
           name:'DESIGN',
           tip:'设计模式',
+          type: '',
         },
         {
           name:'EDITOR',
           tip:'编辑模式',
+          type: '',
         },
         {
           name:'STRICT',
           tip:'严格模式（表单模式）',
+          type: '',
         },
         {
           name:'READONLY',
           tip:'只读模式',
+          type: '',
         },
       ],      
 
@@ -1132,13 +1138,43 @@ export default {
     execCommand() {
       return this.krcd.execCommand.apply(this.krcd, arguments);
     },
-    mode(opt) {
-      if (!!opt.name) {
-        this.krcd.mode(opt.name);
+    mode(opt,i) {
+      if (!!opt[i].name) {
+        this.krcd.mode(opt[i].name);
+
+        // 切换type
+        for(let j=0,len=opt.length;j<len;j++){
+          opt[j].type='';
+        }        
+        opt[i].type="primary";
+
+        // 扩展功能的模式限制
+        switch(opt[i].name){
+          case "DESIGN":
+            this.toolsShow = true;
+            this.templeCtrl = true;
+            break
+          case "EDITOR":
+            this.toolsShow = true;
+            this.templeCtrl = true;
+            break
+          case "STRICT":
+            this.toolsShow = false;
+            this.templeCtrl = false;
+            break
+          case " READONLY":
+            this.toolsShow = false;
+            this.templeCtrl = false;
+            break
+          default:
+            this.toolsShow = false;
+            this.templeCtrl = false;
+        }
+
         // 弹出右侧的提示消息
         this.$notify({
-          title: `【${opt.name}】`,
-          message: `当前模式切换为“${opt.tip}”`,
+          title: `【${opt[i].name}】`,
+          message: `当前模式切换为“${opt[i].tip}”`,
           type: 'success',
           position:'top-left',
           duration: 1500,
@@ -1182,13 +1218,18 @@ export default {
       localStorage.setItem("ctrlist",JSON.stringify(newCtrlist.map(this.font2back)))  // 这样就要改变读取时的问题
       console.log(newCtrlist)
     },
+    modelsData: function(newModelsData, oldModelsData){      
+      return newModelsData
+    }
     // 为了不断的监控
     // arrBtns
   },
 
   mounted() {   
     console.log(funs)
-    
+    console.log(this.$refs.modstyle[0].$el)
+
+
     const self = this;
 
 

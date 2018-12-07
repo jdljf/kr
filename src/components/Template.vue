@@ -75,11 +75,13 @@
               </template>
               <template slot-scope="scope">
                 <el-button
+                  v-if="templeCtrl"
                   size="mini"
                   @click.stop="handleEdit(scope.$index, scope.row)">替换</el-button>
                 <el-button
                   size="mini"
                   type="danger"
+                  v-if="templeCtrl"
                   @click.stop="handleDelete(scope.$index, scope.row)"><i class='el-icon-delete'></i></el-button>
               </template>
             </el-table-column>
@@ -126,6 +128,7 @@ import funs from '../common/funs';
   export default {
     name: "Template",   
     props:{
+        templeCtrl: Boolean,
         list: Array,
         fun: Function,
         savetemple: Function,  
