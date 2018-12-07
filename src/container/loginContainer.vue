@@ -80,7 +80,7 @@ export default {
 }
 
 .title .chn{
-    font-family: "腾祥铁山楷书简"; 
+    font-family: "txtsk"; 
     font-size: 28px;  
     padding-bottom: 12px;
     text-align: justify

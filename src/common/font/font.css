@@ -1,6 +1,6 @@
 @font-face {  
-    font-family: '腾祥铁山楷书简';  /* 重命名字体名 */
-    src: url('腾祥铁山楷书简.ttf');  /* 引入字体 */
+    font-family: 'txtsk';  /* 重命名字体名 */
+    src: url('txtsk.ttf');  /* 引入字体 */
     font-weight: normal;  
     font-style: normal;  
   }

@@ -968,7 +968,7 @@ export default {
               selectedHtml
             }
 
-          }else if(iframeObj.getSelection&&iframeObj.getSelection.rangeCount > 0){    // 以免出现错误，所以先判断大于0
+          }else if(iframeObj.getSelection){    // 以免出现错误，所以先判断大于0
             //标准浏览器
 
             let selectionObj = iframeObj.getSelection();
@@ -982,11 +982,6 @@ export default {
             return {
               selectedText,
               selectedHtml
-            }
-          }else{
-            return {
-              selectedText:'',
-              selectedHtml:''
             }
           }
     },
