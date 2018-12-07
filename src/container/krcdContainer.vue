@@ -11,6 +11,9 @@ import {ajax} from '../common'
 import funs from '../common/funs'
 import tabContainer from './tabContainer'
 
+// import '../assets/js/jquery-1.7.2.min.js';
+// import '../assets/js/jquery.jrumble.1.3.min.js';
+
 export default {
   name: 'krcdContainer',
   extends: krcdEditor,
@@ -69,14 +72,42 @@ export default {
         }        
       },
       arrBtns: function(){
-        console.log(this.selectedHtml)
+        // console.log(this.selectedHtml)
         return this.arrBtnsFun(this)
       }
   },
   data() {
-    return {  
+    return { 
+      /**
+       * 切换模式的数据
+       * 1. DESIGN 设计模式；
+         2. EDITOR 编辑模式；
+         3. STRICT 严格模式（表单模式）；
+         4. READONLY 只读模式；
+       */
+      modelsData:[
+        {
+          name:'DESIGN',
+          tip:'设计模式',
+        },
+        {
+          name:'EDITOR',
+          tip:'编辑模式',
+        },
+        {
+          name:'STRICT',
+          tip:'严格模式（表单模式）',
+        },
+        {
+          name:'READONLY',
+          tip:'只读模式',
+        },
+      ],      
+
       /* 初始化数据 */
-      commitShow: false, // 给初始化弹窗保存动态模版用的
+      commitShow: {
+        OnOff:false
+      }, // 给初始化弹窗保存动态模版用的
       saveDynamicData: null,
 
       // 返回提交数据的函数
@@ -166,7 +197,8 @@ export default {
               groupItems: [
                   { 
                     name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
-                    content: '['+ self.createText({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    // content: '['+ self.createText({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    obj: self.createText({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml),
                     date: "",
                   }
                 ]  // 组项目
@@ -183,7 +215,8 @@ export default {
               groupItems: [
                   { 
                     name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
-                    content: '['+ self.createSelect({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    // content: '['+ self.createSelect({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    obj: self.createSelect({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml),
                     date: "",
                   }
                 ]  // 组项目
@@ -200,7 +233,8 @@ export default {
               groupItems: [
                   { 
                     name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
-                    content: '['+ self.createRadio({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    // content: '['+ self.createRadio({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    obj:self.createRadio({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml),
                     date: "",
                   }
                 ]  // 组项目
@@ -213,16 +247,16 @@ export default {
           iconCls: 'el-icon-more',
           dic:[
             {
-              group: "复选字典1", // 分组名
+              group: "粘贴嵌套模块", // 分组名
               groupItems: [
                   { 
-                    name:'缴费方式', 
-                    content: `<span id="krcd-checkbox-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-right="." krcd-type="checkbox" class="krcd-ctrl" contenteditable="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22desc%22%3A%22%E7%BC%B4%E8%B4%B9%E6%96%B9%E5%BC%8F%22%2C%22bindingdata%22%3A%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%8E%B0%E9%87%91%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E9%93%B6%E8%81%94%E5%8D%A1%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%94%AF%E4%BB%98%E5%AE%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%BE%AE%E4%BF%A1%22%2C%22selected%22%3A0%7D%5D%2C%22required%22%3A0%2C%22remotedata%22%3Anull%7D" krcd-value="" krcd-isloadasyncdata="true" bindingdata="%5B%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%8E%B0%E9%87%91%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E9%93%B6%E8%81%94%E5%8D%A1%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%94%AF%E4%BB%98%E5%AE%9D%22%2C%22selected%22%3A0%7D%2C%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%BE%AE%E4%BF%A1%22%2C%22selected%22%3A0%7D%5D" krcd-updatetime="2018-11-26T11:30:17.773Z"><span contenteditable="true" krcd-left="[" krcd-right="]" class="krcd-value" title="多选框"><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%221%22%2C%22label%22%3A%22%E7%8E%B0%E9%87%91%22%2C%22selected%22%3A0%7D">现金</label><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%222%22%2C%22label%22%3A%22%E9%93%B6%E8%81%94%E5%8D%A1%22%2C%22selected%22%3A0%7D">银联卡</label><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%223%22%2C%22label%22%3A%22%E6%94%AF%E4%BB%98%E5%AE%9D%22%2C%22selected%22%3A0%7D">支付宝</label><label contenteditable="false"><input type="checkbox" value="%7B%22value%22%3A%224%22%2C%22label%22%3A%22%E5%BE%AE%E4%BF%A1%22%2C%22selected%22%3A0%7D">微信</label></span></span>`
-                  },
-                  
+                    name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
+                    // content: '['+ self.createCheckbox({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    obj:self.createCheckbox({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml),
+                    date: "",
+                  }
                 ]  // 组项目
             },
-
           ]
         },
         {
@@ -231,13 +265,14 @@ export default {
           iconCls: 'el-icon-date',
           dic:[
              {
-              group: "日历字典1", // 分组名
+              group: "粘贴嵌套模块", // 分组名
               groupItems: [
                   { 
-                    name:'日历', 
-                    content: `<span class="krcd-ctrl" id="krcd-date-default" style=";padding-left:4px;display:inline-block;margin-top:4px;margin-bottom:4px;margin-right:4px;margin-left:4px" krcd-type="date" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22notdel%22%3A0%2C%22strictverify%22%3A0%2C%22required%22%3A0%2C%22desc%22%3A%22%E6%97%A5%E6%9C%9F%E6%8E%A7%E4%BB%B6%22%2C%22defvalue%22%3A%222018-11-26%2012%3A00%3A00%22%2C%22format%22%3A%22%7Byyyy%7D-%7BMM%7D-%7Bdd%7D%20%7Bhh%7D%3A%7Bmm%7D%3A%7Bss%7D%22%2C%22min%22%3A%22%22%2C%22max%22%3A%22%22%7D" contenteditable="false"><span class="krcd-value flatpickr-input" contenteditable="true" krcd-left="[" krcd-right="]" title="日期控件">2018-11-26 19:33:31</span><div class="flatpickr-calendar hasTime animate showTimeInput arrowTop" tabindex="-1" style="top: 65.4688px; left: 15.957px; right: auto;"><div class="flatpickr-months"><span class="flatpickr-prev-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z"></path></svg></span><div class="flatpickr-month"><div class="flatpickr-current-month"><span class="cur-month">十一月 </span><div class="numInputWrapper"><input class="numInput cur-year" type="text" pattern="\d*" tabindex="-1" aria-label="Year"><span class="arrowUp"></span><span class="arrowDown"></span></div></div></div><span class="flatpickr-next-month"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 17 17"><g></g><path d="M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z"></path></svg></span></div><div class="flatpickr-innerContainer"><div class="flatpickr-rContainer"><div class="flatpickr-weekdays"><div class="flatpickr-weekdaycontainer"><span class="flatpickr-weekday">周日</span><span class="flatpickr-weekday">周一</span><span class="flatpickr-weekday">周二</span><span class="flatpickr-weekday">周三</span><span class="flatpickr-weekday">周四</span><span class="flatpickr-weekday">周五</span><span class="flatpickr-weekday">周六</span></div></div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="十月 28, 2018" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="十月 29, 2018" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="十月 30, 2018" tabindex="-1">30</span><span class="flatpickr-day prevMonthDay" aria-label="十月 31, 2018" tabindex="-1">31</span><span class="flatpickr-day " aria-label="十一月 1, 2018" tabindex="-1">1</span><span class="flatpickr-day " aria-label="十一月 2, 2018" tabindex="-1">2</span><span class="flatpickr-day " aria-label="十一月 3, 2018" tabindex="-1">3</span><span class="flatpickr-day " aria-label="十一月 4, 2018" tabindex="-1">4</span><span class="flatpickr-day " aria-label="十一月 5, 2018" tabindex="-1">5</span><span class="flatpickr-day " aria-label="十一月 6, 2018" tabindex="-1">6</span><span class="flatpickr-day " aria-label="十一月 7, 2018" tabindex="-1">7</span><span class="flatpickr-day " aria-label="十一月 8, 2018" tabindex="-1">8</span><span class="flatpickr-day " aria-label="十一月 9, 2018" tabindex="-1">9</span><span class="flatpickr-day " aria-label="十一月 10, 2018" tabindex="-1">10</span><span class="flatpickr-day " aria-label="十一月 11, 2018" tabindex="-1">11</span><span class="flatpickr-day " aria-label="十一月 12, 2018" tabindex="-1">12</span><span class="flatpickr-day " aria-label="十一月 13, 2018" tabindex="-1">13</span><span class="flatpickr-day " aria-label="十一月 14, 2018" tabindex="-1">14</span><span class="flatpickr-day " aria-label="十一月 15, 2018" tabindex="-1">15</span><span class="flatpickr-day " aria-label="十一月 16, 2018" tabindex="-1">16</span><span class="flatpickr-day " aria-label="十一月 17, 2018" tabindex="-1">17</span><span class="flatpickr-day " aria-label="十一月 18, 2018" tabindex="-1">18</span><span class="flatpickr-day " aria-label="十一月 19, 2018" tabindex="-1">19</span><span class="flatpickr-day " aria-label="十一月 20, 2018" tabindex="-1">20</span><span class="flatpickr-day " aria-label="十一月 21, 2018" tabindex="-1">21</span><span class="flatpickr-day " aria-label="十一月 22, 2018" tabindex="-1">22</span><span class="flatpickr-day " aria-label="十一月 23, 2018" tabindex="-1">23</span><span class="flatpickr-day " aria-label="十一月 24, 2018" tabindex="-1">24</span><span class="flatpickr-day " aria-label="十一月 25, 2018" tabindex="-1">25</span><span class="flatpickr-day today selected" aria-label="十一月 26, 2018" aria-current="date" tabindex="-1">26</span><span class="flatpickr-day " aria-label="十一月 27, 2018" tabindex="-1">27</span><span class="flatpickr-day " aria-label="十一月 28, 2018" tabindex="-1">28</span><span class="flatpickr-day " aria-label="十一月 29, 2018" tabindex="-1">29</span><span class="flatpickr-day " aria-label="十一月 30, 2018" tabindex="-1">30</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 1, 2018" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 2, 2018" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 3, 2018" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 4, 2018" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 5, 2018" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 6, 2018" tabindex="-1">6</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 7, 2018" tabindex="-1">7</span><span class="flatpickr-day nextMonthDay" aria-label="十二月 8, 2018" tabindex="-1">8</span></div></div></div></div><div class="flatpickr-time time24hr hasSeconds" tabindex="-1"><div class="numInputWrapper"><input class="numInput flatpickr-hour" type="text" pattern="\d*" tabindex="-1" data-step="1" data-min="0" data-max="23"><span class="arrowUp"></span><span class="arrowDown"></span></div><span class="flatpickr-time-separator">:</span><div class="numInputWrapper"><input class="numInput flatpickr-minute" type="text" pattern="\d*" tabindex="-1" data-step="1" data-min="0" data-max="59"><span class="arrowUp"></span><span class="arrowDown"></span></div><span class="flatpickr-time-separator">:</span><div class="numInputWrapper"><input class="numInput flatpickr-second" type="text" pattern="\d*" data-step="1" data-min="0" data-max="59"><span class="arrowUp"></span><span class="arrowDown"></span></div></div><div class="flatpickr-confirm visible lightTheme"><div class="left">清除</div><div class="center">今天</div><div class="right" tabindex="-1">确定 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17" height="17" viewBox="0 0 17 17"> <g> </g> <path d="M15.418 1.774l-8.833 13.485-4.918-4.386 0.666-0.746 4.051 3.614 8.198-12.515 0.836 0.548z" fill="#000000"></path> </svg></div></div></div></span>`
-                  },
-                  
+                    name: self.selectedHtml!==''?self.selectedHtml:"（没内容）", 
+                    // content: '['+ self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    obj:self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml),
+                    date: "",
+                  }
                 ]  // 组项目
             },
 
@@ -247,19 +282,7 @@ export default {
           name: '文档段', 
           type: 'SECTION',
           iconCls: 'el-icon-news',
-          dic:[
-            {
-              group: "文档段字典", // 分组名
-              groupItems: [
-                  { 
-                    name:'文档段', 
-                    content: `<div class="krcd-ctrl krcd-section" contenteditable="true" krcd-type="section" id="krcd-section-5" style="" krcd-isloadasyncdata="false" krcd-model="%7B%22mode%22%3A%22EDITOR%22%2C%22originalmode%22%3A%22EDITOR%22%2C%22desc%22%3A%22%22%7D"><p contenteditable="true" class="krcd-value"><br></p></div>`
-                  },
-                  
-                ]  // 组项目
-            },
-
-          ]
+          dic:[ ]
         },
         {
           name: '存文档段模版', 
@@ -529,37 +552,7 @@ export default {
       console.log(window.$EDITORUI["edui93"]._edit)
       window.$EDITORUI["edui93"]._edit()
     },
-    
-
-    // $EDITORUI["edui93"]._edit()   // 这是文本
-
-    // $EDITORUI["edui93"]._delete()
-    
-    // $EDITORUI["edui118"]._edit()  // 这是下拉
-
-//     <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
-//     <img src="img_w3slogo.gif" draggable="true" ondragstart="drag(event)" id="drag1" width="88" height="31"></div>
-// <div id="div2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-
-//     // 利用H5的draggable="true"来拖动控件
-//     function allowDrop(ev)
-// {
-// 	ev.preventDefault();
-// }
-
-// function drag(ev)
-// {
-// 	ev.dataTransfer.setData("Text",ev.target.id);
-// }
-
-// function drop(ev)
-// {
-// 	ev.preventDefault();
-// 	var data=ev.dataTransfer.getData("Text");
-// 	ev.target.appendChild(document.getElementById(data));
-// }
-    
-    
+        
     // 保存成功函数
     saveError(msg) {
         this.$message({
@@ -663,7 +656,7 @@ export default {
       return callback() 
     }, 
     
-      // 保存元素模版(作为动态模版)
+    // 保存元素模版(作为动态模版)
     saveCtrl2Widget(inputInfo={}, callback=()=>{}){     
       let target;
       if(this.tarEl.className.indexOf('krcd-value')!==-1&&this.tarEl.parentNode.className.indexOf('krcd-ctrl')!==-1){
@@ -730,7 +723,7 @@ export default {
 
       // this.saveSuccess('组件');
 
-      this.commitShow = false
+      this.commitShow.OnOff = false
       
       return callback() 
     }, 
@@ -767,7 +760,7 @@ export default {
         div = div.firstElementChild; 
         const bindingdata = desc.length!==0?            
             [//默认绑定数据。
-              {label:desc,value:'0'},
+              {'label':desc,'value':'0'},
             ]
             :
             [//默认绑定数据。
@@ -796,21 +789,26 @@ export default {
             // }
         })
       
-      newDiv.refreshData([true])
-      let  aaa = 
+      
+      newDiv.refreshData([true])  
+      
+      
       // 设置默认值
-      // desc.length!==0?newDiv.setValue([{label:desc,value:'0'}]):newDiv.setValue([{label:'默认值',value:'0'}]);
-      newDiv.setValue(encodeURIComponent(JSON.stringify(bindingdata[0])));
+      desc.length!==0?newDiv.setValue([{label:desc,value:'0'}]):newDiv.setValue([{label:'默认值',value:'0'}]);
+      // newDiv.setValue(encodeURIComponent(JSON.stringify(bindingdata[0])));
+      console.log(newDiv)
       console.log(newDiv.getCtrlElement())
      
       return {
           newDiv,
-          show: newDiv.getValueElement().parentNode.innerHTML,  // 为模版展示用, 取出生成的html
-          html: newDiv.getCtrlElement()
+          show: newDiv.getValueElement().parentNode.innerHTML,  // 为模版展示用, 取出生成的html          
         }
     },
     // 增加点选
     createRadio(domSet={ctrlId:null,ctrlStyle:null}, defOpt, desc){
+
+      console.log(arguments)
+
       let div = document.createElement('span');   
       div.innerHTML = `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
       div = div.firstElementChild;
@@ -843,11 +841,24 @@ export default {
           //     }
           // }
       })
-      
+     
+
+
+
+
+
+
+      console.log(newDiv.getCtrlElement())
       newDiv.refreshData([true]) 
 
-      desc.length!==0?newDiv.setValue({ "value":"0","label":desc,"selected":0 }):newDiv.setValue({ "value":"0","label":"默认单选","selected":0 }) // 设置默认值但是貌似不成功
+      if(desc.length!==0){
+        newDiv.setValue({ "value":"0","label":desc,"selected":0 })
+      }else{
+        newDiv.setValue({ "value":"0","label":"默认单选","selected":0 }) // 设置默认值但是貌似不成功
+      }
+
       console.log(newDiv.getCtrlElement())
+      
       return {
           newDiv,
           show: newDiv.getValueElement().parentNode.innerHTML  // 为模版展示用, 取出生成的html
@@ -951,12 +962,11 @@ export default {
               selectedHtml
             }
 
-          }else if(iframeObj.getSelection){    
+          }else if(iframeObj.getSelection&&iframeObj.getSelection.rangeCount > 0){    // 以免出现错误，所以先判断大于0
             //标准浏览器
 
             let selectionObj = iframeObj.getSelection();
-　　　　　　　let selectedText = selectionObj.toString();
-
+　　　　　　　let selectedText = selectionObj.toString();            
 　　　　　　　let rangeObj = selectionObj.getRangeAt(0);
 　　　　　　　let docFragment = rangeObj.cloneContents();
 　　　　　　  let tempDiv = document.createElement("div");
@@ -967,7 +977,12 @@ export default {
               selectedText,
               selectedHtml
             }
-          }	 
+          }else{
+            return {
+              selectedText:'',
+              selectedHtml:''
+            }
+          }
     },
     
 
@@ -975,7 +990,7 @@ export default {
      * 专门做插入控件之用
      * params1{object}: newDiv（基本来自createDate）
      */
-    addCtrl( type, ctrlName, ctrlId='', ctrlStyle='', Opt=null,  paste=false,){      
+    addCtrl( type, ctrlName, ctrlId='', ctrlStyle='', Opt=null,  paste=false){      
       
       // 获取选中的文字
       function selectText(){
@@ -990,7 +1005,7 @@ export default {
       
       let selResult = selectText();
       if(selResult.length!==0){
-        alert(selResult)
+        // alert(selResult)
       }
      
       let domSet = {
@@ -1005,7 +1020,7 @@ export default {
       let selectedHtml = paste?this.selectedHtml:'';
       let selectedText = paste?this.selectedText:'';
       switch(type){
-        case "PASTE":         
+        case "PASTE":
             this.krcd.execCommand('inserthtml', selectedHtml).newDiv;
             break
         case "DATE":
@@ -1064,16 +1079,28 @@ export default {
       }
       headerTag.appendChild(styleDOM);
 
+      console.log(newDiv.getCtrlElement())
       
-      if(type !== "SECTION"&&type !== "WIDGET"&&type !== "CTRLS"&&type !== "PASTE"){     
+      if(type !== "SECTION"&&type !== "WIDGET"&&type !== "CTRLS"&&type !== "PASTE"){       
         this.krcd.insertControl(
           newDiv.getCtrlElement(),  //  获取会对应的Element
           newDiv.getOpt()     //  获取会对应的opt
         )
+
+        // const ele = this.krcd.getControlByEl(newDiv.getCtrlElement());
+
+        // ele.setValue(newDiv.getOpt().bindingdata[0])
+
+        // console.log(newDiv.getOpt().bindingdata[0])
       }
+
+
+      console.log(newDiv.getCtrlElement())
       
       // 插入后隐藏工具条
-      // this.onOff = {...this.off}
+      // this.onOff = {...this.off}  
+      this.saveAble = null;  // 有一个渐变的的问题
+      
     },
 
     // 插入Section区域控件（文档段）
@@ -1105,9 +1132,17 @@ export default {
     execCommand() {
       return this.krcd.execCommand.apply(this.krcd, arguments);
     },
-    mode(mode) {
-      if (!!mode) {
-        this.krcd.mode(mode);
+    mode(opt) {
+      if (!!opt.name) {
+        this.krcd.mode(opt.name);
+        // 弹出右侧的提示消息
+        this.$notify({
+          title: `【${opt.name}】`,
+          message: `当前模式切换为“${opt.tip}”`,
+          type: 'success',
+          position:'top-left',
+          duration: 1500,
+        });
       } else {
         return this.krcd.mode();
       }

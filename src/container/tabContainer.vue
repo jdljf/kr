@@ -22,7 +22,6 @@ import Widgets from '../components/Widgets';
 import Template from '../components/Template';
 import Tree from '../components/Tree';
 
-
 export default {
     data(){
         return{
@@ -50,8 +49,11 @@ export default {
         back2font: Function,
         getHtmlContent: Function
     },
-    mounted(){
-        console.log(this.savetemplefun)
+    mounted(){        
+       
+    },
+    methods:{
+        
     }
 }
 </script>

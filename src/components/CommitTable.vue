@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="动态模版保存" :visible.sync="commitShow" :show-close="true">
+    <el-dialog title="动态模版保存" :visible.sync="commitShow.OnOff" :show-close="true" >
         <el-form :model="saveForm" status-icon :rules="rules" ref="saveForm" label-width="200px" class="demo-saveForm">            
             <el-form-item label="描述" prop="describe" label-width="100px">
                 <el-input v-model.trim="saveForm.describe"></el-input>
@@ -25,7 +25,7 @@
   export default {
     name: 'CommitTable',
     props:{
-      commitShow: Boolean,   // 参数传入来控制是否展开
+      commitShow: Object,   // 参数传入来控制是否展开
       returnCommitData: Function  //  函数返回数据，传入data，返回父级
     },
     data() {
@@ -88,16 +88,23 @@
         this.$refs[formName].validate((valid) => { 
           if (valid) {
             this.returnCommitData(this.saveForm)  // 将整个数据传给父级
+            this.$notify({
+              title: '成功',
+              message: '已成功保存一份新的数据',
+              type: 'success',
+              duration: 3000 // 测定延时时间              
+            });
             // alert('submit!');
           } else {
             console.log('error submit!!');
             return false;
           }
+          this.resetForm('saveForm')
         });
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
-      }
-    }
+      },      
+    },   
   }
 </script>
