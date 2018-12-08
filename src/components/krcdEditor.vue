@@ -1,9 +1,11 @@
 <template>  
-  <el-container style="height: 100%;" class="krcd-root height-ful">    
+  <el-container style="height: 100%;" class="krcd-root height-ful" v-loading.fullscreen.lock="fullscreenLoading">    
     <el-container>
-      <el-aside style="width:auto;border:none;border-right: 1px solid rgb(220, 223, 230);">      
-        <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>    
-      </el-aside>
+        <el-aside :style="`width:${leftTreeWidth};border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;`">        
+            <!-- <div @mouseout="showHideLeft('hide')">       -->
+              <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>    
+            <!-- </div>        -->
+        </el-aside>
       <div class="tools" v-show="toolsShow">  
         <NavMenu 
           class="tools-btn" 
@@ -15,10 +17,16 @@
           />
         <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
       </div>  
-      <el-container style="overflow: hidden;">
+      <el-container style="overflow: hidden;"  class="left-tree">
+        <div class="showBtnLeft" @click="showHideLeft" @mouseover="showHideLeft('show')">
+          <!-- <span>展开收起</span> -->
+        </div>
+        <div class="showBtnRight" @click="showHideRight"  @mouseover="showHideRight('show')">
+          <!-- <span>展开收起</span> -->
+        </div>
         <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
         </div>
-        <el-footer style="height: 36px;padding: 5px;border:1px solid rgb(220, 223, 230);">
+        <el-footer style="z-index: 999;height: 42px;padding: 5px;background-color: white;border: 1px solid rgb(220, 223, 230);">
           <el-row style="display:flex;justify-content: flex-end;"> 
             <!--1. DESIGN 设计模式；
                 2. EDITOR 编辑模式；
@@ -30,31 +38,51 @@
           </el-row>
         </el-footer>
       </el-container>
-      <el-aside style="width:auto;">
-        <el-header style="height: 30px;
-          box-sizing: border-box;
-          background-color: #409EFF;
-          color: #F2F6FC;
-          line-height: 30px;
-          font-size: 13px;
-          text-align: left;
-          padding: 0px 12px;"></el-header>
-        <div class="widget-list">
-          <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;">
-            <div class="nav-tools">
-              <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
-              <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
-              <el-button v-show="this.saveAble==='ctrlAble'" type="success" size="mini" plain @click="commitShow.OnOff=true">保存动态模版</el-button>
-              <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>            
-              <!-- 这里是保存模版用的隐藏按钮 -->
-              <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData"/>     
-            </div>  
-          </el-header>    
-          <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
-          <!-- <Models :list="widgetlist" :fun="insert"/> -->
-          <tabContainer :templeCtrl="templeCtrl" :ctrlist="ctrlist" :ctrlfun="insert" :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun" :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)" :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxTemplate" :back2font="back2font" :getHtmlContent="getHtmlContent"/>
-        </div>
-      </el-aside>          
+          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;`">        
+            <!-- 为了隐藏而用 -->
+            <!-- <div @mouseout="showHideRight('hide')"> -->
+              <el-header style="height: 30px;
+                box-sizing: border-box;
+                background-color: #409EFF;
+                color: #F2F6FC;
+                line-height: 30px;
+                font-size: 13px;
+                text-align: left;
+                padding: 0px 12px;"></el-header>
+              <div class="widget-list">          
+                <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;">
+                  <div class="nav-tools">
+                    <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
+                    <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
+                    <el-button v-show="this.saveAble==='ctrlAble'" type="success" size="mini" plain @click="commitShow.OnOff=true">保存动态模版</el-button>
+                    <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>            
+                    <!-- 这里是保存模版用的隐藏按钮 -->
+                    <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData"/>     
+                  </div>  
+                </el-header>    
+                <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
+                <!-- <Models :list="widgetlist" :fun="insert"/> -->
+                <tabContainer 
+                    :templeCtrl="templeCtrl" 
+                    :ctrlist="ctrlist" 
+                    :ctrlfun="insert" 
+                    :templatelist="templatelist" 
+                    :widgetlist="widgetlist" 
+                    :patlist="patlist" 
+                    :widgetfun="insert" 
+                    :templatefun="replaceFun" 
+                    :savetemplefun="()=>inputName(saveHtmlContent)" 
+                    :savewidgetfun="()=>inputName(saveHtmlContent)" 
+                    :savectrlfun="()=>inputName(saveHtmlContent)" 
+                    :ajaxtemple="ajaxTemplate" 
+                    :back2font="back2font" 
+                    :getHtmlContent="getHtmlContent">              
+                </tabContainer>
+              </div>
+
+            <!-- </div> -->
+          </el-aside>   
+          
      </el-container>    
   </el-container>
 </template>
@@ -131,6 +159,8 @@ export default {
     getHTML() {
       return this.krcd.html();
     },
+    
+
     dddd() {
       var div = document.createElement("div");
       div.innerHTML = `<span id="gj" krcd-right="." krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false">
@@ -1154,6 +1184,9 @@ export default {
     // var ue = window.$EDITORUI["edui151"].editor;
     
     // console.log(ue.getContent());
+
+
+    
   },
   beforeDestroy() {
     this.krcd.__ue__.destroy();
@@ -1241,7 +1274,45 @@ export default {
   padding:8px;
 }
 
+.left-tree{
+  position: relative;
+}
 
+.showBtnLeft{
+  display: inline-block;
+  position: absolute;
+  background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  color: #F2F6FC;
+  left: 0;
+  top: 50%;
+  margin-top: -50px;
+  width: 24px;
+  height: 100px;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.showBtnRight{
+  display: inline-block;
+  position: absolute;
+  background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  color: #F2F6FC;
+  right: 0;  
+  top: 50%;
+  margin-top: -50px;
+  width: 24px;
+  height: 100px;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;  
+}
 
 </style>
 

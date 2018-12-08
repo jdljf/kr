@@ -78,6 +78,9 @@ export default {
   },
   data() {
     return { 
+      fullscreenLoading: true,  // true时显示loading
+      leftTreeWidth: 0,  // 左方收起展开
+      rightTreeWidth: 0,  // 左方收起展开
       templeCtrl: false, // 整个模版的编辑和删除的控制
       toolsShow: false,  // 工具的隐藏
       /**
@@ -544,6 +547,36 @@ export default {
     }
   },
   methods: {
+
+    // 展开收起
+    showHideLeft(over){
+      if(over==='show'){
+        this.leftTreeWidth = 'auto';
+      }else if(over==='hide'){
+        this.leftTreeWidth = 0;
+      }else{
+        if(this.leftTreeWidth === 0){
+          this.leftTreeWidth = 'auto';
+        }else if(this.leftTreeWidth === 'auto'){
+          this.leftTreeWidth = 0;
+        }      
+      }
+      
+    },
+
+    showHideRight(over){
+       if(over==='show'){
+        this.rightTreeWidth = 'auto';
+      }else if(over==='hide'){
+        this.rightTreeWidth = 0;
+      }else{
+        if(this.rightTreeWidth === 0){
+          this.rightTreeWidth = 'auto';
+        }else if(this.rightTreeWidth === 'auto'){
+          this.rightTreeWidth = 0;
+        }        
+      }
+    },
     
     // 调出编辑的弹窗
     editWin(type){
@@ -770,10 +803,10 @@ export default {
             ]
             :
             [//默认绑定数据。
-              {label:'默认值',value:'0'},
-              {label:'男',value:'1'},
-              {label:'女',value:'2'},
-              {label:'未知',value:'3'}
+              {'label':'默认值','value':'0'},
+              {'label':'男','value':'1'},
+              {'label':'女','value':'2'},
+              {'label':'未知','value':'3'}
             ];
         let newDiv = this.krcd.createCtrl(div, defOpt?defOpt:{
             "mode":"EDITOR",//控件状态。EDITOR编辑;READONLY只读
@@ -800,7 +833,7 @@ export default {
       
       
       // 设置默认值
-      desc.length!==0?newDiv.setValue([{label:desc,value:'0'}]):newDiv.setValue([{label:'默认值',value:'0'}]);
+      desc.length!==0?newDiv.setValue([{'label':desc,'value':'0'}]):newDiv.setValue([{'label':'默认值','value':'0'}]);
       // newDiv.setValue(encodeURIComponent(JSON.stringify(bindingdata[0])));
       console.log(newDiv)
       console.log(newDiv.getCtrlElement())
@@ -984,7 +1017,7 @@ export default {
               selectedHtml
             }
           }
-    },
+     },
     
 
     /**
@@ -1079,13 +1112,11 @@ export default {
         styleDOM.innerHTML = this.styleSection(ctrlId, ctrlName) + ctrlStyle;
       }
       headerTag.appendChild(styleDOM);
-
-      console.log(newDiv.getCtrlElement())
       
       if(type !== "SECTION"&&type !== "WIDGET"&&type !== "CTRLS"&&type !== "PASTE"){       
         this.krcd.insertControl(
-          newDiv.getCtrlElement(),  //  获取会对应的Element
-          newDiv.getOpt()     //  获取会对应的opt
+          newDiv.newDiv.getCtrlElement(),  //  获取会对应的Element
+          newDiv.newDiv.getOpt()     //  获取会对应的opt
         )
 
         // const ele = this.krcd.getControlByEl(newDiv.getCtrlElement());
@@ -1096,7 +1127,7 @@ export default {
       }
 
 
-      console.log(newDiv.getCtrlElement())
+      // console.log(newDiv.getCtrlElement())
       
       // 插入后隐藏工具条
       // this.onOff = {...this.off}  
@@ -1133,6 +1164,7 @@ export default {
     execCommand() {
       return this.krcd.execCommand.apply(this.krcd, arguments);
     },
+    
     mode(opt,i) {
       if (!!opt[i].name) {
         this.krcd.mode(opt[i].name);
@@ -1191,6 +1223,10 @@ export default {
     console.log('krcd components created.');
     
   },
+  beforeMount(){
+    
+  },
+
   beforeUpdate(){
       // console.log(document.getElementsByTagName('iframe'))
   },
@@ -1219,14 +1255,13 @@ export default {
     // 为了不断的监控
     // arrBtns
   },
-
+  
   mounted() {   
     console.log(funs)
     console.log(this.$refs.modstyle[0].$el)
 
-
-    const self = this;
-
+      
+    const self = this;    
 
     /**
      * 请求模版数据
@@ -1442,10 +1477,43 @@ export default {
     });
 
     this.krcd.addListener("ready", function() {
-      console.log("krcd 初始化完成！");      
+      console.log("krcd 初始化完成！"); 
+
+      // 根据屏幕变化
+      window.onresize=function(){
+        console.log(window.innerWidth)
+        if(window.innerWidth <= 900){
+          self.leftTreeWidth = 0;
+          self.rightTreeWidth = 0;
+          console.log("屏幕太小了")
+        }else if(window.innerWidth <= 1680){
+          console.log("屏幕还算可以")
+          self.leftTreeWidth = 'auto';
+          self.rightTreeWidth = 0;
+        }else{
+          console.log("屏幕够大了")          
+          self.leftTreeWidth = 'auto';
+          self.rightTreeWidth = 'auto';
+        }      
+      }
+
+      setTimeout(function(){
+          
+        self.fullscreenLoading=false
+        window.onresize();  // 初始化一次 
+        console.log(self.modelsData)
+        // 默认设定为设计模式
+        self.mode(self.modelsData,0);
+
+      },1500)
+
+      
+
+
+
     });
 
-   
+
     
     
   },

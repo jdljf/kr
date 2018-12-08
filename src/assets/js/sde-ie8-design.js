@@ -4300,7 +4300,8 @@
         }),
         l = B["default"].createElement(document, "div", {
           "class": "krcd-editor-outer",
-          style: "width:" + e.outer_width + "px;margin:19px auto;padding:20px 0;"
+          style: "width:" + e.outer_width + "px;margin:19px auto;padding:0;"
+          // style: "width:" + e.outer_width + "px;margin:19px auto;padding:20px 0;"
         }),
         c = B["default"].createElement(document, "div", {
           "class": "krcd-editor-page_header_footer"
