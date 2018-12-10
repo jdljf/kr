@@ -3,11 +3,13 @@
   <!--row-click 参数是row, event, column-->
   <!-- :data="list" :data中的filter筛选是搜索的关键-->
   <div>
+       <!-- 
       <div class="nav-tools">
-        <!-- <el-button type="primary" size="mini" plain @click="savetemple">文档存模版</el-button> -->
+        <el-button type="primary" size="mini" plain @click="savetemple">文档存模版</el-button>
         <el-button type="success" size="mini" plain @click="savewidget">文档存模版</el-button>
         <el-button type="warning" size="mini" plain @click="showSelectShare">分享</el-button>
       </div>      
+      -->
       <el-table  
         ref="navTable" 
         style="width: 100%;"
@@ -16,9 +18,8 @@
         :highlight-current-row='true'
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
-        max-height="500px"
         size="small"
-        >       
+        > 
             <!-- 这是多选 -->
             <el-table-column
               label="序号"              
@@ -74,11 +75,13 @@
               </template>
               <template slot-scope="scope">
                 <el-button
+                  v-if="templeCtrl"
                   size="mini"
                   @click.stop="handleEdit(scope.$index, scope.row)">替换</el-button>
                 <el-button
                   size="mini"
                   type="danger"
+                  v-if="templeCtrl"
                   @click.stop="handleDelete(scope.$index, scope.row)"><i class='el-icon-delete'></i></el-button>
               </template>
             </el-table-column>
@@ -125,6 +128,7 @@ import funs from '../common/funs';
   export default {
     name: "Template",   
     props:{
+        templeCtrl: Boolean,
         list: Array,
         fun: Function,
         savetemple: Function,  
@@ -290,8 +294,5 @@ import funs from '../common/funs';
 .el-table .cell {
   display: flex;
 }
-.nav-tools{
-  display: flex;
-  flex-direction: flex-start;
-}
+
 </style>

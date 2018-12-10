@@ -1,11 +1,6 @@
 <template>
     <div :style="toolStyle">
-        <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
-            <el-radio-button :label="false" @open="handleOpen" >展开</el-radio-button>
-            <el-radio-button :label="true"  @close="handleClose" >收起</el-radio-button>
-        </el-radio-group> -->      
-           
-
+        
         <!-- 第一层按钮 -->
         <el-menu 
             default-active="" 
@@ -40,7 +35,7 @@
                   :key="(index+1)+'-'+(groupIdx+1)"                 
                   >                   
                     <el-card shadow="hover"  style="margin-bottom:12px;" class="card-style">                      
-                      <el-menu-item :index="(index+1)+'-'+(groupIdx+1)" @click="addDic(groupItem.content)" v-html="`<span style='color:#999'>${groupItem.name} | </span>`+groupItem.content" ></el-menu-item>
+                      <el-menu-item :index="(index+1)+'-'+(groupIdx+1)" @click="addDic(groupItem.obj)" v-html="`<span style='color:#999;padding-right:8px;'>${groupItem.name} | </span>`+groupItem.obj.show" ></el-menu-item>
                     </el-card>
                   </el-col>                  
                 </el-row>
@@ -122,9 +117,17 @@
       },
       // 点击插入对应字典
       addDic(item){
+        console.log(item)
         // 调用对应的插入方法
-        this.self.krcd.execCommand('inserthtml',item)
-        this.self.onOff = {...this.self.off};
+        // this.self.krcd.execCommand('inserthtml',item)
+        // this.self.onOff = {...this.self.off};
+
+        this.self.krcd.insertControl(
+          item.newDiv.getCtrlElement(),  //  获取会对应的Element
+          item.newDiv.getOpt()     //  获取会对应的opt
+        )
+
+        this.self.saveAble = null; // 改变工具的状态为默认值
       },
       
     }

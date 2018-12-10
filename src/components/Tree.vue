@@ -23,8 +23,6 @@
             >
           </el-tree>    
         </div>
-
-        
     </div>    
 </template>
 
