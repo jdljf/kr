@@ -1107,9 +1107,6 @@ export default {
     // console.log(this.krcd);
     this.krcd.addListener("ready", function() {
       console.log("krcd 初始化完成！");
-      $("#ueditor_1").contents().on("click",".krcd-tmp-content td", function() {
-        alert("asdsadsada");
-      });
     });
     this.krcd.addListener("headerfooteropen", function() {
       console.log(this);
