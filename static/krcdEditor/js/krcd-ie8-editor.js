@@ -19359,15 +19359,21 @@
               for(var i=0;i<ctrlsLen;i++){
                 sectionHTML.push(ctrls[i].getAttribute("title"))
               }
-              sectionHTML=sectionHTML.join(',')
+              
             ////////////////////////
             var inps=div.getElementsByTagName("input"),
-                inpLen=inps.length;
+                inpLen=inps.length,
+                selects=div.getElementsByClassName("krcd-select"),
+                selectsLen=selects.length,
+                checkvalue=[];
             console.log(inps);
             if(inpLen!=0){
               for(var i=0;i<inpLen;i++){
                 if(inps[i].getAttribute("checked")!="checked"){
                   inps[i].classList.add("removeInp");
+                }else{
+                  var checkBoxValue=JSON.parse(decodeURIComponent(inps[i].value));
+                  checkvalue.push(checkBoxValue.label)
                 }
               }
               var removes=div.querySelectorAll(".removeInp,.krcd-revise-del");
@@ -19378,7 +19384,15 @@
             }else{
               divText=div.innerText;
             }
+            if(selectsLen!=0){
+              for(var i=0;i<selectsLen;i++){
+                checkvalue.push(selects[i].innerText);
+              }
+            }
           }
+          console.log(checkvalue)
+          var sectionHTML=sectionHTML.concat(checkvalue);
+          sectionHTML=sectionHTML.join(',');
           e.controls.push({
             id: t.getCtrlElement().getAttribute("id"),
             type: t.TYPE_NAME,
