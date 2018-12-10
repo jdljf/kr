@@ -21618,22 +21618,34 @@
       return (0, l["default"])(t, e), t.prototype.render = function () {
         var t = arguments.length > 0 && arguments[0] !== undefined && arguments[0],
           n = e.prototype.getOpt.call(this),
-          a = this.getValue(),
+          a = this.getValue(),          
           r = f["default"].getUUID(),
           i = e.prototype.getCtrlElement.call(this),
           o = e.prototype.getValueElement.call(this),
           s = void 0,
           d = void 0;
+          console.log(a)
         n && n.remotedata && n.remotedata.url.length > 0 ? (s = [], d = i ? f["default"].str2json(i.getAttribute("bindingdata")) : [], f["default"].each(d, function (e) {
           var t = !!a && a.value === e;
           s.push('<label contenteditable="false"><input name="radio_' + r + '" type="radio" ' + (t ? ' checked="checked" ' : "") + ' value="' + v["default"].encryptStr(f["default"].json2str(e)) + '">' + e.label + "</label>")
         }), o && (o.innerHTML = s.join(""))) : t && (s = [], d = n.bindingdata, i && (i.setAttribute("bindingdata", v["default"].encryptStr(f["default"].json2str(d))), i.setAttribute("krcd-value", "")), f["default"].each(d, function (e) {
           var t = !!a && a.value === e;
           s.push('<label contenteditable="false"><input name="radio_' + r + '" type="radio" ' + (t ? ' checked="checked" ' : "") + ' value="' + v["default"].encryptStr(f["default"].json2str(e)) + '">' + e.label + "</label>")
+          console.log(v["default"].encryptStr)
         }), o && (o.innerHTML = s.join("")))
       }, t.prototype.setValue = function (t) {
         var n = e.prototype.getCtrlElement.call(this);
+        
+        console.log(n)
         n && (e.prototype._reviseChangeValue.call(this), null === t && (t = ""), n.setAttribute("krcd-value", v["default"].encryptStr(f["default"].isString(t) ? t : f["default"].json2str(t))))
+        console.log(v["default"].encryptStr(f["default"].isString(t) ? t : f["default"].json2str(t)))
+        console.log(f["default"].isString(t) ? t : f["default"].json2str(t))
+        console.log(v["default"].encryptStr)
+        console.log(f['default'])
+        console.log(this)
+        console.log(a)
+        console.log(t)
+        console.log(f["default"].json2str(t))
       }, t.prototype.getValue = function () {
         var t = e.prototype.getCtrlElement.call(this);
         if (t) return f["default"].str2json(v["default"].decryptStr(t.getAttribute("krcd-value")))
@@ -21643,7 +21655,7 @@
             a = e.prototype.getValueElement.call(this).querySelectorAll("input[type=radio]");
           f["default"].each(a, function (e) {
             e.removeAttribute("checked")
-          }), n.setAttribute("checked", "checked");
+          }), n.setAttribute("checked", "checked");          
           var r = f["default"].str2json(v["default"].decryptStr(n.value));
           this.setValue(r);
           var i = e.prototype.getOpt.call(this);
