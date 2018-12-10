@@ -116,7 +116,7 @@
             domCtrl = ctrl.getCtrlElement();
           var domValue = ctrl.getValueElement();
           $('#txtID').val(domCtrl.getAttribute('id'));
-          $('#txtDESC').val(opt.desc);
+          $('#txtDESC').val(opt.descNEW);
           // if (opt.required === 1) {
           //   $G('txtREQUIRED').checked = true;
           // }
@@ -153,6 +153,7 @@
           return false;
         }
         var newOpt = opt || {};
+        newOpt.descNEW=$('#txtDESC').val();
         newOpt.desc = '';
         newOpt.notdel = $G('txtNOTDEL').checked ? 1 : 0;
         newOpt.originalmode = newOpt.mode = $('#txtMODE').val();
@@ -180,7 +181,7 @@
             contenteditable: false,
             id: $G('txtID').value,
             'krcd-type': 'section',
-            title:newOpt.desc
+            title:newOpt.descNEW
           });
           var domValue = UE.dom.domUtils.createElement(document, 'p', {
             class: 'krcd-value',

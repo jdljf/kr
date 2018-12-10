@@ -33306,11 +33306,11 @@
       e.commands.insertcontrol = {
         execCommand: function (n, r, a) {
           t || (t = this.__krcd__);
+          console.log(a)
           var A = ["label"],
             o = r.getAttribute("krcd-type");
           if (o && A.indexOf(o) >= 0) return void e.execCommand("insertHtml", r.outerHTML);
           var s = t.createCtrl(r, a);
-          console.log(s.getCtrlElement().outerHTML)
           s.refreshData(!0), e.execCommand("insertHtml", i["default"].specialStr + s.getCtrlElement().outerHTML + i["default"].specialStr)
         }
       }

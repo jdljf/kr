@@ -123,7 +123,7 @@
               domCtrl = ctrl.getCtrlElement();
             var domValue = ctrl.getValueElement();
             $('#txtID').val(domCtrl.getAttribute('id'));
-            $('#txtDESC').val(opt.desc);
+            $('#txtDESC').val(opt.descNEW);
             if (opt.required === 1) {
               $G('txtREQUIRED').checked = true;
             }
@@ -160,6 +160,7 @@
             return false;
           }
           var newOpt = opt || {};
+          newOpt.descNEW=$('#txtDESC').val();
           newOpt.desc = '';
           newOpt.required = $G('txtREQUIRED').checked ? 1 : 0;
           newOpt.strictverify = $G('txtSTRICTVERIFY').checked ? 1 : 0;
@@ -190,7 +191,7 @@
               id: $G('txtID').value,
               'krcd-type': 'text',
               'krcd-right': '.',
-              title:newOpt.desc
+              title:newOpt.descNEW
             });
             var domValue = UE.dom.domUtils.createElement(document, 'span', {
               class: 'krcd-value',
