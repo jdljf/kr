@@ -1262,5 +1262,55 @@ export default {
 .height-ful {
   height: 100%;
 }
+
+.nav-tools{
+  display: flex;
+  flex-direction: flex-start;
+  align-items: center
+}
+
+.nav-tools>*{
+  padding:8px;
+}
+
+.left-tree{
+  position: relative;
+}
+
+.showBtnLeft{
+  display: inline-block;
+  position: absolute;
+  background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  color: #F2F6FC;
+  left: 0;
+  top: 50%;
+  margin-top: -50px;
+  width: 24px;
+  height: 100px;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.showBtnRight{
+  display: inline-block;
+  position: absolute;
+  background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  color: #F2F6FC;
+  right: 0;  
+  top: 50%;
+  margin-top: -50px;
+  width: 24px;
+  height: 100px;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;  
+}
 </style>
 
