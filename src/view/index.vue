@@ -29,8 +29,8 @@
       
     </div>
     <!-- <div class="toolbars"></div> -->
-    <button @click="testSet()">设置按钮</button>
-    <button @click="getTds()">获取编辑器的td</button>
+    <!-- <button @click="testSet()">设置按钮</button>
+    <button @click="getTds()">获取编辑器的td</button> -->
     <div style="margin:0 auto;width:100%;height:100%;">
       <krcd-editor ref="krcdEditor"></krcd-editor>
     </div>
