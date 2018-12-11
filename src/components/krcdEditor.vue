@@ -93,12 +93,11 @@ import "../../static/krcdEditor/ueditor/themes/default/css/ueditor.min.css";
 import "../../static/krcdEditor/ueditor/ueditor.all.min.js";
 import "../../static/krcdEditor/ueditor/lang/zh-cn/zh-cn.js";
 import "../../static/krcdEditor/js/krcd-ie8-design.js";
-import {ajax} from '../common'
+import { ajax } from "../common";
 
 export default {
   name: "krcdEditor",
-  components: {    
-  },
+  components: {},
   props: {
     //编辑器的宽高取决于编辑器渲染节点本身的宽高
     width: {
@@ -108,8 +107,7 @@ export default {
     height: {
       type: String,
       default: "calc(100%-144px)"
-    },
-    
+    }
   },
   data() {
     return {
@@ -160,8 +158,6 @@ export default {
     getHTML() {
       return this.krcd.html();
     },
-    
-
     dddd() {
       var div = document.createElement("div");
       div.innerHTML = `<span id="gj" krcd-right="." krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false">
@@ -215,8 +211,8 @@ export default {
   },
   mounted() {
     //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');
-    console.log(UE.getEditor("editor"));  
-    console.log(ajax)
+    console.log(UE.getEditor("editor"));
+    console.log(ajax);
     var that = this;
     this.krcd = new KRCD({
       el: this.$refs.editor,
@@ -312,157 +308,156 @@ export default {
                     });
                     return div;
                   }
-                },
-          //       {
-          //         name: 'tt3',
-          //         title: '保存模版', 
-          //         render: ()=>{
-          //           let div = document.createElement('div');
-          //           div.innerHTML = `<div class="panel-content-ctrl" title="保存模版" >
-          //   <div class="krcd-icon krcd-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
-          //   <div style="text-align: center;">保存模版</div>
-          //   <div class="shade" style="display:none;background-color:rgba(0,0,0,0.3);position:fixed;left:0;right:0;top:0;bottom:0;z-index:1008;">
-          //     <div class="modelId-input" style="position:absolute;left:50%;top:50%;margin-left:-150px;margin-top:-80px;background-color:#ffffff;width:300px;height:160px;display:flex;align-items:center;flex-direction:column;justify-content:center;">
-          //       <input type="text" placeholder="新建模版名" class="modelId-input" style="width:200px;height:28px;border-radius:6px;padding:8px;"/> 
-          //       <div style="padding-top:20px;">
-          //         <button style="width:80px;height:40px;">确认</button>
-          //         <button style="width:80px;height:40px;">取消</button>  
-          //       </div>                       
-          //     </div>              
-          //   </div>
-          // </div>`;
-                    
-          //           div = div.firstElementChild;
-          //           const win = div.querySelector('.shade');
-          //           const inp = win.querySelector('input');
-          //           const btns = win.querySelectorAll('button');
-          //           const btn1 = btns[0],
-          //                 btn2 = btns[1];                    
+                }
+                //       {
+                //         name: 'tt3',
+                //         title: '保存模版',
+                //         render: ()=>{
+                //           let div = document.createElement('div');
+                //           div.innerHTML = `<div class="panel-content-ctrl" title="保存模版" >
+                //   <div class="krcd-icon krcd-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
+                //   <div style="text-align: center;">保存模版</div>
+                //   <div class="shade" style="display:none;background-color:rgba(0,0,0,0.3);position:fixed;left:0;right:0;top:0;bottom:0;z-index:1008;">
+                //     <div class="modelId-input" style="position:absolute;left:50%;top:50%;margin-left:-150px;margin-top:-80px;background-color:#ffffff;width:300px;height:160px;display:flex;align-items:center;flex-direction:column;justify-content:center;">
+                //       <input type="text" placeholder="新建模版名" class="modelId-input" style="width:200px;height:28px;border-radius:6px;padding:8px;"/>
+                //       <div style="padding-top:20px;">
+                //         <button style="width:80px;height:40px;">确认</button>
+                //         <button style="width:80px;height:40px;">取消</button>
+                //       </div>
+                //     </div>
+                //   </div>
+                // </div>`;
 
-          //           const stopEvent = (e)=>{
-          //             if ( e && e.stopPropagation ) 
-          //                   //因此它支持W3C的stopPropagation()方法 
-          //                   e.stopPropagation(); 
-          //             else
-          //                   //否则，我们需要使用IE的方式来取消事件冒泡 
-          //                   window.event.cancelBubble = true; 
-          //           }
+                //           div = div.firstElementChild;
+                //           const win = div.querySelector('.shade');
+                //           const inp = win.querySelector('input');
+                //           const btns = win.querySelectorAll('button');
+                //           const btn1 = btns[0],
+                //                 btn2 = btns[1];
 
-          //           // 设定调用保存函数
-          //           div.addEventListener('click', ()=>{   
-          //             // console.log("点了flex")                     
-          //               win.style.display = "flex";   
-          //               //  console.log(that.ajax)
-          //             });
-                    
-          //           btn1.addEventListener('click', (e)=>{  
-          //               stopEvent()     // 阻止冒泡              
-          //               let modelId = inp.value;
-          //               that.saveHtmlContent(modelId, (content)=>{ 
+                //           const stopEvent = (e)=>{
+                //             if ( e && e.stopPropagation )
+                //                   //因此它支持W3C的stopPropagation()方法
+                //                   e.stopPropagation();
+                //             else
+                //                   //否则，我们需要使用IE的方式来取消事件冒泡
+                //                   window.event.cancelBubble = true;
+                //           }
 
-          //                 console.log(content.length)
-          //                 console.log(content)
-          //                 win.style.display = "none";  
-          //                 ajax.post(
-          //                   '/DocumentTemplate/Save',
-          //                   content                            
-          //                 ).then((res)=>{
-          //                   console.log('成功了！',res)
-          //                   that.saveSuccess('模版')  
-          //                   }                       
-          //                 ).catch((err)=>{
-          //                   console.log(err)
-          //                   that.saveError('模版')  
-          //                 })
-                         
-          //               })                                    
-          //             });
+                //           // 设定调用保存函数
+                //           div.addEventListener('click', ()=>{
+                //             // console.log("点了flex")
+                //               win.style.display = "flex";
+                //               //  console.log(that.ajax)
+                //             });
 
-          //           btn2.addEventListener('click', ()=>{ 
-          //               stopEvent()                 
-          //               win.style.display = "none";        
-          //               // console.log( win)           
-          //             });
+                //           btn1.addEventListener('click', (e)=>{
+                //               stopEvent()     // 阻止冒泡
+                //               let modelId = inp.value;
+                //               that.saveHtmlContent(modelId, (content)=>{
 
-          //           return div;
-          //         }
-          //       },
-          //       {
-          //         name: 'tt3',
-          //         title: '读取模版', 
-          //         render: ()=>{
-          //           let div = document.createElement('div');
-          //           div.innerHTML = `<div class="panel-content-ctrl" title="读取模版" >
-          //   <div class="krcd-icon krcd-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
-          //   <div style="text-align: center;">读取模版</div>
-          //   <div class="shade" style="display:none;background-color:rgba(0,0,0,0.3);position:fixed;left:0;right:0;top:0;bottom:0;z-index:1008;">
-          //     <div class="modelId-input" style="position:absolute;left:50%;top:50%;margin-left:-150px;margin-top:-80px;background-color:#ffffff;width:300px;height:160px;display:flex;align-items:center;flex-direction:column;justify-content:center;">
-          //       <input type="text" placeholder="新建模版名" class="modelId-input" style="width:200px;height:28px;border-radius:6px;padding:8px;"/> 
-          //       <div style="padding-top:20px;">
-          //         <button style="width:80px;height:40px;">确认</button>
-          //         <button style="width:80px;height:40px;">取消</button>  
-          //       </div>                       
-          //     </div>              
-          //   </div>
-          // </div>`;
-                    
-          //           div = div.firstElementChild;
-          //           const win = div.querySelector('.shade');
-          //           const inp = win.querySelector('input');
-          //           const btns = win.querySelectorAll('button');
-          //           const btn1 = btns[0],
-          //                 btn2 = btns[1];                    
+                //                 console.log(content.length)
+                //                 console.log(content)
+                //                 win.style.display = "none";
+                //                 ajax.post(
+                //                   '/DocumentTemplate/Save',
+                //                   content
+                //                 ).then((res)=>{
+                //                   console.log('成功了！',res)
+                //                   that.saveSuccess('模版')
+                //                   }
+                //                 ).catch((err)=>{
+                //                   console.log(err)
+                //                   that.saveError('模版')
+                //                 })
 
-          //           const stopEvent = (e)=>{
-          //             if ( e && e.stopPropagation ) 
-          //                   //因此它支持W3C的stopPropagation()方法 
-          //                   e.stopPropagation(); 
-          //             else
-          //                   //否则，我们需要使用IE的方式来取消事件冒泡 
-          //                   window.event.cancelBubble = true; 
-          //           }
+                //               })
+                //             });
 
-          //           // 设定调用保存函数
-          //           div.addEventListener('click', ()=>{   
-          //             // console.log("点了flex")                     
-          //               win.style.display = "flex";   
-          //               //  console.log(that.ajax)
-          //             });
-                    
-          //           btn1.addEventListener('click', (e)=>{  
-          //               stopEvent()     // 阻止冒泡              
-          //               let modelId = inp.value;
-                        
-          //                 win.style.display = "none";
-          //                 ajax.post(
-          //                   '/DocumentTemplate/GetList',
-          //                   {
-          //                     "deptCode": "",
-          //                     "creatorUserId": 0,
-          //                     "id": +inp.value
-          //                   }
-          //                 ).then((res)=>{
-          //                   console.log('成功了！',res)
-          //                   let content = JSON.parse(res.data.data[0].htmlContent)                            
-          //                   that.replaceFun(content)
+                //           btn2.addEventListener('click', ()=>{
+                //               stopEvent()
+                //               win.style.display = "none";
+                //               // console.log( win)
+                //             });
 
-          //                   }
-          //                 ).catch((err)=>{
-          //                   console.log(err)
-          //                 })
-                         
-                                                          
-          //             });
+                //           return div;
+                //         }
+                //       },
+                //       {
+                //         name: 'tt3',
+                //         title: '读取模版',
+                //         render: ()=>{
+                //           let div = document.createElement('div');
+                //           div.innerHTML = `<div class="panel-content-ctrl" title="读取模版" >
+                //   <div class="krcd-icon krcd-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
+                //   <div style="text-align: center;">读取模版</div>
+                //   <div class="shade" style="display:none;background-color:rgba(0,0,0,0.3);position:fixed;left:0;right:0;top:0;bottom:0;z-index:1008;">
+                //     <div class="modelId-input" style="position:absolute;left:50%;top:50%;margin-left:-150px;margin-top:-80px;background-color:#ffffff;width:300px;height:160px;display:flex;align-items:center;flex-direction:column;justify-content:center;">
+                //       <input type="text" placeholder="新建模版名" class="modelId-input" style="width:200px;height:28px;border-radius:6px;padding:8px;"/>
+                //       <div style="padding-top:20px;">
+                //         <button style="width:80px;height:40px;">确认</button>
+                //         <button style="width:80px;height:40px;">取消</button>
+                //       </div>
+                //     </div>
+                //   </div>
+                // </div>`;
 
-          //           btn2.addEventListener('click', ()=>{ 
-          //               stopEvent()                 
-          //               win.style.display = "none";        
-          //               // console.log( win)           
-          //             });
+                //           div = div.firstElementChild;
+                //           const win = div.querySelector('.shade');
+                //           const inp = win.querySelector('input');
+                //           const btns = win.querySelectorAll('button');
+                //           const btn1 = btns[0],
+                //                 btn2 = btns[1];
 
-          //           return div;
-          //         }
-          //       },
+                //           const stopEvent = (e)=>{
+                //             if ( e && e.stopPropagation )
+                //                   //因此它支持W3C的stopPropagation()方法
+                //                   e.stopPropagation();
+                //             else
+                //                   //否则，我们需要使用IE的方式来取消事件冒泡
+                //                   window.event.cancelBubble = true;
+                //           }
+
+                //           // 设定调用保存函数
+                //           div.addEventListener('click', ()=>{
+                //             // console.log("点了flex")
+                //               win.style.display = "flex";
+                //               //  console.log(that.ajax)
+                //             });
+
+                //           btn1.addEventListener('click', (e)=>{
+                //               stopEvent()     // 阻止冒泡
+                //               let modelId = inp.value;
+
+                //                 win.style.display = "none";
+                //                 ajax.post(
+                //                   '/DocumentTemplate/GetList',
+                //                   {
+                //                     "deptCode": "",
+                //                     "creatorUserId": 0,
+                //                     "id": +inp.value
+                //                   }
+                //                 ).then((res)=>{
+                //                   console.log('成功了！',res)
+                //                   let content = JSON.parse(res.data.data[0].htmlContent)
+                //                   that.replaceFun(content)
+
+                //                   }
+                //                 ).catch((err)=>{
+                //                   console.log(err)
+                //                 })
+
+                //             });
+
+                //           btn2.addEventListener('click', ()=>{
+                //               stopEvent()
+                //               win.style.display = "none";
+                //               // console.log( win)
+                //             });
+
+                //           return div;
+                //         }
+                //       },
               ]
             }
           ]
@@ -1165,10 +1160,10 @@ export default {
       console.log(arguments);
       console.log("rendered ok!");
     });
-    // this.krcd.addListener("click", function() {
-    //   console.log(arguments);
-    //   console.log("click ok!");
-    // });
+    this.krcd.addListener("click", function() {
+      console.log(arguments);
+      console.log("click ok!");
+    });
     this.krcd.addListener("valuechange", function() {
       console.log(arguments);
       console.log("valuechange ok!");
@@ -1177,17 +1172,15 @@ export default {
     this.krcd.addListener("contentchange", function() {
       console.log("contentchange ok!");
     });
+
     // console.log(window);
     // //todo 这里可以尝试调用this.krcd的各种方法
     // console.log(window.baidu.editor.getEditor("editor"));
     // console.log(window.$EDITORUI.edui1.editor);
     // console.log(window.$EDITORUI["edui75"].editor);
     // var ue = window.$EDITORUI["edui151"].editor;
-    
+
     // console.log(ue.getContent());
-
-
-    
   },
   beforeDestroy() {
     this.krcd.__ue__.destroy();
@@ -1228,92 +1221,46 @@ export default {
   overflow-y: auto;
 }
 
-.krcd-section::before{
-  content: "我是标签"
+.krcd-section::before {
+  content: "我是标签";
 }
-.krcd-root{
+.krcd-root {
   display: flex;
   flex-direction: row;
 }
-
-.editor-box{
+.widget-list {
+  flex-basis: 150px;
+  flex-shrink: 0;
+  box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px,
+    rgb(204, 204, 204) 0px 0px 3px 1px;
+}
+.editor-box {
   display: flex;
   flex-direction: column;
 }
-.height-ful{
+.height-ful {
   height: 100%;
 }
 
 /* jimmyFok's CSS style */
-.krcd-section::before{
-  content: "我是标签"
+.krcd-section::before {
+  content: "我是标签";
 }
-.krcd-root{
+.krcd-root {
   display: flex;
   flex-direction: row;
 }
-.widget-list{
+.widget-list {
   flex-basis: 150px;
   flex-shrink: 0;
   flex-grow: 1;
 }
-.editor-box{
+.editor-box {
   display: flex;
   flex-direction: column;
 }
-.height-ful{
+.height-ful {
   height: 100%;
 }
-
-.nav-tools{
-  display: flex;
-  flex-direction: flex-start;
-  align-items: center
-}
-
-.nav-tools>*{
-  padding:8px;
-}
-
-.left-tree{
-  position: relative;
-}
-
-.showBtnLeft{
-  display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
-  left: 0;
-  top: 50%;
-  margin-top: -50px;
-  width: 24px;
-  height: 100px;
-  border-bottom-right-radius: 8px;
-  border-top-right-radius: 8px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-}
-
-.showBtnRight{
-  display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
-  right: 0;  
-  top: 50%;
-  margin-top: -50px;
-  width: 24px;
-  height: 100px;
-  border-bottom-left-radius: 8px;
-  border-top-left-radius: 8px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;  
-}
-
 </style>
 

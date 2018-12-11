@@ -21087,13 +21087,6 @@
           w: 600,
           h: 480
         }), [{
-          className: "edui-pre-btn",
-          label: "保存",
-          onclick: function () {
-            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
-            thisIFR.document.getElementById("pre-btn").click();
-          }
-        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -21171,13 +21164,6 @@
           w: 600,
           h: 600
         }), [{
-          className: "edui-pre-btn",
-          label: "保存",
-          onclick: function () {
-            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
-            thisIFR.document.getElementById("pre-btn").click();
-          }
-        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -21252,17 +21238,9 @@
     plugin: function (e) {
       var t = this.name,
         n = a["default"].getDialog(e, t, "checkbox/index.html", "复选框", a["default"].getWidthHeight({
-          w: 900,
+          w: 600,
           h: 600
         }), [{
-          className: "edui-pre-btn",
-          label: "保存",
-          onclick: function () {
-            
-            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
-            thisIFR.document.getElementById("pre-btn").click();
-          }
-        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -21340,13 +21318,6 @@
           w: 600,
           h: 600
         }), [{
-          className: "edui-pre-btn",
-          label: "保存",
-          onclick: function () {
-            var thisIFR=document.getElementsByClassName(n.className)[0].getElementsByTagName("iframe")[0].contentWindow;
-            thisIFR.document.getElementById("pre-btn").click();
-          }
-        },{
           className: "edui-okbutton",
           label: "确定",
           onclick: function () {
@@ -33335,11 +33306,11 @@
       e.commands.insertcontrol = {
         execCommand: function (n, r, a) {
           t || (t = this.__krcd__);
+          console.log(a)
           var A = ["label"],
             o = r.getAttribute("krcd-type");
           if (o && A.indexOf(o) >= 0) return void e.execCommand("insertHtml", r.outerHTML);
           var s = t.createCtrl(r, a);
-          console.log(s.getCtrlElement().outerHTML)
           s.refreshData(!0), e.execCommand("insertHtml", i["default"].specialStr + s.getCtrlElement().outerHTML + i["default"].specialStr)
         }
       }
