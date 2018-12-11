@@ -29,8 +29,8 @@
       
     </div>
     <!-- <div class="toolbars"></div> -->
-    <!-- <button @click="testSet()">设置按钮</button>
-    <button @click="getTds()">获取编辑器的td</button> -->
+    <!-- <button @click="testSet()">设置按钮</button> -->
+    <!-- <button @click="getTds()">获取编辑器的td</button> -->
     <div style="margin:0 auto;width:100%;height:100%;">
       <krcd-editor ref="krcdEditor"></krcd-editor>
     </div>
@@ -103,35 +103,6 @@ export default {
       // document.execCommand("insertHTML","false",'<h1>插入插入插入</h1>')
 
       // document.execCommand("insertHTML","false",'<h1>asdasasdsa</h1>')
-    },
-    getTds(){
-      var tds;
-      $("#ueditor_1").contents().find("tr:first-child td").on("mousedown", function(e) {
-        if(e.offsetX>$(e.currentTarget).outerWidth()-10){
-          tds=$(e.currentTarget);
-          tds.mouseDown=true;
-          tds.oldX=e.pageX;
-          tds.oldWidth=$(e.currentTarget).outerWidth();
-        }
-        
-      });
-      $("#ueditor_1").contents().find("tr:first-child td").on("mouseup", function(e) {
-        tds.mouseDown = false;
-      });
-      $("#ueditor_1").contents().find("tr:first-child td").on("mousemove", function(e) {
-        if(e.offsetX>$(e.currentTarget).outerWidth()-10){
-          $(e.currentTarget).css("cursor","col-resize")
-        }else{
-          $(e.currentTarget).css("cursor","default")
-        }
-        // console.log(e.pageX,tds.oldX,tds.oldWidth+(e.pageX-tds.oldX),tds.oldWidth)
-
-        if(tds.mouseDown!=null&&tds.mouseDown==true){
-          if(tds.oldWidth+(e.pageX-tds.oldX)>0){
-            tds.outerWidth(tds.oldWidth+(e.pageX-tds.oldX));
-          }
-        }
-      });
     }
   },
   mounted() {
