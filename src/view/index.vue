@@ -105,11 +105,31 @@ export default {
       // document.execCommand("insertHTML","false",'<h1>asdasasdsa</h1>')
     },
     getTds(){
-      console.log($("#ueditor_1").contents().find(".krcd-tmp-content td").length)
-      $("#ueditor_1").contents().find("td").on("mousemove", function(event) {
-        console.log(event)
-        if(event.offsetX){
+      var tds;
+      $("#ueditor_1").contents().find("tr:first-child td").on("mousedown", function(e) {
+        if(e.offsetX>$(e.currentTarget).outerWidth()-10){
+          tds=$(e.currentTarget);
+          tds.mouseDown=true;
+          tds.oldX=e.pageX;
+          tds.oldWidth=$(e.currentTarget).outerWidth();
+        }
+        
+      });
+      $("#ueditor_1").contents().find("tr:first-child td").on("mouseup", function(e) {
+        tds.mouseDown = false;
+      });
+      $("#ueditor_1").contents().find("tr:first-child td").on("mousemove", function(e) {
+        if(e.offsetX>$(e.currentTarget).outerWidth()-10){
+          $(e.currentTarget).css("cursor","col-resize")
+        }else{
+          $(e.currentTarget).css("cursor","default")
+        }
+        // console.log(e.pageX,tds.oldX,tds.oldWidth+(e.pageX-tds.oldX),tds.oldWidth)
 
+        if(tds.mouseDown!=null&&tds.mouseDown==true){
+          if(tds.oldWidth+(e.pageX-tds.oldX)>0){
+            tds.outerWidth(tds.oldWidth+(e.pageX-tds.oldX));
+          }
         }
       });
     }
