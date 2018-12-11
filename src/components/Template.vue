@@ -214,7 +214,7 @@ import funs from '../common/funs';
                 "id": row.index   // 这是后端的数据
             }          
             
-            this.ajaxtemple('Update', updateData,"模版数据更新成功", ()=>this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})
+            this.ajaxtemple('/DocumentTemplate/Update', updateData,"模版数据更新成功", ()=>this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})
             );
         }
         
@@ -252,7 +252,7 @@ import funs from '../common/funs';
             console.log(row.index)
              // 这里只是改变了临时的list数据，还需要改变local中的数据            
             
-            this.ajaxtemple('Delete', {
+            this.ajaxtemple('/DocumentTemplate/Delete', {
                 "deleterUserId": 0,
                 "id": row.index
               },

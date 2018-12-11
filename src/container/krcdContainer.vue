@@ -567,6 +567,7 @@
 
         // 请求接口
         ajaxTemplate: (type, content, successMsg, sucessFun) => {
+          console.log(content)
           ajax.post(
             `${type}`,
             JSON.stringify(content)

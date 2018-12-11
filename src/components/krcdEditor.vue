@@ -87,6 +87,7 @@
      </el-container>    
   </el-container>
 </template>
+
 <script>
 import "../../static/krcdEditor/krcd.config.js?t=88";
 import "../../static/krcdEditor/ueditor/themes/default/css/ueditor.min.css";
@@ -1221,45 +1222,39 @@ export default {
   overflow-y: auto;
 }
 
-.krcd-section::before {
-  content: "我是标签";
+.krcd-section::before{
+  content: "我是标签"
 }
-.krcd-root {
+.krcd-root{
   display: flex;
   flex-direction: row;
 }
-.widget-list {
-  flex-basis: 150px;
-  flex-shrink: 0;
-  box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px,
-    rgb(204, 204, 204) 0px 0px 3px 1px;
-}
-.editor-box {
+
+.editor-box{
   display: flex;
   flex-direction: column;
 }
-.height-ful {
+.height-ful{
   height: 100%;
 }
 
 /* jimmyFok's CSS style */
-.krcd-section::before {
-  content: "我是标签";
+.krcd-section::before{
+  content: "我是标签"
 }
-.krcd-root {
+.krcd-root{
   display: flex;
   flex-direction: row;
 }
-.widget-list {
-  flex-basis: 150px;
-  flex-shrink: 0;
+.widget-list{
   flex-grow: 1;
+  overflow: auto;
 }
-.editor-box {
+.editor-box{
   display: flex;
   flex-direction: column;
 }
-.height-ful {
+.height-ful{
   height: 100%;
 }
 
