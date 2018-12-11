@@ -214,7 +214,7 @@ import funs from '../common/funs';
                 "id": row.index   // 这是后端的数据
             }          
             
-            this.ajaxtemple('Update', updateData,"模版数据更新成功", ()=>this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})
+            this.ajaxtemple('/DocumentTemplate/Update', updateData,"模版数据更新成功", ()=>this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})
             );
         }
         
@@ -252,7 +252,7 @@ import funs from '../common/funs';
             console.log(row.index)
              // 这里只是改变了临时的list数据，还需要改变local中的数据            
             
-            this.ajaxtemple('Delete', {
+            this.ajaxtemple('/DocumentTemplate/Delete', {
                 "deleterUserId": 0,
                 "id": row.index
               },
@@ -265,8 +265,9 @@ import funs from '../common/funs';
        
       },
       // 一个函数的包装
-      todo(fun,args,styleString){
-        return fun(args,styleString) // 返回该函数的运行
+      todo(fun,args,styleString,command){
+        // console.log(this)
+        return fun(args,styleString,command) // 返回该函数的运行
       },
       setCurrent(row) {
         this.$refs.singleTable.setCurrentRow(row);
@@ -277,7 +278,7 @@ import funs from '../common/funs';
         console.log(column)
         // 事件函数直接在这里设置这几个函数就可以读取了，不需要自己传入。
         // 填好对应参数即可
-        this.todo(this.fun,row.content,row.styleString)
+        this.todo(this.fun,row.content,row.styleString,row.command)
 
         console.log(this.$refs)
         // this.$refs.navTable.$children[0].type="index" // 单向数据流的问题
