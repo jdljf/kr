@@ -18,10 +18,10 @@
         <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
       </div>  
       <el-container style="overflow: hidden;"  class="left-tree">
-        <div class="showBtnLeft" @click="showHideLeft" @mouseover="showHideLeft('show')">
+        <div class="showBtnLeft" @click="showHideLeft">
           <!-- <span>展开收起</span> -->
         </div>
-        <div class="showBtnRight" @click="showHideRight"  @mouseover="showHideRight('show')">
+        <div class="showBtnRight" @click="showHideRight">
           <!-- <span>展开收起</span> -->
         </div>
         <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
@@ -38,7 +38,7 @@
           </el-row>
         </el-footer>
       </el-container>
-          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;`">        
+          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;display:flex;flex-direction:column`">        
             <!-- 为了隐藏而用 -->
             <!-- <div @mouseout="showHideRight('hide')"> -->
               <el-header style="height: 30px;
@@ -63,9 +63,10 @@
                 <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
                 <!-- <Models :list="widgetlist" :fun="insert"/> -->
                 <tabContainer 
+                    :tabsArray = "tabsArray"
                     :templeCtrl="templeCtrl" 
                     :ctrlist="ctrlist" 
-                    :ctrlfun="insert" 
+                    :ctrlfun="insertDynamicWidget" 
                     :templatelist="templatelist" 
                     :widgetlist="widgetlist" 
                     :patlist="patlist" 
@@ -1254,7 +1255,7 @@ export default {
 .widget-list{
   flex-basis: 150px;
   flex-shrink: 0;
-  /* box-shadow: rgb(209, 209, 209) 0px 0px 0px 1px, rgb(204, 204, 204) 0px 0px 3px 1px; */
+  flex-grow: 1;
 }
 .editor-box{
   display: flex;
