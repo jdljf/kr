@@ -26,9 +26,9 @@
         </div>
         <el-container>
 
-          <!-- <el-aside>
-            <FileList>里分开的时间可浪费的时间分开了</FileList>
-          </el-aside> -->
+          <el-aside style="width:auto;">
+            <FileList>病人信息和文档信息</FileList>
+          </el-aside>
 
           <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
         
@@ -345,7 +345,7 @@ export default {
             <div style="text-align: center;">对象扩展</div>
           </div>`;
                     div = div.firstElementChild;
-                    div.addEventListener("click", function() {
+                    div.addEventListener("click", function() {                      
                       that.addHorizontal();
                     });
                     return div;
@@ -782,9 +782,8 @@ export default {
             <div style="text-align: center;">分割线</div>
           </div>`;
                     div = div.firstElementChild;
-                    div.addEventListener("click", function() {
-                      that.addHorizontal();
-                    });
+                    that.fenGeXian = div;
+                    div.addEventListener("click", that.addHorizontal);
                     return div;
                   }
                 }

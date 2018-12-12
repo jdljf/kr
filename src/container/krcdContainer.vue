@@ -157,7 +157,7 @@
           };
           this.saveCtrl2Widget(this.saveDynamicData)
         },
-
+        fenGeXian: null,
         selectedText: '', // 用来存储选中文字的数据
         selectedHtml: '',
         saveAble: null, // 保存允许状态。 只允许ctrlAble和sectionAble
@@ -1417,19 +1417,27 @@
             case "DESIGN":
               this.toolsShow = true;
               this.templeCtrl = true;
+              this.fenGeXian.addEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl';
               break
             case "EDITOR":
               this.toolsShow = true;
               this.templeCtrl = true;
+              this.fenGeXian.addEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl';
               break
             case "STRICT":
               this.toolsShow = false;
               this.templeCtrl = false;
+              this.fenGeXian.removeEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
               break
             case "READONLY":
               this.toolsShow = false;
               this.templeCtrl = false;
+              this.fenGeXian.removeEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
               break
             default:

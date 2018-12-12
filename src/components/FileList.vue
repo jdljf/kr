@@ -9,10 +9,10 @@
             text-align: left;
             padding: 0px 12px;"></el-header>
         <el-main>
-            <!-- <el-row>
+            <el-row>
                 <el-col :span="8" v-for="(o, index) in 2" :key="o" :offset="index > 0 ? 2 : 0">
                     <el-card :body-style="{ padding: '0px' }">
-                    <img src="~examples/assets/images/hamburger.png" class="image">
+                    <!-- <img src="~examples/assets/images/hamburger.png" class="image"> -->
                     <div style="padding: 14px;">
                         <span>好吃的汉堡</span>
                         <div class="bottom clearfix">
@@ -22,7 +22,7 @@
                     </div>
                     </el-card>
                 </el-col>
-            </el-row> -->
+            </el-row>
             <slot></slot>
         </el-main>
     </el-container>
@@ -33,7 +33,7 @@ export default {
     name: "FileList",
     data() {
         return {
-        currentDate: new Date()
+            currentDate: new Date()
         };
     }
     
