@@ -1913,6 +1913,7 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .el-tabs__content>.el-tab-pane>div>div>.el-table__header-wrapper{
