@@ -1,7 +1,7 @@
 <template>  
   <el-container style="height: 100%;" class="krcd-root height-ful" v-loading.fullscreen.lock="fullscreenLoading">    
     <el-container>
-        <el-aside :style="`width:${leftTreeWidth};border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;`">        
+        <el-aside :style="`width:${leftTreeWidth};border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;box-shadow: 2px 0 8px #409eff1c;z-index: 1;`">        
             <!-- <div @mouseout="showHideLeft('hide')">       -->
               <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag" ></Tree></Widgets>    
             <!-- </div>        -->
@@ -30,7 +30,7 @@
             <FileList>里分开的时间可浪费的时间分开了</FileList>
           </el-aside> -->
 
-          <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;"></div>
+          <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
         
         </el-container>
         
@@ -46,7 +46,7 @@
           </el-row>
         </el-footer>
       </el-container>
-          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;display:flex;flex-direction:column`">        
+          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;display:flex;flex-direction:column;box-shadow:-2px 0 8px #409eff1c;z-index: 1;`">        
             <!-- 为了隐藏而用 -->
             <!-- <div @mouseout="showHideRight('hide')"> -->
               <el-header style="height: 30px;

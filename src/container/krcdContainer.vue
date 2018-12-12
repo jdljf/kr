@@ -1839,9 +1839,6 @@
   display: flex;
   flex-direction: column;
 }
-.height-ful{
-  height: 100%;
-}
 
 .nav-tools{
   display: flex;
@@ -1904,9 +1901,7 @@
 }
 
 .el-tabs--border-card>.el-tabs__content{
-  padding: 0;
-  box-shadow: 0px 2px 8px #409eff1c;
-  z-index: 1;
+  padding: 0;  
 }
 
 .el-tabs--border-card, .el-tabs__content, .el-tabs__content>.el-tab-pane, .el-tabs__content>.el-tab-pane>div, .el-tabs__content>.el-tab-pane>div>div{
@@ -1918,6 +1913,8 @@
 
 .el-tabs__content>.el-tab-pane>div>div>.el-table__header-wrapper{
   flex-shrink: 0;
+  box-shadow: 0px 2px 8px #409eff1c;
+  z-index: 1;
 }
 
 .el-table__body-wrapper{
