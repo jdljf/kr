@@ -1327,7 +1327,7 @@
       },defOpt,selectedHtml) {
         let div = document.createElement('div');
         div.innerHTML =
-          `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></p></div>`
+          `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><div contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></div></div>`
         div = div.firstElementChild;
 
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
@@ -1724,12 +1724,12 @@
         getPositon()
 
         // 点中初始化时的p不能编辑，所以赋予它可编辑的属性
-        if (arguments[0].path[0].attributes.length === 0 && arguments[1] !== null && arguments[1]['TYPE_NAME'] ===
-          'section') {
-          arguments[0].path[0].setAttribute("contenteditable", "true");
-          arguments[0].path[0].className = 'krcd-value';
-          arguments[0].path[0].focus();
-        }
+        // if (arguments[0].path[0].attributes.length === 0 && arguments[1] !== null && arguments[1]['TYPE_NAME'] ===
+        //   'section') {
+        //   arguments[0].path[0].setAttribute("contenteditable", "true");
+        //   arguments[0].path[0].className = 'krcd-value';
+        //   arguments[0].path[0].focus();
+        // }
 
         
 
