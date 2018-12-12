@@ -9,40 +9,43 @@
             >
         </el-input>
         <!-- <el-button @click="change">方式简单看了附近卡斯蒂略附近的</el-button> -->
+
+        
         <div class="tree">
-          <keep-alive>
           <el-tree            
             :props="treeProps"
             :load="loadNode"
             lazy
             show-checkbox
             default-expand-all
-            @check-change="handleCheckChange"
             @node-click="handleNodeClick"
+            @check-change="handleCheckChange(node,data)"            
             :filter-node-method="filterNode"
-            :data='list'
-            :accordion="true"            
+            :data='treeData'       
             ref='list'
             >
             <span class="custom-tree-node" slot-scope="{ node, data }">
-              <span>{{ node.label }}</span>
+              <span>{{ node.label }}</span>              
               <span>
-                <el-button
+                <!-- 第二层而且可以有子类的就有对应的按钮 -->
+                <!-- <el-button
+                  v-if="node.level === 2&&node.data['hasChild']"
                   type="text"
                   size="mini"
-                  @click="() => append(data)">
-                  Append
-                </el-button>
-                <el-button
+                  @click="() => append(node,data)">
+                  <i class="el-icon-plus"></i>
+                </el-button> -->
+                <!-- 第三层而且二次允许删除的会展示 -->
+                <!-- <el-button
+                  v-if="node.level === 2&&node.data['hasChild']&&node.data['children'].length>0"
                   type="text"
                   size="mini"
                   @click="() => remove(node, data)">
-                  Delete
-                </el-button>
+                  <i class="el-icon-delete"></i>
+                </el-button> -->
               </span>
             </span>
           </el-tree>    
-          </keep-alive>
         </div>
     </div>    
 </template>
@@ -52,15 +55,15 @@
   export default {
     name: 'Tree',
     data() {
+       
       // props属性绑定的数据就是设定树形节点标签的。label是当前节点标签标题，而children就是子节点，一直嵌套就能一直延伸树状图
       return { 
         filterText: '',   // 与input双向绑定了
         treeProps: {
           label: 'name',
-          children: 'zones',
-          
+          children: 'zones',          
         },   
-        treeData:[]
+        // treeData:[]
       };
     },   
     props:{
@@ -75,6 +78,9 @@
       },       
       templateTag: function(value,old){
         return value
+      },
+      treeData: function(value,old){
+        return value
       }
 
     },
@@ -82,41 +88,30 @@
       console.log(this.templateTag)
       console.log(this.list)
       console.log(this.templateTag)
-      // 必须组合一个tree对象让增加删除有数据可操作
-      // const temp = this.templateTag;  
-      // this.treeData = this.list.map(element => {
-      //   return {...element, 'children':[...temp]}
-      // });    
-      // console.log(this.treeData)
-      // let that = this
-      // console.log(that.templateTag)
-      // this.treeData = this.list.map(function(element){
-      //     return {...element, 'children':[...that.templateTag]}
-      //   });    
-      // console.log(this.treeData)
     },
     computed:{
-      // treeData: function(){
-      //   let that = this
-      //   const aaa = this.list.map(function(element){
-      //     return {...element, 'children':[...that.templateTag]}
-      //   });    
-      //   console.log(aaa)
-      //   return aaa
-      // }      
+      treeData: function(){
+        let that = this
+        const aaa = this.list.map(function(element){
+          return {...element, 'children':[...that.templateTag]}
+        });    
+        return aaa
+      }      
     },
     mounted(){
       // 改变默认的属性
       console.log(this.treeData)
-      // this.$refs.list.store.defaultExpandAll=true
     } ,
-    methods: {
-      append(data) {
-        const newChild = { id: id++, label: 'testtest', children: [] };
+    methods: {      
+      append(node,data) {
+        const newChild = { id: id++, name: 'testtest', children: [] };
         if (!data.children) {
           this.$set(data, 'children', []);
         }
         data.children.push(newChild);
+        console.log(data)
+        console.log(node)
+        console.log(this.treeData)
       },
 
       remove(node, data) {
@@ -125,38 +120,6 @@
         const index = children.findIndex(d => d.id === data.id);
         children.splice(index, 1);
       },
-      change(){
-        debugger
-        this.treeData.push({name: 'sdsad2',id :23,childre:[]})
-      },
-
-       /* 自定义树节点，用于底层文件数量部分 */
-       // 添加树节点
-    //    append(data) {
-    //     const newChild = { id: id++, name: 'testtest', children: [] };
-    //     if (!data.children) {
-    //       this.$set(data, 'children', []);
-    //     }
-    //     data.children.push(newChild);
-    //   },
-    //   // 移除树节点
-    //   remove(node, data) {
-    //     const parent = node.parent;
-    //     const children = parent.data.children || parent.data;
-    //     const index = children.findIndex(d => d.id === data.id);
-    //     children.splice(index, 1);
-    //   },
-    //   // 渲染自定义工具栏
-    //   renderContent(h, { node, data, store }) {
-    //     return (
-    //       <span class="custom-tree-node">
-    //         <span>{node.label}</span>
-    //         <span>
-    //           <el-button size="mini" type="text" on-click={ () => this.append(data) }>新建</el-button>
-    //           <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }>删除</el-button>
-    //         </span>
-    //       </span>);
-    //   },
 
       // 搜索匹配函数
       filterNode(value, data) {
@@ -168,14 +131,11 @@
       handleCheckChange(data, checked, indeterminate) {
         console.log(data, checked, indeterminate);
       },
+      
       // 点击节点的函数
-      handleNodeClick(data) {
-        console.log(data);
-        // alert(`你点击的是${data.name}`) 
-        console.log(this.$refs.list.store.defaultExpandAll)
-
-        // // 改变默认的属性
-        // this.$refs.list.store.defaultExpandAll=true
+      handleNodeClick(node,data){
+        console.log(data)
+        console.log(node)
       },
 
       // 加载节点函数，绑定load属性，加载时绑定对应树状数据
@@ -195,7 +155,10 @@
           // return resolve(this.treeData);  // 这里count自定义为1作为编号
         }
         // 子节点大于3层后必然范围空节点
-        if (node.level > 3) return resolve([]);
+        if (node.level > 3&& node.data) {
+          console.log(node.data)
+          return resolve([]);
+        }
         
         // 随机判断有没有child和数量
         var hasChild;
@@ -204,30 +167,23 @@
         } else if (node.data.name !== '24小时内入出院记录') {
           hasChild = false;
         } 
-        // else {
-        //   hasChild = Math.random() > 0.5;
-        // }
+        else {
+          hasChild = Math.random() > 0.5;
+        }
 
         // 函数内的data就是子中的数据？之前的data是返回到标签属性中的data
         setTimeout(() => {
           var data;
-          if (hasChild) {
-            data = [{
-              name: node.data.name + node.data.count++, id: id++, 
-            }, {
-              name: node.data.name + node.data.count++, id: id++, 
-            }];
+          if (node.data.hasChild) {
+            data = node.data.children;
           } else {
             data = [];
           }
           console.log(data)
           resolve(data);
         }, 500);    
-
         
         console.log(this.list)    
-
-        
       }
       
     }
@@ -246,7 +202,7 @@
         width: 100%;
         flex-grow:1;
         overflow: auto;
-        padding-right: 20px;
+        padding-right: 10px;
         box-sizing: border-box;
         padding-bottom: 8px;
     }
@@ -264,5 +220,9 @@
         justify-content: space-between;
         font-size: 14px;
         padding-right: 8px;
+    }
+
+    .custom-tree-node>span:nth-child(2)>.el-button:nth-child(1){
+        margin-left: 20px;
     }
 </style>

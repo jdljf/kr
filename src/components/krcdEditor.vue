@@ -24,8 +24,16 @@
         <div class="showBtnRight" @click="showHideRight">
           <!-- <span>展开收起</span> -->
         </div>
-        <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
-        </div>
+        <el-container>
+
+          <!-- <el-aside>
+            <FileList>里分开的时间可浪费的时间分开了</FileList>
+          </el-aside> -->
+
+          <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;"></div>
+        
+        </el-container>
+        
         <el-footer style="z-index: 999;height: 42px;padding: 5px;background-color: white;border: 1px solid rgb(220, 223, 230);">
           <el-row style="display:flex;justify-content: flex-end;"> 
             <!--1. DESIGN 设计模式；
@@ -1267,76 +1275,6 @@ export default {
 }
 .height-ful{
   height: 100%;
-}
-
-/* jimmyFok's CSS style */
-.krcd-section::before{
-  content: "我是标签"
-}
-.krcd-root{
-  display: flex;
-  flex-direction: row;
-}
-.widget-list{
-  flex-grow: 1;
-  overflow: auto;
-}
-.editor-box{
-  display: flex;
-  flex-direction: column;
-}
-.height-ful{
-  height: 100%;
-}
-
-.nav-tools{
-  display: flex;
-  flex-direction: flex-start;
-  align-items: center
-}
-
-.nav-tools>*{
-  padding:8px;
-}
-
-.left-tree{
-  position: relative;
-}
-
-.showBtnLeft{
-  display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
-  left: 0;
-  top: 50%;
-  margin-top: -50px;
-  width: 24px;
-  height: 100px;
-  border-bottom-right-radius: 8px;
-  border-top-right-radius: 8px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-}
-
-.showBtnRight{
-  display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
-  right: 0;  
-  top: 50%;
-  margin-top: -50px;
-  width: 24px;
-  height: 100px;
-  border-bottom-left-radius: 8px;
-  border-top-left-radius: 8px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;  
 }
 </style>
 
