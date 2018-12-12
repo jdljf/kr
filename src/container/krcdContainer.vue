@@ -394,6 +394,7 @@
          * params {string} styleString  head>style标签中的样式文本
          */
         replaceFun: (content, styleString) => {
+          console.log(this)
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
 
           // 确保初始化时没有聚焦导致不能倒入模版
@@ -401,8 +402,17 @@
 
           // innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML='';
           // this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
+          // debugger
+          // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content;
+          // console.log(this.$refs.setContentInp)
 
-          innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content
+          // console.log(this.$parent.$refs.setContentInp.value)
+
+          // 这是index.vue中绑定到对应的input的value中了，所以需要对它进行辅助。
+          this.$parent.$refs.setContentInp.value=content
+          
+          this.krcd.html(content);
+          
         },
 
         // 提示输入模版名称弹窗
@@ -1173,7 +1183,8 @@
           //ie浏览器
           return {
             selectedText,
-            selectedHtml
+            selectedHtml,
+            selectedDOM: rangeObj
           }
 
         } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
@@ -1190,7 +1201,8 @@
 
           return {
             selectedText,
-            selectedHtml
+            selectedHtml,
+            selectedDOM: tempDiv
           }
         }
       },
@@ -1202,18 +1214,18 @@
        */
       addCtrl(type, ctrlName, ctrlId = '', ctrlStyle = '', Opt = null, paste = false) {
 
-        // 获取选中的文字
-        function selectText() {
-          if (document.Selection) {
-            //ie浏览器
-            return document.selection.createRange().text;
-          } else {
-            //标准浏览器
-            return window.getSelection().toString();
-          }
-        }
+        // // 获取选中的文字
+        // function selectText() {
+        //   if (document.Selection) {
+        //     //ie浏览器
+        //     return document.selection.createRange().text;
+        //   } else {
+        //     //标准浏览器
+        //     return window.getSelection().toString();
+        //   }
+        // }
 
-        let selResult = selectText();
+        // let selResult = selectText();
         if (selResult.length !== 0) {
           // alert(selResult)
         }
@@ -1777,13 +1789,23 @@
             // 输出点击时获取的数据
             let selText = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedText;
             let selHtml = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedHtml;
+            let selectedDOM = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedDOM;
+
+            console.log(selectedDOM)
+
+            console.log(selHtml)
+
             // 防止被无聊的点击覆盖了
             self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
             self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml : self.selectedHtml;
+            // self.selectedDOM = 
+
+            // if()
           }
 
           
         }, 1500)
+
 
 
 
