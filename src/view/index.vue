@@ -29,8 +29,8 @@
       
     </div>
     <!-- <div class="toolbars"></div> -->
-    <button @click="testSet()">设置按钮</button>
-    <button @click="getTds()">获取编辑器的td</button>
+    <!-- <button @click="testSet()">设置按钮</button> -->
+    <!-- <button @click="getTds()">获取编辑器的td</button> -->
     <div style="margin:0 auto;width:100%;height:100%;">
       <krcd-editor ref="krcdEditor"></krcd-editor>
     </div>
@@ -103,15 +103,6 @@ export default {
       // document.execCommand("insertHTML","false",'<h1>插入插入插入</h1>')
 
       // document.execCommand("insertHTML","false",'<h1>asdasasdsa</h1>')
-    },
-    getTds(){
-      console.log($("#ueditor_1").contents().find(".krcd-tmp-content td").length)
-      $("#ueditor_1").contents().find("td").on("mousemove", function(event) {
-        console.log(event)
-        if(event.offsetX){
-
-        }
-      });
     }
   },
   mounted() {
