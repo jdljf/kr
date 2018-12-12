@@ -172,23 +172,25 @@
         toolStyle: {}, // 初始化工具条样式
 
         // 模版类型
-        templateTag: [{
-            id: "0",
-            title: "住院病案首页"
-          },
-          {
-            id: "1",
-            title: "病程记录"
-          },
-          {
-            id: "2",
-            title: "入院记录"
-          },
-          {
-            id: "4",
-            title: "24小时内入出院记录"
-          },
-        ],
+        templateTag: [],
+        
+        // [{
+        //     id: "0",
+        //     title: "住院病案首页"
+        //   },
+        //   {
+        //     id: "1",
+        //     title: "病程记录"
+        //   },
+        //   {
+        //     id: "2",
+        //     title: "入院记录"
+        //   },
+        //   {
+        //     id: "4",
+        //     title: "24小时内入出院记录"
+        //   },
+        // ],
         // 组件类型（归属于哪种表）
         widgetTag: [{
             id: "0",
@@ -233,12 +235,12 @@
               dic: [{
                 group: "粘贴嵌套模块", // 分组名
                 groupItems: [{
-                  name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                  name: self.selectedText !== '' ? self.selectedText : "（没内容）",
                   // content: '['+ self.createText({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
                   obj: self.createText({
                     ctrlId: null,
                     ctrlStyle: null
-                  }, null, self.selectedHtml),
+                  }, null, self.selectedText),
                   date: "",
                 }] // 组项目
               }, ]
@@ -250,12 +252,12 @@
               dic: [{
                 group: "粘贴嵌套模块", // 分组名
                 groupItems: [{
-                  name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                  name: self.selectedText !== '' ? self.selectedText : "（没内容）",
                   // content: '['+ self.createSelect({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
                   obj: self.createSelect({
                     ctrlId: null,
                     ctrlStyle: null
-                  }, null, self.selectedHtml),
+                  }, null, self.selectedText),
                   date: "",
                 }] // 组项目
               }, ]
@@ -267,12 +269,12 @@
               dic: [{
                 group: "粘贴嵌套模块", // 分组名
                 groupItems: [{
-                  name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                  name: self.selectedText !== '' ? self.selectedText : "（没内容）",
                   // content: '['+ self.createRadio({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
                   obj: self.createRadio({
                     ctrlId: null,
                     ctrlStyle: null
-                  }, null, self.selectedHtml),
+                  }, null, self.selectedText),
                   date: "",
                 }] // 组项目
               }, ]
@@ -284,12 +286,12 @@
               dic: [{
                 group: "粘贴嵌套模块", // 分组名
                 groupItems: [{
-                  name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                  name: self.selectedText !== '' ? self.selectedText : "（没内容）",
                   // content: '['+ self.createCheckbox({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
                   obj: self.createCheckbox({
                     ctrlId: null,
                     ctrlStyle: null
-                  }, null, self.selectedHtml),
+                  }, null, self.selectedText),
                   date: "",
                 }] // 组项目
               }, ]
@@ -301,12 +303,12 @@
               dic: [{
                   group: "粘贴嵌套模块", // 分组名
                   groupItems: [{
-                    name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                    name: self.selectedText !== '' ? self.selectedText : "（没内容）",
                     // content: '['+ self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
                     obj: self.createDate({
                       ctrlId: null,
                       ctrlStyle: null
-                    }, null, self.selectedHtml),
+                    }, null, self.selectedText),
                     date: "",
                   }] // 组项目
                 },
@@ -317,7 +319,22 @@
               name: '文档段',
               type: 'SECTION',
               iconCls: 'el-icon-news',
-              dic: []
+              dic: [{
+                  group: "粘贴嵌套模块", // 分组名
+                  groupItems: [{
+                    name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                    // content: '['+ self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                    obj: self.createSection({
+                      'ctrlName': self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                      'ctrlId': null,
+                      'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
+                      // `${ctrlStyle}
+                      // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
+                      // `
+                    }, null,self.selectedHtml),
+                    date: "",
+                  }] // 组项目
+                },]
             },
             {
               name: '存文档段模版',
@@ -364,8 +381,8 @@
             id: 4,
             count: 1
           } // 这个为了子元素编号来设定的count
-        ],
-
+        ]
+        ,
         patlistOnoff: (event) => {
           const e = event || window.event;
           alert(`你点击的是：第${+e.currentTarget.getAttribute('index')+1}个病人`)
@@ -450,7 +467,7 @@
           // 将原来的转为接口的格式
           const postData = this.font2back(newItem)
 
-          this.ajaxTemplate('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
+          this.ajaxFunTemp('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
             this.templatelist.push(newItem);
           });
 
@@ -566,9 +583,9 @@
         },
 
         // 请求接口
-        ajaxTemplate: (type, content, successMsg, sucessFun) => {
+        ajaxFunTemp: (type, content, successMsg, sucessFun=()=>{}) => {
           console.log(content)
-          ajax.post(
+          return ajax.post(
             `${type}`,
             JSON.stringify(content)
           ).then((res) => {
@@ -579,6 +596,7 @@
           }).catch((err) => {
             console.log(err)
             this.saveError('请查看控制台错误')
+            return []
           })
         },
 
@@ -753,7 +771,7 @@
         // 将原来的转为接口的格式
         const postData = this.font2back(newItem)
 
-        this.ajaxTemplate('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
+        this.ajaxFunTemp('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
           this.templatelist.push(newItem);
         });
 
@@ -851,7 +869,7 @@
             "command": command,
           }
           
-          this.ajaxTemplate(
+          this.ajaxFunModel(
             '/ElementTemplate/ExecCommandForText', postData, `成功获取动态数据`, (res)=>{
               sucessFun(res) // 成功的函数调用
             }
@@ -1163,6 +1181,7 @@
 
           let selectionObj = iframeObj.getSelection();
           let selectedText = selectionObj.toString();
+          console.log(selectionObj)
           let rangeObj = selectionObj.getRangeAt(0);
           let docFragment = rangeObj.cloneContents();
           let tempDiv = document.createElement("div");
@@ -1215,7 +1234,7 @@
             this.krcd.execCommand('inserthtml', selectedHtml).newDiv;
             break
           case "DATE":
-            newDiv = this.createDate(domSet, Opt, selectedHtml).newDiv
+            newDiv = this.createDate(domSet, Opt, selectedText).newDiv
             break
           case "SELECT":
             newDiv = this.createSelect(domSet, Opt, selectedText).newDiv
@@ -1230,15 +1249,23 @@
             newDiv = this.createText(domSet, Opt, selectedText).newDiv
             break
           case "SECTION":
-            this.addSection([], {
+            // this.addSection([], {
+            //   'ctrlName': ctrlName,
+            //   'ctrlId': ctrlId,
+            //   'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
+            //   'selectedText': this.selectedHtml
+            //   // `${ctrlStyle}
+            //   // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
+            //   // `
+            // })
+            newDiv = this.createSection({
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
               'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
-              'selectedText': this.selectedHtml
               // `${ctrlStyle}
               // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
               // `
-            })
+            }, Opt, selectedHtml).newDiv
             break
           case 'WIDGET':
             if (this.inSection === true) {
@@ -1270,7 +1297,7 @@
         }
         headerTag.appendChild(styleDOM);
 
-        if (type !== "SECTION" && type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE") {
+        if (type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE") {
           this.krcd.insertControl(
             newDiv.getCtrlElement(), //  获取会对应的Element
             newDiv.getOpt() //  获取会对应的opt
@@ -1292,36 +1319,63 @@
 
       },
 
-      // 插入Section区域控件（文档段）
-      addSection(newDiv, domSet = {
+      // 创建Section
+      createSection(domSet = {
         ctrlId: null,
         ctrlName: null,
         ctrlStyle: null,
-        selectedText: null
-      }) {
+      },defOpt,selectedHtml) {
         let div = document.createElement('div');
         div.innerHTML =
-          `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;">${domSet.selectedText}</p></div>`
+          `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></p></div>`
         div = div.firstElementChild;
 
-        let sp;
-        if (newDiv) {
-          sp = document.createElement('div');
-          // 遍历数组控件，返回dom
-          newDiv.forEach(item => {
-            sp.appendChild(item.getCtrlElement());
-          })
-          console.log(sp)
-        }
+        let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
+          "mode":"EDITOR",//当前模式
+          "originalmode":"EDITOR",//原始模式
+          "desc": selectedHtml ? selectedHtml: '', //描述
+        })
 
-        // 插入控制器
-        this.krcd.insertControl(div, {
-            "mode": "EDITOR", //当前模式
-            "originalmode": "EDITOR", //原始模式
-            "desc": sp ? sp.innerHTML : '', //描述
-          } //区域控件有时会随着当前业务的要求而进行模式的变更，在控件被渲染时默认将mode与originalmode进行同步。originalmode的存在也是为了方便区域控件模式重置)
-        )
+        console.log(selectedHtml)
+        console.log(newDiv.getValueElement().parentNode)
+        
+        return {
+          newDiv,
+          show: selectedHtml, 
+          // newDiv.getValueElement().parentNode.innerHTML // 为模版展示用, 取出生成的html
+        }
       },
+
+      // 插入Section区域控件（文档段）
+      // addSection(newDiv, domSet = {
+      //   ctrlId: null,
+      //   ctrlName: null,
+      //   ctrlStyle: null,
+      //   selectedText: null
+      // }) {
+      //   let div = document.createElement('div');
+      //   div.innerHTML =
+      //     `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;">${domSet.selectedText}</p></div>`
+      //   div = div.firstElementChild;
+
+      //   let sp;
+      //   if (newDiv) {
+      //     sp = document.createElement('div');
+      //     // 遍历数组控件，返回dom
+      //     newDiv.forEach(item => {
+      //       sp.appendChild(item.getCtrlElement());
+      //     })
+      //     console.log(sp)
+      //   }
+
+      //   // 插入控制器
+      //   this.krcd.insertControl(div, {
+      //       "mode": "EDITOR", //当前模式
+      //       "originalmode": "EDITOR", //原始模式
+      //       "desc": sp ? sp.innerHTML : '', //描述
+      //     } //区域控件有时会随着当前业务的要求而进行模式的变更，在控件被渲染时默认将mode与originalmode进行同步。originalmode的存在也是为了方便区域控件模式重置)
+      //   )
+      // },
 
 
       execCommand() {
@@ -1390,9 +1444,84 @@
 
 
     },
-    created() {
+    beforeCreate() {
       console.log('krcd components created.');
+      // debugger
+      let self = this;
+      async function asyncGetTemp(self) {   
+          await ajax.post(
+              '/ParagraphTheme/GetList', 
+              ''
+              ).then((res) => {
+              console.log('成功了！', res.data.data)
+              // 转换一下数据
+              const newArr = res.data.data.map(function(item){            
+                  return {...item,name: item['theme'],children:[],id: item['id']}
+              })
+              self.templateTag.push(...newArr)
+              console.log(self.templateTag)
+            }).catch((err) => {
+              console.log(err)
+            })
+      }
+    
+     asyncGetTemp(self);
+      
 
+      /**
+       * 请求模版数据
+       */
+      ajax.post(
+        '/DocumentTemplate/GetList', {
+          "deptCode": "",
+          "creatorUserId": 0,
+          "id": 0
+        }).then((res) => {
+        console.log('成功了！', typeof res.data.data)
+
+        const templataData = res.data.data;
+
+        // 后端数组转为前端数组
+        const templateArr = templataData.map(this.back2font)
+
+        // 修改templatelist的数据
+        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
+      }).catch((err) => {
+        console.log(err)
+      })
+
+      // // 为什么不能这样？！
+      // 应该是因为this.ajaxFunTemp还没加载出来，所以无效
+      // const content = {
+      //       "deptCode": "",
+      //       "creatorUserId": 0,
+      //        "id": 0
+      //    }
+
+      // this.ajaxFunTemp('GetList', content ,()=>{
+      //     console.log('成功了！',typeof res.data.data) 
+
+      //     const templataData = res.data.data;
+
+      //     // 后端数组转为前端数组
+      //     const templateArr = templataData.map(this.back2font)  
+
+      //     // 修改templatelist的数据
+      //     this.templatelist.push(...templateArr)
+      // });
+    },
+
+    created(){
+      console.log(this.templatelist)
+
+      // 屏蔽右键，防止外层window的bug
+      document.oncontextmenu = function(){
+          event.returnValue = false;
+      }
+      // 或者直接返回整个事件
+      document.oncontextmenu = function(){
+          return false;
+      }
     },
     beforeMount() {
 
@@ -1426,9 +1555,10 @@
 
       tabshow: function (newtabshow, oldtabshow) {
         return newtabshow
-      }
-      // 为了不断的监控
-      // arrBtns
+      },
+      templateTag: function (newTemplateTag, oldTemplateTag) {
+        return newTemplateTag
+      },
     },
 
     mounted() {
@@ -1437,49 +1567,8 @@
       
 
       const self = this;
-
-      /**
-       * 请求模版数据
-       */
-      ajax.post(
-        '/DocumentTemplate/GetList', {
-          "deptCode": "",
-          "creatorUserId": 0,
-          "id": 0
-        }).then((res) => {
-        console.log('成功了！', typeof res.data.data)
-
-        const templataData = res.data.data;
-
-        // 后端数组转为前端数组
-        const templateArr = templataData.map(this.back2font)
-
-        // 修改templatelist的数据
-        this.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
-      }).catch((err) => {
-        console.log(err)
-      })
-
-      // // 为什么不能这样？！
-      // const content = {
-      //       "deptCode": "",
-      //       "creatorUserId": 0,
-      //        "id": 0
-      //    }
-
-      // this.ajaxTemplate('GetList', content ,()=>{
-      //     console.log('成功了！',typeof res.data.data) 
-
-      //     const templataData = res.data.data;
-
-      //     // 后端数组转为前端数组
-      //     const templateArr = templataData.map(this.back2font)  
-
-      //     // 修改templatelist的数据
-      //     this.templatelist.push(...templateArr)
-      // });
-
-
+      
+      
       /**
        * 点击编辑区获取聚焦的控制
        */
@@ -1488,9 +1577,9 @@
       this.krcd.addListener('click', function (event) {
 
         console.log(arguments);
-
         // 获取ifame中的window
         self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+        
         const e = event || window.event;
         self.tarEl = arguments[0].target; // 获取点中的对象
         console.log(self.tarEl)
@@ -1642,19 +1731,14 @@
           arguments[0].path[0].focus();
         }
 
-        // 输出点击时获取的数据
-        let selText = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedText;
-        let selHtml = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedHtml;
-        // 防止被无聊的点击覆盖了
-        self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
-        self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml :
-          self.selectedHtml;
+        
 
       });
 
       this.krcd.addListener("ready", function () {
         console.log("krcd 初始化完成！");
 
+       
         // 根据屏幕变化
         window.onresize = function () {
           console.log(window.innerWidth)
@@ -1682,7 +1766,27 @@
 
           // 默认设定为设计模式
           self.mode(self.modelsData, 0);
+
+          /***
+           * 给编辑器增加鼠标抬起事件
+           */
+          // 获取ifame中的window
+          const editor = document.getElementsByTagName('iframe')[1].contentWindow;
+          editor.onmouseup = function(){
+            console.log("鼠标抬起了")
+            // 输出点击时获取的数据
+            let selText = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedText;
+            let selHtml = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedHtml;
+            // 防止被无聊的点击覆盖了
+            self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
+            self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml : self.selectedHtml;
+          }
+
+          
         }, 1500)
+
+
+
 
       });
 
