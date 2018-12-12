@@ -3,7 +3,7 @@
     <el-container>
         <el-aside :style="`width:${leftTreeWidth};border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;`">        
             <!-- <div @mouseout="showHideLeft('hide')">       -->
-              <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree :list="patlist"></Tree></Widgets>    
+              <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag" ></Tree></Widgets>    
             <!-- </div>        -->
         </el-aside>
       <div class="tools" v-show="toolsShow">  
@@ -75,7 +75,7 @@
                     :savetemplefun="()=>inputName(saveHtmlContent)" 
                     :savewidgetfun="()=>inputName(saveHtmlContent)" 
                     :savectrlfun="()=>inputName(saveHtmlContent)" 
-                    :ajaxtemple="ajaxTemplate" 
+                    :ajaxtemple="ajaxFunTemp" 
                     :back2font="back2font" 
                     :getHtmlContent="getHtmlContent">              
                 </tabContainer>
