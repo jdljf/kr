@@ -21638,14 +21638,6 @@
         
         console.log(n)
         n && (e.prototype._reviseChangeValue.call(this), null === t && (t = ""), n.setAttribute("krcd-value", v["default"].encryptStr(f["default"].isString(t) ? t : f["default"].json2str(t))))
-        console.log(v["default"].encryptStr(f["default"].isString(t) ? t : f["default"].json2str(t)))
-        console.log(f["default"].isString(t) ? t : f["default"].json2str(t))
-        console.log(v["default"].encryptStr)
-        console.log(f['default'])
-        console.log(this)
-        console.log(a)
-        console.log(t)
-        console.log(f["default"].json2str(t))
       }, t.prototype.getValue = function () {
         var t = e.prototype.getCtrlElement.call(this);
         if (t) return f["default"].str2json(v["default"].decryptStr(t.getAttribute("krcd-value")))
@@ -21695,6 +21687,8 @@
     s = a(o);
   e.exports = {
     changeDESIGN: function (e) {
+      console.log(e[r.__private__]);
+      document.getElementsByClassName("krcd-tmp-content-value")[0].setAttribute("contenteditable", !0);
       e[r.__private__].contentValue.setAttribute("contenteditable", !0);
       var t = e[r.__private__].rootDom.querySelectorAll('[krcd-type="label"]');
       s["default"].each(t, function (e) {
@@ -21706,6 +21700,7 @@
       })
     },
     changeEDITOR: function (e) {
+      document.getElementsByClassName("krcd-tmp-content-value")[0].setAttribute("contenteditable", !0);
       e[r.__private__].contentValue.setAttribute("contenteditable", !0);
       var t = e[r.__private__].rootDom.querySelectorAll('[krcd-type="label"]');
       s["default"].each(t, function (e) {
