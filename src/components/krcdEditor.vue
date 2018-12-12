@@ -211,6 +211,9 @@ export default {
         }
       });
     },
+    addHorizontal(){
+      this.krcd.execCommand("insertHTML",'<hr style="margin:2px 0">')
+    },
     setHTML(html) {
       this.krcd.html(html);
     },
@@ -343,7 +346,7 @@ export default {
           </div>`;
                     div = div.firstElementChild;
                     div.addEventListener("click", function() {
-                      that.dddd();
+                      that.addHorizontal();
                     });
                     return div;
                   }
@@ -766,12 +769,24 @@ export default {
               ]
             },
             {
-              name: "krcd-toolbar-insert-map",
-              title: "地图",
+              name: "krcd-toolbar-insert-horizontal",
+              title: "分隔线",
               items: [
                 {
-                  name: "map",
-                  title: "地图"
+                  name: "horizontal",
+                  title: "分割线", //方式二：（推荐）
+                  render: function() {
+                    let div = document.createElement("div");
+                    div.innerHTML = `<div class="panel-content-ctrl" title="分割线" >
+            <div class="krcd-icon krcd-icon-openxml" style="width: 40px; height: 32px; float: none;"></div>
+            <div style="text-align: center;">分割线</div>
+          </div>`;
+                    div = div.firstElementChild;
+                    div.addEventListener("click", function() {
+                      that.addHorizontal();
+                    });
+                    return div;
+                  }
                 }
               ]
             },
