@@ -1,7 +1,7 @@
 <template>  
   <el-container style="height: 100%;" class="krcd-root height-ful" v-loading.fullscreen.lock="fullscreenLoading">    
     <el-container>
-        <el-aside :style="`width:${leftTreeWidth};border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;`">        
+        <el-aside :style="`width:${leftTreeWidth};border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;box-shadow: 2px 0 8px #409eff1c;z-index: 1;`">        
             <!-- <div @mouseout="showHideLeft('hide')">       -->
               <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist"><Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag" ></Tree></Widgets>    
             <!-- </div>        -->
@@ -24,8 +24,16 @@
         <div class="showBtnRight" @click="showHideRight">
           <!-- <span>展开收起</span> -->
         </div>
-        <div class="editor-box height-ful" ref="editor" id="editor" :style="{ width:width, height:height }" style="box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;">         
-        </div>
+        <el-container>
+
+          <!-- <el-aside style="width:auto;">
+            <FileList>病人信息和文档信息</FileList>
+          </el-aside> -->
+
+          <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
+        
+        </el-container>
+        
         <el-footer style="z-index: 999;height: 42px;padding: 5px;background-color: white;border: 1px solid rgb(220, 223, 230);">
           <el-row style="display:flex;justify-content: flex-end;"> 
             <!--1. DESIGN 设计模式；
@@ -38,7 +46,7 @@
           </el-row>
         </el-footer>
       </el-container>
-          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;display:flex;flex-direction:column`">        
+          <el-aside :style="`width:${rightTreeWidth};transition: width 10s;display:flex;flex-direction:column;box-shadow:-2px 0 8px #409eff1c;z-index: 1;`">        
             <!-- 为了隐藏而用 -->
             <!-- <div @mouseout="showHideRight('hide')"> -->
               <el-header style="height: 30px;
@@ -337,7 +345,7 @@ export default {
             <div style="text-align: center;">对象扩展</div>
           </div>`;
                     div = div.firstElementChild;
-                    div.addEventListener("click", function() {
+                    div.addEventListener("click", function() {                      
                       that.addHorizontal();
                     });
                     return div;
@@ -774,9 +782,8 @@ export default {
             <div style="text-align: center;">分割线</div>
           </div>`;
                     div = div.firstElementChild;
-                    div.addEventListener("click", function() {
-                      that.addHorizontal();
-                    });
+                    that.fenGeXian = div;
+                    div.addEventListener("click", that.addHorizontal);
                     return div;
                   }
                 }
@@ -1282,76 +1289,6 @@ export default {
 }
 .height-ful{
   height: 100%;
-}
-
-/* jimmyFok's CSS style */
-.krcd-section::before{
-  content: "我是标签"
-}
-.krcd-root{
-  display: flex;
-  flex-direction: row;
-}
-.widget-list{
-  flex-grow: 1;
-  overflow: auto;
-}
-.editor-box{
-  display: flex;
-  flex-direction: column;
-}
-.height-ful{
-  height: 100%;
-}
-
-.nav-tools{
-  display: flex;
-  flex-direction: flex-start;
-  align-items: center
-}
-
-.nav-tools>*{
-  padding:8px;
-}
-
-.left-tree{
-  position: relative;
-}
-
-.showBtnLeft{
-  display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
-  left: 0;
-  top: 50%;
-  margin-top: -50px;
-  width: 24px;
-  height: 100px;
-  border-bottom-right-radius: 8px;
-  border-top-right-radius: 8px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-}
-
-.showBtnRight{
-  display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
-  right: 0;  
-  top: 50%;
-  margin-top: -50px;
-  width: 24px;
-  height: 100px;
-  border-bottom-left-radius: 8px;
-  border-top-left-radius: 8px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;  
 }
 </style>
 

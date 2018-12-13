@@ -6,6 +6,7 @@
   import Models from '../components/Template'
   import NavMenu from '../components/NavMenu'
   import CommitTable from '../components/CommitTable'
+  import FileList from '../components/FileList'
   import {
     ajax
   } from '../common'
@@ -35,6 +36,7 @@
       },
     },
     components: {
+      FileList,
       Tools,
       Widgets,
       krcdEditor,
@@ -155,7 +157,7 @@
           };
           this.saveCtrl2Widget(this.saveDynamicData)
         },
-
+        fenGeXian: null,
         selectedText: '', // 用来存储选中文字的数据
         selectedHtml: '',
         saveAble: null, // 保存允许状态。 只允许ctrlAble和sectionAble
@@ -366,19 +368,19 @@
         // 左方病人的共有列表格式（暂时就这样）
         patlist: [{
             name: '康软人1',
-            id: 1
+            id: 111
           },
           {
             name: '康软人2',
-            id: 2
+            id: 222
           },
           {
             name: '康软人3',
-            id: 3
+            id: 333
           },
           {
             name: '康软人4',
-            id: 4,
+            id: 444,
             count: 1
           } // 这个为了子元素编号来设定的count
         ]
@@ -1415,19 +1417,27 @@
             case "DESIGN":
               this.toolsShow = true;
               this.templeCtrl = true;
+              this.fenGeXian.addEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl';
               break
             case "EDITOR":
               this.toolsShow = true;
               this.templeCtrl = true;
+              this.fenGeXian.addEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl';
               break
             case "STRICT":
               this.toolsShow = false;
               this.templeCtrl = false;
+              this.fenGeXian.removeEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
               break
             case "READONLY":
               this.toolsShow = false;
               this.templeCtrl = false;
+              this.fenGeXian.removeEventListener("click", this.addHorizontal);
+              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
               break
             default:
@@ -1468,7 +1478,7 @@
               console.log('成功了！', res.data.data)
               // 转换一下数据
               const newArr = res.data.data.map(function(item){            
-                  return {...item,name: item['theme'],children:[],id: item['id']}
+                  return {...item,name: item['theme'],children:[],id: item['id'],hasChild:(Math.random()>0.5)?true:false,count:1 }
               })
               self.templateTag.push(...newArr)
               console.log(self.templateTag)
@@ -1822,3 +1832,100 @@
   };
 
 </script>
+
+<style>
+/* jimmyFok's CSS style */
+.krcd-section::before{
+  content: "我是标签"
+}
+.krcd-root{
+  display: flex;
+  flex-direction: row;
+}
+
+.editor-box{
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-tools{
+  display: flex;
+  flex-direction: flex-start;
+  align-items: center
+}
+
+.nav-tools>*{
+  padding:8px;
+}
+
+.left-tree{
+  position: relative;
+}
+
+.showBtnLeft{
+  display: inline-block;
+  position: absolute;
+  background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  color: #F2F6FC;
+  left: 0;
+  top: 50%;
+  margin-top: -50px;
+  width: 24px;
+  height: 100px;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.showBtnRight{
+  display: inline-block;
+  position: absolute;
+  background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  color: #F2F6FC;
+  right: 0;  
+  top: 50%;
+  margin-top: -50px;
+  width: 24px;
+  height: 100px;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;  
+}
+
+/*
+* 改造右方保证表格隐藏滚动
+*/
+.widget-list{
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.el-tabs--border-card>.el-tabs__content{
+  padding: 0;  
+}
+
+.el-tabs--border-card, .el-tabs__content, .el-tabs__content>.el-tab-pane, .el-tabs__content>.el-tab-pane>div, .el-tabs__content>.el-tab-pane>div>div{
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.el-tabs__content>.el-tab-pane>div>div>.el-table__header-wrapper{
+  flex-shrink: 0;
+  box-shadow: 0px 2px 8px #409eff1c;
+  z-index: 1;
+}
+
+.el-table__body-wrapper{
+  overflow: auto
+}
+</style>
