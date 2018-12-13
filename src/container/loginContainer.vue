@@ -18,8 +18,8 @@
 <script>
 import Login from '../components/Login';
 
-const src = require('../assets/login.png');
-const logo = require('../assets/logo.png');
+const src = require('../assets/img/login.png');
+const logo = require('../assets/img/logo.png');
 
 export default {  
     name:'loginContainer', 

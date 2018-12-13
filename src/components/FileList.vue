@@ -8,18 +8,18 @@
             font-size: 13px;
             text-align: left;
             padding: 0px 12px;"></el-header>
-        <el-main>
+        <el-main style="padding:12px">
             <el-row>
-                <el-col :span="8" v-for="(o, index) in 2" :key="o" :offset="index > 0 ? 2 : 0">
-                    <el-card :body-style="{ padding: '0px' }">
-                    <!-- <img src="~examples/assets/images/hamburger.png" class="image"> -->
-                    <div style="padding: 14px;">
-                        <span>好吃的汉堡</span>
-                        <div class="bottom clearfix">
-                        <time class="time">{{ currentDate }}</time>
-                        <el-button type="text" class="button">操作按钮</el-button>
+                <el-col :span="24" v-for="(o, index) in 1" :key="o" :offset="index > 0 ? 2 : 0">
+                    <el-card :body-style="{ padding: '0px', display:'flex', flexDirection: 'row', width:'180px', height:'80px', flexShrink: 0 }">
+                        <img :src="imgsArr[0]" class="image" style="height:80px">
+                        <div style="padding: 12px;flex-grow:1;">
+                            <span style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">患者01患者01</span>
+                            <div class="bottom clearfix">
+                                <time class="time">{{ currentDate }}</time>
+                                <el-button type="text" class="button">操作按钮</el-button>
+                            </div>
                         </div>
-                    </div>
                     </el-card>
                 </el-col>
             </el-row>
@@ -35,6 +35,9 @@ export default {
         return {
             currentDate: new Date()
         };
+    },
+    props:{
+        imgsArr: Array,
     }
     
 }

@@ -27,7 +27,7 @@
         <el-container>
 
           <!-- <el-aside style="width:auto;">
-            <FileList>病人信息和文档信息</FileList>
+            <FileList :imgsArr="imgsArr">病人信息和文档信息</FileList>
           </el-aside> -->
 
           <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
@@ -1287,6 +1287,9 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
+
+
 .height-ful{
   height: 100%;
 }

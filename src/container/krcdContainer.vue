@@ -17,6 +17,9 @@
   // import '../assets/js/jquery-1.7.2.min.js';
   // import '../assets/js/jquery.jrumble.1.3.min.js';
 
+  const face01 = require('../assets/img/face01.jpeg');
+  const face02 = require('../assets/img/face02.jpeg');
+
   export default {
     name: 'krcdContainer',
     extends: krcdEditor,
@@ -82,6 +85,10 @@
     },
     data() {
       return {
+        imgsArr:[
+          face01,
+          face02
+        ],
         tabsArray: [{
             clsType: 'template',
             iconCls: 'el-icon-document',
@@ -1926,6 +1933,11 @@
 }
 
 .el-table__body-wrapper{
+  overflow: auto
+}
+
+.editor-box>div:nth-child(2){
+  flex-grow: 1;
   overflow: auto
 }
 </style>
