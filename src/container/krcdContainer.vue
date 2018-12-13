@@ -65,7 +65,7 @@
             // [...this.arrBtns.slice(this.arrBtns.length-1)]
             break
           case 'sectionAble':
-            const newTools = [...this.arrBtns.slice(0, this.arrBtns.length - 3)];
+            const newTools = [...this.arrBtns.slice(1, this.arrBtns.length - 3)];
             newTools.push(this.arrBtns[this.arrBtns.length - 2])
             return newTools
             break
@@ -672,6 +672,24 @@
         }
       },
 
+      longer(e){
+        e.target.style = `
+          background-color: #ffffff;
+          border: 10px solid #65B1FF;
+          width: 24px
+         `
+      }
+      ,
+
+      shorter(e){
+        e.target.style = `
+          border: 0;
+          width: 6px;
+          background-color: #65B1FF;
+        `
+      }
+      ,
+
       // 调出编辑的弹窗
       editWin(type) {
         console.log(window)
@@ -1199,10 +1217,14 @@
         } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
           //标准浏览器
 
-          let selectionObj = iframeObj.getSelection();
-          let selectedText = selectionObj.toString();
+          let selectionObj = iframeObj.getSelection()||window.getSelection();
+          debugger
           console.log(selectionObj)
+          // selectionObj = selectionObj.anchorNode ===null?selectionObj.anchorNod='text':selectionObj.anchorNode;  // 防止报错的
+          let selectedText = selectionObj.toString();
+          // selectedText = selectedText.length===0?' ':selectedText;  // 防止文本为空是报错
           let rangeObj = selectionObj.getRangeAt(0);
+          // console.log(rangObj)
           let docFragment = rangeObj.cloneContents();
           let tempDiv = document.createElement("div");
           tempDiv.appendChild(docFragment);
@@ -1651,23 +1673,11 @@
           // self.toolBtns = self.arrBtns.slice(0, self.arrBtns.length-1)
         }
 
-        // // 当点中的元素是p但又是插入section的时候
-        // if(arguments[0].target.tagName==="P"){ 
-        //     console.log(arguments[0].target)
-        //     // 用replaceChild来将当前节点替换。
-        //     let content = arguments[0].target.innerHTML;
-        //     const newNode = self.iframeWin.document.createElement("div");
-        //     newNode.innHTML =  content
-        //     newNode.style="display:inline-block;width:100%;contenteditable=true;" // 保证原来p的整行且居中
-
-        //     arguments[0].target.parentNode.replaceChild(newNode,arguments[0].target)
-        //   }
-
         // 选择空白处自动聚焦
         if (arguments[0].path[0].className === "krcd-tmp-content") {
 
           // 定位div(contenteditable = "true")聚焦点到最后的函数
-          function po_Last_Div(obj, docObj) {
+          function po_Last_Div(obj, docObj ) {
             if (window.getSelection) { //ie11 10 9 ff safari  
               // obj.focus(); //解决ff不获取焦点无法定位问题              // 这里会让我的直接到元素的位置处
               var range = docObj.getSelection(); //创建range
@@ -1680,6 +1690,7 @@
               range.collapse(false); //光标移至最后
               range.select();
             }
+   
           }
 
           const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
@@ -1693,14 +1704,6 @@
           // 聚焦到最后
           po_Last_Div(editDOM, self.iframeWin)
 
-
-          // }else if (arguments[1]!==null&&arguments[1]['TYPE_NAME']!=='section'){      // 选中文档段中控件时隐藏工具条
-          //   //  self.onOff = {...this.off}
-          // }else if(arguments[0].target.className==="krcd-ctrl krcd-section"&&arguments[1]['TYPE_NAME']!=='section'){
-          //   if(arguments[0].target.querySelectorAll('p').length === 1 && !arguments[0].target.querySelector('p').className){
-          //     arguments[0].target.removeChild(arguments[0].target.querySelector('p'))
-          //   }
-          //   po_Last_Div(arguments[0].target.querySelector('p'), arguments[0].target)
         }
 
         /**
@@ -1715,6 +1718,8 @@
           console.log(document.querySelector('.tools-btn'))
           let toolbtnW = document.querySelector('.tools-btn').offsetWidth
           let toolbtnH = document.querySelector('.tools-btn').offsetHeightd
+          console.log(arguments[0].clientY)
+          console.log(arguments[0].clientY - scrTop > (arguments[0].screenY * 1 / 2))
 
           // 设定工具条的样式
           const sources = {
@@ -1731,7 +1736,7 @@
             // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
             //       // toolbtnH + 
             //       'px',  
-            'top': arguments[0].clientY - scrTop > (arguments[0].screenY * 1 / 2) ? editorY + arguments[0].clientY -
+            'top': arguments[0].clientY - scrTop > (toolsH / 2) ? editorY + arguments[0].clientY -
               scrTop - 55 * 2 - toolsH + // 为了要输入的时候不要被影响到
               // toolbtnH + 
               'px' : toolsH + editorY + arguments[0].clientY - scrTop + 55 * 2 + // 为了要输入的时候不要被影响到
@@ -1752,15 +1757,6 @@
         // 每次点击都重新定位工具条
         getPositon()
 
-        // 点中初始化时的p不能编辑，所以赋予它可编辑的属性
-        // if (arguments[0].path[0].attributes.length === 0 && arguments[1] !== null && arguments[1]['TYPE_NAME'] ===
-        //   'section') {
-        //   arguments[0].path[0].setAttribute("contenteditable", "true");
-        //   arguments[0].path[0].className = 'krcd-value';
-        //   arguments[0].path[0].focus();
-        // }
-
-        
 
       });
 
@@ -1801,25 +1797,33 @@
            */
           // 获取ifame中的window
           const editor = document.getElementsByTagName('iframe')[1].contentWindow;
-          editor.onmouseup = function(){
-            console.log("鼠标抬起了")
-            // 输出点击时获取的数据
-            let selText = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedText;
-            let selHtml = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedHtml;
-            let selectedDOM = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow).selectedDOM;
+          editor.onmousedown = function(){    
+            if(!this.editor.onmouseup){
+                this.onmouseover = function(){              
+                this.editor.onmouseup = function(){
+                    console.log("鼠标抬起了")
+                    debugger
+                    // 输出点击时获取的数据
+                    let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow);
 
-            console.log(selectedDOM)
+                    let selText = getSelected.selectedText;
+                    let selHtml = getSelected.selectedHtml;
+                    let selectedDOM = getSelected.selectedDOM;
 
-            console.log(selHtml)
+                    console.log(selectedDOM)
 
-            // 防止被无聊的点击覆盖了
-            self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
-            self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml : self.selectedHtml;
-            // self.selectedDOM = 
+                    console.log(selHtml)
 
-            // if()
+                    // 防止被无聊的点击覆盖了
+                    self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
+                    self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml : self.selectedHtml;
+
+                    self.saveAble = 'normal'; // 保证弹出窗口
+                }
+            }             
+            }        
+            
           }
-
           
         }, 1500)
 
@@ -1871,39 +1875,54 @@
 
 .showBtnLeft{
   display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
+  position: absolute;  
   color: #F2F6FC;
   left: 0;
   top: 50%;
   margin-top: -50px;
-  width: 24px;
+  
   height: 100px;
-  border-bottom-right-radius: 8px;
-  border-top-right-radius: 8px;
+  border-bottom-right-radius: 6px;
+  border-top-right-radius: 6px;
   z-index: 1000;
   display: flex;
   align-items: center;
+  border: 0;
+  width: 6px;
+  background-color: #65B1FF;
+  box-shadow: rgba(64, 158, 255, 0.11) 2px 0px 8px;
+  /* background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  width: 24px; */
 }
 
 .showBtnRight{
   display: inline-block;
-  position: absolute;
-  background-color: #ffffff;
-  border: 10px solid #65B1FF;
-  color: #F2F6FC;
+  position: absolute;  
   right: 0;  
   top: 50%;
   margin-top: -50px;
   width: 24px;
   height: 100px;
-  border-bottom-left-radius: 8px;
-  border-top-left-radius: 8px;
+  border-bottom-left-radius: 6px;
+  border-top-left-radius: 6px;
   z-index: 1000;
   display: flex;
   align-items: center;  
+  border: 0;
+  width: 6px;
+  background-color: #65B1FF;
+  box-shadow: rgba(64, 158, 255, 0.11) -2px 0px 8px;
+  /* background-color: #ffffff;
+  border: 10px solid #65B1FF;
+  width: 24px; */
 }
+
+/* .showBtnLittle{
+  border: 0;
+  width: 6px;
+  background: #65B1FF;
+} */
 
 /*
 * 改造右方保证表格隐藏滚动

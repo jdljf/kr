@@ -18,17 +18,19 @@
         <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
       </div>  
       <el-container style="overflow: hidden;"  class="left-tree">
-        <div class="showBtnLeft" @click="showHideLeft">
+        <div class="showBtnLeft showBtnLittle" @click="showHideLeft"  @mouseover="longer" @mouseout="shorter">
           <!-- <span>展开收起</span> -->
         </div>
-        <div class="showBtnRight" @click="showHideRight">
+        <div class="showBtnRight showBtnLittle" @click="showHideRight" @mouseover="longer" @mouseout="shorter">
           <!-- <span>展开收起</span> -->
         </div>
         <el-container>
 
-          <!-- <el-aside style="width:auto;">
-            <FileList :imgsArr="imgsArr">病人信息和文档信息</FileList>
-          </el-aside> -->
+          <el-aside style="width:auto;display: flex;">
+            <FileList :imgsArr="imgsArr">
+              <!-- 病人信息和文档信息 -->
+            </FileList>
+          </el-aside>
 
           <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
         
