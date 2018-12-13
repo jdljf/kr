@@ -762,7 +762,7 @@ export default {
             },
             {
               name: "krcd-toolbar-insert-horizontal",
-              title: "分隔线",
+              title: "分割线",
               items: [
                 {
                   name: "horizontal",
