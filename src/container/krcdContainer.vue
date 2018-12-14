@@ -23,6 +23,87 @@
   export default {
     name: 'krcdContainer',
     extends: krcdEditor,
+
+    beforeCreate() {
+      console.log('krcd components created.');
+      // debugger
+      let self = this;
+      async function asyncGetTemp(self) {   
+          await ajax.post(
+              '/ParagraphTheme/GetList', 
+              ''
+              ).then((res) => {
+              console.log('成功了！', res.data.data)
+              // 转换一下数据
+              const newArr = res.data.data.map(function(item){            
+                  return {...item,name: item['theme'],children:[],id: item['id'],hasChild:(Math.random()>0.5)?true:false,count:1 }
+              })
+              self.templateTag.push(...newArr)
+              console.log(self.templateTag)
+            }).catch((err) => {
+              console.log(err)
+            })
+      }
+    
+     asyncGetTemp(self);
+      
+
+      /**
+       * 请求模版数据
+       */
+      ajax.post(
+        '/DocumentTemplate/GetList', {
+          "deptCode": "",
+          "creatorUserId": 0,
+          "id": 0
+        }).then((res) => {
+        console.log('成功了！', typeof res.data.data)
+
+        const templataData = res.data.data;
+
+        // 后端数组转为前端数组
+        const templateArr = templataData.map(this.back2font)
+
+        // 修改templatelist的数据
+        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
+      }).catch((err) => {
+        console.log(err)
+      })
+
+      // // 为什么不能这样？！
+      // 应该是因为this.ajaxFunTemp还没加载出来，所以无效
+      // const content = {
+      //       "deptCode": "",
+      //       "creatorUserId": 0,
+      //        "id": 0
+      //    }
+
+      // this.ajaxFunTemp('GetList', content ,()=>{
+      //     console.log('成功了！',typeof res.data.data) 
+
+      //     const templataData = res.data.data;
+
+      //     // 后端数组转为前端数组
+      //     const templateArr = templataData.map(this.back2font)  
+
+      //     // 修改templatelist的数据
+      //     this.templatelist.push(...templateArr)
+      // });
+    },
+
+    created(){
+      console.log(this.templatelist)
+
+      // 屏蔽右键，防止外层window的bug
+      document.oncontextmenu = function(){
+          event.returnValue = false;
+      }
+      // 或者直接返回整个事件
+      document.oncontextmenu = function(){
+          return false;
+      }
+    },
+
     props: {
       //编辑器的宽高取决于编辑器渲染节点本身的宽高
       width: {
@@ -38,6 +119,7 @@
         default: 'flex',
       },
     },
+
     components: {
       FileList,
       Tools,
@@ -49,6 +131,7 @@
       NavMenu,
       CommitTable
     },
+
     computed: {
       // // 这是控制工具栏开关的
       // onOff: function(){
@@ -61,18 +144,22 @@
       toolBtns: function () {
         switch (this.saveAble) {
           case 'ctrlAble':
+            this.toolsShow = false;
             return []
             // [...this.arrBtns.slice(this.arrBtns.length-1)]
             break
           case 'sectionAble':
+            this.toolsShow = true;
             const newTools = [...this.arrBtns.slice(1, this.arrBtns.length - 3)];
             newTools.push(this.arrBtns[this.arrBtns.length - 2])
             return newTools
             break
           case 'normal':
+            this.toolsShow = true;
             return [...this.arrBtns.slice(1, this.arrBtns.length - 2)]
             break
           default:
+            this.toolsShow = false;
             return []
             // [...this.arrBtns.slice(0, this.arrBtns.length-2)]
             break
@@ -83,6 +170,7 @@
         return this.arrBtnsFun(this)
       }
     },
+
     data() {
       return {
         imgsArr:[
@@ -231,6 +319,15 @@
               name: '粘贴',
               type: 'PASTE',
               iconCls: 'el-icon-refresh',
+              // 预留每个类型的字典
+              dic: [
+
+              ]
+            },
+            {
+              name: '关闭',
+              type: 'CLOSE',
+              iconCls: 'el-icon-close',
               // 预留每个类型的字典
               dic: [
 
@@ -640,7 +737,13 @@
 
       }
     },
+
     methods: {
+      // 点击列表项目
+      getPatMsg(patId,fileTheme){
+        // AJAX请求对应的表格
+        console.log("点击文档读取数据")
+      },
 
       // 展开收起
       showHideLeft(over) {
@@ -657,7 +760,6 @@
         }
 
       },
-
       showHideRight(over) {
         if (over === 'show') {
           this.rightTreeWidth = 'auto';
@@ -678,8 +780,7 @@
           border: 10px solid #65B1FF;
           width: 24px
          `
-      }
-      ,
+      },
 
       shorter(e){
         e.target.style = `
@@ -687,8 +788,7 @@
           width: 6px;
           background-color: #65B1FF;
         `
-      }
-      ,
+      },
 
       // 调出编辑的弹窗
       editWin(type) {
@@ -697,8 +797,6 @@
           case "文本":
             // 弹出窗
             window.$EDITORUI["edui93"]._edit();
-
-
         }
         console.log(window.$EDITORUI["edui93"]._edit)
         window.$EDITORUI["edui93"]._edit()
@@ -1078,12 +1176,6 @@
           // }
         })
 
-
-
-
-
-
-
         console.log(newDiv.getCtrlElement())
         newDiv.refreshData([true])
 
@@ -1200,7 +1292,9 @@
        * 获取text和html
        */
       selectText(iframeObj) {
-        if (iframeObj.document.selection) {
+
+        if (arguments[0].path[0].className === "krcd-tmp-content"){
+          if (iframeObj.document.selection) {
 
           let selectionObj = iframeObj.document.selection;
           let rangeObj = selectionObj.createRange();
@@ -1218,7 +1312,7 @@
           //标准浏览器
 
           let selectionObj = iframeObj.getSelection()||window.getSelection();
-          debugger
+          // debugger
           console.log(selectionObj)
           // selectionObj = selectionObj.anchorNode ===null?selectionObj.anchorNod='text':selectionObj.anchorNode;  // 防止报错的
           let selectedText = selectionObj.toString();
@@ -1236,6 +1330,11 @@
             selectedDOM: tempDiv
           }
         }
+
+        }else{
+          console.log("你没点中编辑区")
+        }
+        
       },
 
 
@@ -1257,9 +1356,9 @@
         // }
 
         // let selResult = selectText();
-        if (selResult.length !== 0) {
-          // alert(selResult)
-        }
+        // if (selResult.length !== 0) {
+        //   // alert(selResult)
+        // }
 
         let domSet = {
           'ctrlName': ctrlName,
@@ -1324,6 +1423,9 @@
               alert('请点击元素')
             }
             break
+          case 'CLOSE':
+            this.saveAble = null            
+            break
           default:
             alert('请选择正确的type')
             return
@@ -1340,7 +1442,8 @@
         }
         headerTag.appendChild(styleDOM);
 
-        if (type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE") {
+        if (type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE"&& type !== "CLOSE") {
+          console.log(newDiv)
           this.krcd.insertControl(
             newDiv.getCtrlElement(), //  获取会对应的Element
             newDiv.getOpt() //  获取会对应的opt
@@ -1420,7 +1523,6 @@
       //   )
       // },
 
-
       execCommand() {
         return this.krcd.execCommand.apply(this.krcd, arguments);
       },
@@ -1495,85 +1597,8 @@
 
 
     },
-    beforeCreate() {
-      console.log('krcd components created.');
-      // debugger
-      let self = this;
-      async function asyncGetTemp(self) {   
-          await ajax.post(
-              '/ParagraphTheme/GetList', 
-              ''
-              ).then((res) => {
-              console.log('成功了！', res.data.data)
-              // 转换一下数据
-              const newArr = res.data.data.map(function(item){            
-                  return {...item,name: item['theme'],children:[],id: item['id'],hasChild:(Math.random()>0.5)?true:false,count:1 }
-              })
-              self.templateTag.push(...newArr)
-              console.log(self.templateTag)
-            }).catch((err) => {
-              console.log(err)
-            })
-      }
-    
-     asyncGetTemp(self);
-      
 
-      /**
-       * 请求模版数据
-       */
-      ajax.post(
-        '/DocumentTemplate/GetList', {
-          "deptCode": "",
-          "creatorUserId": 0,
-          "id": 0
-        }).then((res) => {
-        console.log('成功了！', typeof res.data.data)
 
-        const templataData = res.data.data;
-
-        // 后端数组转为前端数组
-        const templateArr = templataData.map(this.back2font)
-
-        // 修改templatelist的数据
-        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
-      }).catch((err) => {
-        console.log(err)
-      })
-
-      // // 为什么不能这样？！
-      // 应该是因为this.ajaxFunTemp还没加载出来，所以无效
-      // const content = {
-      //       "deptCode": "",
-      //       "creatorUserId": 0,
-      //        "id": 0
-      //    }
-
-      // this.ajaxFunTemp('GetList', content ,()=>{
-      //     console.log('成功了！',typeof res.data.data) 
-
-      //     const templataData = res.data.data;
-
-      //     // 后端数组转为前端数组
-      //     const templateArr = templataData.map(this.back2font)  
-
-      //     // 修改templatelist的数据
-      //     this.templatelist.push(...templateArr)
-      // });
-    },
-
-    created(){
-      console.log(this.templatelist)
-
-      // 屏蔽右键，防止外层window的bug
-      document.oncontextmenu = function(){
-          event.returnValue = false;
-      }
-      // 或者直接返回整个事件
-      document.oncontextmenu = function(){
-          return false;
-      }
-    },
     beforeMount() {
 
     },
@@ -1736,7 +1761,7 @@
             // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
             //       // toolbtnH + 
             //       'px',  
-            'top': arguments[0].clientY - scrTop > (toolsH / 2) ? editorY + arguments[0].clientY -
+            'top': arguments[0].clientY - scrTop > (arguments[0].screenY * 1 / 2) ? editorY + arguments[0].clientY -
               scrTop - 55 * 2 - toolsH + // 为了要输入的时候不要被影响到
               // toolbtnH + 
               'px' : toolsH + editorY + arguments[0].clientY - scrTop + 55 * 2 + // 为了要输入的时候不要被影响到
@@ -1802,7 +1827,7 @@
                 this.onmouseover = function(){              
                 this.editor.onmouseup = function(){
                     console.log("鼠标抬起了")
-                    debugger
+                    // debugger
                     // 输出点击时获取的数据
                     let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow);
 
@@ -1878,10 +1903,10 @@
   position: absolute;  
   color: #F2F6FC;
   left: 0;
-  top: 50%;
-  margin-top: -50px;
+  top: 88px;
+  margin-top: -45px;
   
-  height: 100px;
+  height: 85px;
   border-bottom-right-radius: 6px;
   border-top-right-radius: 6px;
   z-index: 1000;
@@ -1891,6 +1916,7 @@
   width: 6px;
   background-color: #65B1FF;
   box-shadow: rgba(64, 158, 255, 0.11) 2px 0px 8px;
+  z-index:1;
   /* background-color: #ffffff;
   border: 10px solid #65B1FF;
   width: 24px; */
@@ -1900,10 +1926,10 @@
   display: inline-block;
   position: absolute;  
   right: 0;  
-  top: 50%;
-  margin-top: -50px;
+  top: 88px;
+  margin-top: -45px;
   width: 24px;
-  height: 100px;
+  height: 85px;
   border-bottom-left-radius: 6px;
   border-top-left-radius: 6px;
   z-index: 1000;
@@ -1913,6 +1939,7 @@
   width: 6px;
   background-color: #65B1FF;
   box-shadow: rgba(64, 158, 255, 0.11) -2px 0px 8px;
+  z-index:1;
   /* background-color: #ffffff;
   border: 10px solid #65B1FF;
   width: 24px; */

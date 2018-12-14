@@ -4,6 +4,7 @@
     :data="tableData2"
     style="width:207px"
     :fit="false"
+    @row-click="rowClick"
     :row-class-name="tableRowClassName">
     <el-table-column
       prop="icon"
@@ -43,7 +44,20 @@
           return 'success-row';
         }
         return '';
+      },
+
+      rowClick(row, event, column) {
+        // console.log(row)  // 改行的元素
+        // console.log(event)
+        // console.log(column)
+        
+        // this.getPatMsg(patId,fileTheme)
+        this.getPatMsg()
+
       }
+    },
+    props:{
+        getPatMsg: Function,
     },
     data() {
       return {
@@ -56,7 +70,7 @@
           date: '2016-05-04',
           name: '王小虎',
           icon: <i class="el-icon-loading"></i>,
-          state: 2, 
+          state: 0, 
         }, {
           date: '2016-05-01',
           name: '王小虎',
@@ -66,7 +80,7 @@
           date: '2016-05-03',
           name: '王小虎',
           icon: <i class="el-icon-loading"></i>,
-          state: 2, 
+          state: 0, 
         }],
 
         // 警告行的index

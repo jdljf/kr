@@ -27,7 +27,7 @@
         <el-container>
 
           <el-aside style="width:auto;display: flex;">
-            <FileList :imgsArr="imgsArr">
+            <FileList :imgsArr="imgsArr" :getPatMsg="getPatMsg">
               <!-- 病人信息和文档信息 -->
             </FileList>
           </el-aside>

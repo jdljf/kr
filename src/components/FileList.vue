@@ -7,7 +7,9 @@
             line-height: 30px;
             font-size: 13px;
             text-align: left;
-            padding: 0px 12px;"></el-header>
+            padding: 0px 12px;">
+            <i class="el-icon-tickets"></i>&nbsp;&nbsp;某某某的{{theme}}文件
+            </el-header>
     <el-main class="list-main">
       <el-row class="list-row">
         <el-col :span="24" v-for="(o, index) in 1" :key="o" :offset="index > 0 ? 2 : 0">
@@ -32,7 +34,7 @@
       </el-row>
       <slot></slot>
 
-      <FilesTable></FilesTable>
+      <FilesTable :getPatMsg="getPatMsg"></FilesTable>
     </el-main>
   </el-container>
 </template>
@@ -45,15 +47,17 @@
     name: "FileList",
     components: {
       PatMsg,
-      FilesTable
+      FilesTable,      
     },
     data() {
       return {
         showHide: false, // 用来记录病人详细信息是否完全展示
+        theme: "主题"
       };
     },
     props: {
       imgsArr: Array,
+      getPatMsg: Function,  // 父类传入patId和fileTheme获取病人信息，并请求接口
     },
     methods: {
       changeShow() {
@@ -73,7 +77,7 @@
   }
 
   .list-row {
-    padding: 12px 12px 4px 12px;
+    padding: 12px 12px 8px 12px;
     flex-grow: 1;
     overflow: auto;
   }
