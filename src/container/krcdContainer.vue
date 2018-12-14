@@ -14,9 +14,6 @@
   import funs from '../common/funs'
   import tabContainer from './tabContainer'
 
-  // import '../assets/js/jquery-1.7.2.min.js';
-  // import '../assets/js/jquery.jrumble.1.3.min.js';
-
   const face01 = require('../assets/img/face01.jpeg');
   const face02 = require('../assets/img/face02.jpeg');
 
@@ -504,6 +501,20 @@
           alert(`你点击的是：第${+e.currentTarget.getAttribute('index')+1}个病人`)
         },
 
+        docSplit: (doc ,content)=>{
+              const div = doc.createElement('div');
+              div.innerHTML = content;
+              let contentValue = div.getElementsByClassName("krcd-tmp-content-value")[0];
+              let headerValue = div.getElementsByClassName("krcd-tmp-header-value")[0];
+              let footerValue = div.getElementsByClassName("krcd-tmp-footer-value")[0];
+
+              return{
+                contentValue,
+                headerValue,
+                footerValue
+              }
+          },
+
         /**
          * 0、模版插入替换
          * params {string} content   模版/控件/字典的innerHTML内容
@@ -511,23 +522,21 @@
          */
         replaceFun: (content, styleString) => {
           console.log(this)
-          // const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
-
-          // 确保初始化时没有聚焦导致不能倒入模版
-          // innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
-
-          // innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].innerHTML='';
-          // this.krcd.execCommand('inserthtml',content);  // 聚焦点插入内容
           
-          // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content;
-          // console.log(this.$refs.setContentInp)
+          // 需要判断是什么模式才决定倒入的content还是all
+          console.log(this.iframeWin)
 
-          // console.log(this.$parent.$refs.setContentInp.value)
+          const docThreePart = this.docSplit(this.iframeWin.document, content);
 
-          // 这是index.vue中绑定到对应的input的value中了，所以需要对它进行辅助。
-          this.$parent.$refs.setContentInp.value = content
+          this.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML;
+          
+          this.krcd.html(docThreePart.contentValue?docThreePart.contentValue.innerHTML:'');
+          
+          let headerValue = this.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+          let footerValue = this.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
-          this.krcd.html(content);
+          headerValue.innerHTML = docThreePart.headerValue?docThreePart.headerValue.innerHTML:'';  // 页头
+          footerValue.innerHTML = docThreePart.footerValue?docThreePart.footerValue.innerHTML:'';  // 页脚
 
         },
 
@@ -557,7 +566,8 @@
         // 获取整个文档的html
         getHtmlContent: () => {
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
-          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML; // 获取对应的innerHTML  
+          let htmlAll = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML; // 获取对应的innerHTML  
+          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content')[0].innerHTML;  // 获取对应内容的innerHTML（content中的内容）
 
           const headStyleString = (() => {
             const arr = innerDoc.querySelectorAll('style[stylename]');
@@ -568,6 +578,7 @@
             return newArr.join('')
           })()
           return {
+            htmlAll,
             htmlContent,
             headStyleString
           }
@@ -584,6 +595,7 @@
             id: '', // 因为是模版所以不设置了
             styleString: docContent.headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
             content: docContent.htmlContent,
+            allhtml: docContent.htmlAll,
             scope: '全院',
             discribe: '描述', // 描述
             tag: docContent.tag, // 模版类型
@@ -1693,8 +1705,57 @@
           });
         } else {
           return this.krcd.mode();
-        }
+        }   
       },
+           /**
+         * 工具栏定位
+         */
+        // 根据点击对象的坐标给组件传值来定位
+        getPositon(){
+          let editorX = document.querySelector('.krcd-editor-inner').offsetLeft
+          let editorY = document.querySelector('.krcd-editor-inner').offsetTop
+          let scrTop = document.querySelector('.krcd-editor').scrollTop // 滚动的高度
+          let toolsH = document.querySelector('.krcd-toolbars').offsetHeight
+          console.log(document.querySelector('.tools-btn'))
+          let toolbtnW = document.querySelector('.tools-btn').offsetWidth
+          let toolbtnH = document.querySelector('.tools-btn').offsetHeight
+          let listW= document.querySelector('.widget-container').offsetWidth
+          let fileListW = document.querySelector('.list-main').offsetWidth
+          debugger
+          // 设定工具条的样式
+          const sources = {
+            "flex": 1,
+            "display": "flex",
+            "align-items": "center",
+            "flex-direction": "column", // 改变column再扩展字典
+            "line-height": "30px",
+            "background-color": "white",
+            'position': 'absolute',
+            'left': editorX + this.args[0].clientX +
+              // (toolbtnW===0?65:toolbtnW)/2 + // 因为原来就是0，所以不应该是这个值
+              listW + 
+              fileListW +  // 新增的左边list的距离
+              'px',
+            // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
+            //       // toolbtnH + 
+            //       'px',  
+            'top': this.args[0].clientY - scrTop > (this.args[0].screenY * 1 / 2) ? editorY + this.args[0].clientY -
+              scrTop - 55 * 2 - toolsH + // 为了要输入的时候不要被影响到
+              // toolbtnH + 
+              'px' : toolsH + editorY + this.args[0].clientY - scrTop + 55 * 2 + // 为了要输入的时候不要被影响到
+              //       // toolbtnH + 
+              'px',
+            "margin-top": "-30px",
+            'z-index': '1005',
+            'box-shadow': '1px 1px 4px #00000033'
+          }
+
+          // 改变工具条数据
+          this.toolStyle = {
+            ...this.toolStyle,
+            ...sources
+          }
+        },
       getHTML() {
         return this.krcd.html();
       },
@@ -1761,7 +1822,7 @@
 
         console.log(arguments);
         // 获取ifame中的window
-        self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+        // self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
 
         const e = event || window.event;
         self.args = arguments; // 获取点中的对象
@@ -1839,59 +1900,8 @@
 
         }
 
-        /**
-         * 这是为工具栏定位用
-         */
-        // 根据点击对象的坐标给组件传值来定位
-        const getPositon = () => {
-          let editorX = document.querySelector('.krcd-editor-inner').offsetLeft
-          let editorY = document.querySelector('.krcd-editor-inner').offsetTop
-          let scrTop = document.querySelector('.krcd-editor').scrollTop // 滚动的高度
-          let toolsH = document.querySelector('.krcd-toolbars').offsetHeight
-          console.log(document.querySelector('.tools-btn'))
-          let toolbtnW = document.querySelector('.tools-btn').offsetWidth
-          let toolbtnH = document.querySelector('.tools-btn').offsetHeight
-          let listW= document.querySelector('.widget-container').offsetWidth
-          console.log(arguments[0].clientY)
-          console.log(arguments[0].clientY - scrTop > (arguments[0].screenY * 1 / 2))
-          debugger
-          // 设定工具条的样式
-          const sources = {
-            "flex": 1,
-            "display": "flex",
-            "align-items": "center",
-            "flex-direction": "column", // 改变column再扩展字典
-            "line-height": "30px",
-            "background-color": "white",
-            'position': 'absolute',
-            'left': editorX + arguments[0].clientX +
-              // (toolbtnW===0?65:toolbtnW)/2 + // 因为原来就是0，所以不应该是这个值
-              listW + 
-              208 +  // 新增的左边list的距离
-              'px',
-            // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
-            //       // toolbtnH + 
-            //       'px',  
-            'top': arguments[0].clientY - scrTop > (arguments[0].screenY * 1 / 2) ? editorY + arguments[0].clientY -
-              scrTop - 55 * 2 - toolsH + // 为了要输入的时候不要被影响到
-              // toolbtnH + 
-              'px' : toolsH + editorY + arguments[0].clientY - scrTop + 55 * 2 + // 为了要输入的时候不要被影响到
-              //       // toolbtnH + 
-              'px',
-            "margin-top": "-30px",
-            'z-index': '1005',
-            'box-shadow': '1px 1px 4px #00000033'
-          }
-
-          // 改变工具条数据
-          self.toolStyle = {
-            ...self.toolStyle,
-            ...sources
-          }
-        }
-
-        // 每次点击都重新定位工具条
-        getPositon()
+        // 工具栏定位
+        self.getPositon()
 
 
       });
@@ -1899,6 +1909,7 @@
       this.krcd.addListener("ready", function () {
         console.log("krcd 初始化完成！");
 
+        self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
 
         // 根据屏幕变化
         window.onresize = function () {
@@ -1937,6 +1948,8 @@
 
           // 默认设定为设计模式
           self.mode(self.modelsData, 0);
+
+          
 
           /***
            * 给编辑器增加鼠标抬起事件
@@ -1979,15 +1992,23 @@
         }, 1500)
 
 
+      });
 
+      this.krcd.addListener("contentchange", function () {
+        console.log("内容改变了");
+        console.log(self.$parent.$refs)
 
+        const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
+
+        self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
+        // this.krcd.html(content);
 
       });
 
 
-
-
     },
+
+    
     beforeDestroy() {
       this.krcd.__ue__.destroy();
     },
