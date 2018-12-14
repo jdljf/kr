@@ -28,25 +28,31 @@
       console.log('krcd components created.');
       // debugger
       let self = this;
-      async function asyncGetTemp(self) {   
-          await ajax.post(
-              '/ParagraphTheme/GetList', 
-              ''
-              ).then((res) => {
-              console.log('成功了！', res.data.data)
-              // 转换一下数据
-              const newArr = res.data.data.map(function(item){            
-                  return {...item,name: item['theme'],children:[],id: item['id'],hasChild:(Math.random()>0.5)?true:false,count:1 }
-              })
-              self.templateTag.push(...newArr)
-              console.log(self.templateTag)
-            }).catch((err) => {
-              console.log(err)
-            })
+      async function asyncGetTemp(self) {
+        await ajax.post(
+          '/ParagraphTheme/GetList',
+          ''
+        ).then((res) => {
+          console.log('成功了！', res.data.data)
+          // 转换一下数据
+          const newArr = res.data.data.map(function (item) {
+            return { ...item,
+              name: item['theme'],
+              children: [],
+              id: item['id'],
+              hasChild: (Math.random() > 0.5) ? true : false,
+              count: 1
+            }
+          })
+          self.templateTag.push(...newArr)
+          console.log(self.templateTag)
+        }).catch((err) => {
+          console.log(err)
+        })
       }
-    
-     asyncGetTemp(self);
-      
+
+      asyncGetTemp(self);
+
 
       /**
        * 请求模版数据
@@ -91,16 +97,16 @@
       // });
     },
 
-    created(){
+    created() {
       console.log(this.templatelist)
 
       // 屏蔽右键，防止外层window的bug
-      document.oncontextmenu = function(){
-          event.returnValue = false;
+      document.oncontextmenu = function () {
+        event.returnValue = false;
       }
       // 或者直接返回整个事件
-      document.oncontextmenu = function(){
-          return false;
+      document.oncontextmenu = function () {
+        return false;
       }
     },
 
@@ -173,7 +179,7 @@
 
     data() {
       return {
-        imgsArr:[
+        imgsArr: [
           face01,
           face02
         ],
@@ -207,8 +213,12 @@
         //   ctrllist: true,
         // },
         fullscreenLoading: true, // true时显示loading
+
+        isMouseOver: false, // 判断用什么事件驱动展示工具栏
         leftTreeWidth: 0, // 左方收起展开
         rightTreeWidth: 0, // 左方收起展开
+        leftOtherStyle: '', // 附带的左工具样式
+        rightOtherStyle: '', // 附带的右工具样式
         templeCtrl: false, // 整个模版的编辑和删除的控制
         toolsShow: false, // 工具的隐藏
         /**
@@ -270,7 +280,7 @@
 
         // 模版类型
         templateTag: [],
-        
+
         // [{
         //     id: "0",
         //     title: "住院病案首页"
@@ -426,21 +436,21 @@
               type: 'SECTION',
               iconCls: 'el-icon-news',
               dic: [{
-                  group: "粘贴嵌套模块", // 分组名
-                  groupItems: [{
-                    name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
-                    // content: '['+ self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
-                    obj: self.createSection({
-                      'ctrlName': self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
-                      'ctrlId': null,
-                      'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
-                      // `${ctrlStyle}
-                      // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
-                      // `
-                    }, null,self.selectedHtml),
-                    date: "",
-                  }] // 组项目
-                },]
+                group: "粘贴嵌套模块", // 分组名
+                groupItems: [{
+                  name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                  // content: '['+ self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
+                  obj: self.createSection({
+                    'ctrlName': self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                    'ctrlId': null,
+                    'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
+                    // `${ctrlStyle}
+                    // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
+                    // `
+                  }, null, self.selectedHtml),
+                  date: "",
+                }] // 组项目
+              }, ]
             },
             {
               name: '存文档段模版',
@@ -487,8 +497,7 @@
             id: 444,
             count: 1
           } // 这个为了子元素编号来设定的count
-        ]
-        ,
+        ],
         patlistOnoff: (event) => {
           const e = event || window.event;
           alert(`你点击的是：第${+e.currentTarget.getAttribute('index')+1}个病人`)
@@ -501,7 +510,7 @@
          */
         replaceFun: (content, styleString) => {
           console.log(this)
-          const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
+          // const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
 
           // 确保初始化时没有聚焦导致不能倒入模版
           // innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
@@ -515,10 +524,10 @@
           // console.log(this.$parent.$refs.setContentInp.value)
 
           // 这是index.vue中绑定到对应的input的value中了，所以需要对它进行辅助。
-          this.$parent.$refs.setContentInp.value=content
-          
+          this.$parent.$refs.setContentInp.value = content
+
           this.krcd.html(content);
-          
+
         },
 
         // 提示输入模版名称弹窗
@@ -590,6 +599,7 @@
         },
 
 
+
         /* 初始化的函数对象 */
 
         /**
@@ -605,14 +615,7 @@
             innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
 
             // 所有有stylename的属性的style标签，并最后一个中增加样式
-            const headStyle = document.createElement('style');
-            headStyle.innerHTML = styleString; // head中加入style
-            if (innerDoc.querySelectorAll('style[stylename]').length != 0) { // 当拥有stylename属性的标签时
-              let len = innerDoc.querySelectorAll('style[stylename]').length;
-              innerDoc.querySelectorAll('style[stylename]')[len - 1].innerHTML = styleString;
-            } else { // 当不拥有时插入对应dom
-              innerDoc.getElementsByTagName('head')[0].appendChild(headStyle);
-            }
+            this.insertStyle('stylename',innerDoc, styleString);
 
             this.krcd.execCommand('inserthtml', content); // 聚焦点插入内容
             // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content
@@ -622,27 +625,30 @@
           }
 
         },
-        
+
         /**
          * 1-1、动态组件插入，只支持text
          * params {string} ctrlId  模版/控件/字典的innerHTML内容
          * params {string} idName  head>style标签中的样式文本
          * 
          */
-        insertDynamicWidget: (content, styleString, command)=>{   
-            console.log(this)    
-            console.log(command)     
-            this.commandGetResult(
-              command,
-              // "select [name] from PATIENTINFO where id = 599651",
-              (res)=>{
-                const newDiv = this.createText({ctrlId: null,ctrlStyle: null}, null, res.data)  // 创建text
-                this.krcd.insertControl(
-                  newDiv.newDiv.getCtrlElement(), //  获取会对应的Element
-                  newDiv.newDiv.getOpt() //  获取会对应的opt
-                )
-              }
-            )          
+        insertDynamicWidget: (content, styleString, command) => {
+          console.log(this)
+          console.log(command)
+          this.commandGetResult(
+            command,
+            // "select [name] from PATIENTINFO where id = 599651",
+            (res) => {
+              const newDiv = this.createText({
+                ctrlId: null,
+                ctrlStyle: null
+              }, null, res.data) // 创建text
+              this.krcd.insertControl(
+                newDiv.newDiv.getCtrlElement(), //  获取会对应的Element
+                newDiv.newDiv.getOpt() //  获取会对应的opt
+              )
+            }
+          )
         },
 
         /**
@@ -699,7 +705,7 @@
         },
 
         // 请求接口
-        ajaxFunTemp: (type, content, successMsg, sucessFun=()=>{}) => {
+        ajaxFunTemp: (type, content, successMsg, sucessFun = () => {}) => {
           console.log(content)
           return ajax.post(
             `${type}`,
@@ -708,7 +714,7 @@
             this.saveSuccess(successMsg)
             sucessFun(res)
             console.log(res)
-            return res  // 返回函数的返回值
+            return res // 返回函数的返回值
           }).catch((err) => {
             console.log(err)
             this.saveError('请查看控制台错误')
@@ -739,8 +745,35 @@
     },
 
     methods: {
+
+      // 插入样式的方法
+      insertStyle(type, innerDoc, styleString) {
+        const headStyle = document.createElement('style');
+        headStyle.innerHTML = styleString; // head中加入style
+        debugger
+        if(type==='stylename'){
+          if (innerDoc.querySelectorAll('style[stylename]').length !== 0) { // 当拥有stylename属性的标签时
+            let len = innerDoc.querySelectorAll('style[stylename]').length;
+            innerDoc.querySelectorAll('style[stylename]')[len - 1].innerHTML += styleString;
+          }else{
+            headStyle.setAttribute('stylename','stylename');
+            innerDoc.getElementsByTagName('head')[0].appendChild(headStyle);
+          }
+        }else if(type==='modename'){
+          if (innerDoc.querySelectorAll('style[modename]').length !== 0) { // 当拥有stylename属性的style标签时
+            let len = innerDoc.querySelectorAll('style[modename]').length;            
+            innerDoc.querySelectorAll('style[modename]')[len - 1].innerHTML = styleString;
+          }else{
+            headStyle.setAttribute('modename','modename')
+            innerDoc.getElementsByTagName('head')[0].appendChild(headStyle);
+          }
+        } else { // 当不拥有时插入对应dom
+          innerDoc.getElementsByTagName('head')[0].appendChild(headStyle);
+        }
+      },
+
       // 点击列表项目
-      getPatMsg(patId,fileTheme){
+      getPatMsg(patId, fileTheme) {
         // AJAX请求对应的表格
         console.log("点击文档读取数据")
       },
@@ -774,20 +807,27 @@
         }
       },
 
-      longer(e){
-        e.target.style = `
+      longer(e) {
+        e.target.style =
+          `
           background-color: #ffffff;
           border: 10px solid #65B1FF;
           width: 24px
          `
+        //  if(this.isMouseOver){
+        //    e.target.click()
+        // }
       },
 
-      shorter(e){
+      shorter(e) {
         e.target.style = `
           border: 0;
           width: 6px;
           background-color: #65B1FF;
         `
+        // if(this.isMouseOver){
+        //   e.target.parentNodeclassName.indexOf('showBtnRight')===-1?this.showHideLeft():this.showHideRight()
+        // }
       },
 
       // 调出编辑的弹窗
@@ -979,18 +1019,18 @@
         // 保存到localStorage
         localStorage.setItem('ctrlist', JSON.stringify(this.ctrlist))
 
-        
+
         this.commitShow.OnOff = false
 
         return callback()
       },
 
-      
+
       /**
        * 动态模版获得动态数据方法
        * command{String}
        */
-      commandGetResult(command, sucessFun){
+      commandGetResult(command, sucessFun) {
         /**
          * 对接接口的内容, 每次根据数据来得到结果
          *  {
@@ -999,17 +1039,17 @@
             }
          **/
 
-          const postData = {
-            "elementType": "string",
-            "command": command,
+        const postData = {
+          "elementType": "string",
+          "command": command,
+        }
+
+        this.ajaxFunModel(
+          '/ElementTemplate/ExecCommandForText', postData, `成功获取动态数据`, (res) => {
+            sucessFun(res) // 成功的函数调用
           }
-          
-          this.ajaxFunModel(
-            '/ElementTemplate/ExecCommandForText', postData, `成功获取动态数据`, (res)=>{
-              sucessFun(res) // 成功的函数调用
-            }
-          )
-        
+        )
+
       },
 
       /************************
@@ -1051,29 +1091,28 @@
           `<span class="krcd-ctrl" contenteditable="false" krcd-type="select" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-select'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null}><span contenteditable="true" class="krcd-value"></span></span>`; // 这里有个bug，内部标签不能用p要用span
         div = div.firstElementChild;
         const bindingdata = desc.length !== 0 ? [ //默认绑定数据。
-            {
-              'label': desc,
-              'value': '0'
-            },
-          ] :
-          [ //默认绑定数据。
-            {
-              'label': '默认值',
-              'value': '0'
-            },
-            {
-              'label': '男',
-              'value': '1'
-            },
-            {
-              'label': '女',
-              'value': '2'
-            },
-            {
-              'label': '未知',
-              'value': '3'
-            }
-          ];
+          {
+            'label': desc,
+            'value': '0'
+          },
+        ] : [ //默认绑定数据。
+          {
+            'label': '默认值',
+            'value': '0'
+          },
+          {
+            'label': '男',
+            'value': '1'
+          },
+          {
+            'label': '女',
+            'value': '2'
+          },
+          {
+            'label': '未知',
+            'value': '3'
+          }
+        ];
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //控件状态。EDITOR编辑;READONLY只读
           "notdel": 0, //不许删除
@@ -1136,36 +1175,35 @@
           "strictverify": 0, // 严格模式
           "multi": 1,
           "bindingdata": desc.length !== 0 ? [{
+            "value": "0",
+            "label": desc,
+            "selected": 0
+          }] : [{
               "value": "0",
-              "label": desc,
+              "label": "默认单选",
               "selected": 0
-            }] :
-            [{
-                "value": "0",
-                "label": "默认单选",
-                "selected": 0
-              },
-              {
-                "value": "1",
-                "label": "感觉很好",
-                "selected": 0
-              },
-              {
-                "value": "2",
-                "label": "感觉一般",
-                "selected": 0
-              },
-              {
-                "value": "3",
-                "label": "无感觉",
-                "selected": 0
-              },
-              {
-                "value": "4",
-                "label": "感觉糟糕",
-                "selected": 0
-              }
-            ],
+            },
+            {
+              "value": "1",
+              "label": "感觉很好",
+              "selected": 0
+            },
+            {
+              "value": "2",
+              "label": "感觉一般",
+              "selected": 0
+            },
+            {
+              "value": "3",
+              "label": "无感觉",
+              "selected": 0
+            },
+            {
+              "value": "4",
+              "label": "感觉糟糕",
+              "selected": 0
+            }
+          ],
           // "remotedata":{//krcd v4的异步请求采用目前主流的axios，remotedata为发起异步请求时的配置项目
           //     "url":"",//这里建议配置初始化KRCD时options中的ctrl_remote_handle一起用，因为存在你设置模板跟你打开模板时当前路径不一致的情况，导致如果用相对路径会出错的情况（如果用绝对路径也会存在换一家医院实施所有模板都需要改的情况）。故所有控件中的异步请求数据在发起请求前都会调用options.ctrl_remote_handle方法进行处理（也可以加一些权限控制）
           //     "method":"get",
@@ -1293,48 +1331,48 @@
        */
       selectText(iframeObj) {
 
-        if (arguments[0].path[0].className === "krcd-tmp-content"){
+        if (arguments[0].path[0].className === "krcd-tmp-content") {
           if (iframeObj.document.selection) {
 
-          let selectionObj = iframeObj.document.selection;
-          let rangeObj = selectionObj.createRange();
-          let selectedText = rangeObj.text;
-          let selectedHtml = rangeObj.htmlText;
+            let selectionObj = iframeObj.document.selection;
+            let rangeObj = selectionObj.createRange();
+            let selectedText = rangeObj.text;
+            let selectedHtml = rangeObj.htmlText;
 
-          //ie浏览器
-          return {
-            selectedText,
-            selectedHtml,
-            selectedDOM: rangeObj
+            //ie浏览器
+            return {
+              selectedText,
+              selectedHtml,
+              selectedDOM: rangeObj
+            }
+
+          } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
+            //标准浏览器
+
+            let selectionObj = iframeObj.getSelection() || window.getSelection();
+            // debugger
+            console.log(selectionObj)
+            // selectionObj = selectionObj.anchorNode ===null?selectionObj.anchorNod='text':selectionObj.anchorNode;  // 防止报错的
+            let selectedText = selectionObj.toString();
+            // selectedText = selectedText.length===0?' ':selectedText;  // 防止文本为空是报错
+            let rangeObj = selectionObj.getRangeAt(0);
+            // console.log(rangObj)
+            let docFragment = rangeObj.cloneContents();
+            let tempDiv = document.createElement("div");
+            tempDiv.appendChild(docFragment);
+            let selectedHtml = tempDiv.innerHTML;
+
+            return {
+              selectedText,
+              selectedHtml,
+              selectedDOM: tempDiv
+            }
           }
 
-        } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
-          //标准浏览器
-
-          let selectionObj = iframeObj.getSelection()||window.getSelection();
-          // debugger
-          console.log(selectionObj)
-          // selectionObj = selectionObj.anchorNode ===null?selectionObj.anchorNod='text':selectionObj.anchorNode;  // 防止报错的
-          let selectedText = selectionObj.toString();
-          // selectedText = selectedText.length===0?' ':selectedText;  // 防止文本为空是报错
-          let rangeObj = selectionObj.getRangeAt(0);
-          // console.log(rangObj)
-          let docFragment = rangeObj.cloneContents();
-          let tempDiv = document.createElement("div");
-          tempDiv.appendChild(docFragment);
-          let selectedHtml = tempDiv.innerHTML;
-
-          return {
-            selectedText,
-            selectedHtml,
-            selectedDOM: tempDiv
-          }
-        }
-
-        }else{
+        } else {
           console.log("你没点中编辑区")
         }
-        
+
       },
 
 
@@ -1424,7 +1462,7 @@
             }
             break
           case 'CLOSE':
-            this.saveAble = null            
+            this.saveAble = null
             break
           default:
             alert('请选择正确的type')
@@ -1442,7 +1480,7 @@
         }
         headerTag.appendChild(styleDOM);
 
-        if (type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE"&& type !== "CLOSE") {
+        if (type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE" && type !== "CLOSE") {
           console.log(newDiv)
           this.krcd.insertControl(
             newDiv.getCtrlElement(), //  获取会对应的Element
@@ -1470,24 +1508,24 @@
         ctrlId: null,
         ctrlName: null,
         ctrlStyle: null,
-      },defOpt,selectedHtml) {
+      }, defOpt, selectedHtml) {
         let div = document.createElement('div');
         div.innerHTML =
           `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><div contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></div></div>`
         div = div.firstElementChild;
 
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
-          "mode":"EDITOR",//当前模式
-          "originalmode":"EDITOR",//原始模式
-          "desc": selectedHtml ? selectedHtml: '', //描述
+          "mode": "EDITOR", //当前模式
+          "originalmode": "EDITOR", //原始模式
+          "desc": selectedHtml ? selectedHtml : '', //描述
         })
 
         console.log(selectedHtml)
         console.log(newDiv.getValueElement().parentNode)
-        
+
         return {
           newDiv,
-          show: selectedHtml, 
+          show: selectedHtml,
           // newDiv.getValueElement().parentNode.innerHTML // 为模版展示用, 取出生成的html
         }
       },
@@ -1537,11 +1575,63 @@
           }
           opt[i].type = "primary";
 
-          // 初始化所有的tabshow
-          // let tabshowkeyArr = Object.keys(this.tabshow);
-          // tabshowkeyArr.forEach((key)=>{
-          //   this.tabshow[key] = true;
-          // })
+          const modeStyleDef = () => {
+            return `
+              .krcd-ctrl{
+                display: inline;
+                background-color: #F0F8FF;
+              }.krcd-ctrl:after{
+                color: red;
+                content: attr(krcd-right);
+                font-weight: bold;
+                position: relative;
+                bottom: -2px;
+              }.krcd-ctrl>.krcd-value:before,.krcd-ctrl>.krcd-revise>.krcd-value-revise:before {
+                color: #0000ff;
+                padding-right: 3px;
+                content: attr(krcd-left);
+              }.krcd-ctrl>.krcd-value:after,.krcd-ctrl>.krcd-revise>.krcd-value-revise:after {
+                color: #0000ff;
+                padding-left: 3px;
+                content: attr(krcd-right);
+              }
+          `
+          }
+          // 当前需要修改的样式
+          const modeStyle = () => {
+            return `
+              .krcd-ctrl{
+                display: inline;
+                background-color: transparent;
+              }.krcd-ctrl:after{
+                color: red;
+                content: '';
+                font-weight: bold;
+                position: relative;
+                bottom: -2px;
+              }.krcd-ctrl>.krcd-value:before,.krcd-ctrl>.krcd-revise>.krcd-value-revise:before {
+                color: #0000ff;
+                padding-right: 3px;
+                content: ''
+              }.krcd-ctrl>.krcd-value:after,.krcd-ctrl>.krcd-revise>.krcd-value-revise:after {
+                color: #0000ff;
+                padding-left: 3px;
+                content: '';
+              };
+          `
+          }
+
+          /** 
+           * 创建含modename属性的style标签。管理mode相关样式
+           */
+          const addModeStyle = function (insertStyle, modeStyle) {
+            const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
+            let headerTag = innerDoc.getElementsByTagName('head')[0];
+            let styleDOM = innerDoc.createElement('style');
+            debugger
+            console.log(typeof insertStyle)
+            insertStyle('modename', innerDoc, modeStyle);
+          }
 
           // 扩展功能的模式限制
           switch (opt[i].name) {
@@ -1550,12 +1640,14 @@
               this.templeCtrl = true;
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
+              addModeStyle(this.insertStyle, modeStyleDef())
               break
             case "EDITOR":
               this.toolsShow = true;
               this.templeCtrl = true;
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
+              addModeStyle(this.insertStyle, modeStyleDef())
               break
             case "STRICT":
               this.toolsShow = false;
@@ -1563,6 +1655,7 @@
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
+              addModeStyle(this.insertStyle, modeStyleDef())
               break
             case "READONLY":
               this.toolsShow = false;
@@ -1570,6 +1663,8 @@
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
+              // 插对应的模版样式
+              addModeStyle(this.insertStyle, modeStyle())
               break
             default:
               this.toolsShow = false;
@@ -1640,11 +1735,11 @@
     mounted() {
       console.log(funs)
       console.log(this.$refs.modstyle[0].$el)
-      
+
 
       const self = this;
-      
-      
+
+
       /**
        * 点击编辑区获取聚焦的控制
        */
@@ -1655,7 +1750,7 @@
         console.log(arguments);
         // 获取ifame中的window
         self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-        
+
         const e = event || window.event;
         self.tarEl = arguments[0].target; // 获取点中的对象
         console.log(self.tarEl)
@@ -1702,7 +1797,7 @@
         if (arguments[0].path[0].className === "krcd-tmp-content") {
 
           // 定位div(contenteditable = "true")聚焦点到最后的函数
-          function po_Last_Div(obj, docObj ) {
+          function po_Last_Div(obj, docObj) {
             if (window.getSelection) { //ie11 10 9 ff safari  
               // obj.focus(); //解决ff不获取焦点无法定位问题              // 这里会让我的直接到元素的位置处
               var range = docObj.getSelection(); //创建range
@@ -1715,7 +1810,7 @@
               range.collapse(false); //光标移至最后
               range.select();
             }
-   
+
           }
 
           const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
@@ -1788,22 +1883,32 @@
       this.krcd.addListener("ready", function () {
         console.log("krcd 初始化完成！");
 
-       
+
         // 根据屏幕变化
         window.onresize = function () {
           console.log(window.innerWidth)
           if (window.innerWidth <= 900) {
             self.leftTreeWidth = 0;
             self.rightTreeWidth = 0;
+            self.leftOtherStyle = 'position:absolute;left:0;bottom: 0;top: 0;overflow: unset;z-index:1000;';
+            self.rightOtherStyle = 'position:absolute;right:0;bottom: 0;top: 0;overflow: unset;z-index:1000;'
+            // 设定为浮动打开还是不浮动打开
+            self.isMouseOver = true;
             console.log("屏幕太小了")
           } else if (window.innerWidth <= 1680) {
             console.log("屏幕还算可以")
             self.leftTreeWidth = 'auto';
             self.rightTreeWidth = 0;
+            self.leftOtherStyle = '';
+            self.rightOtherStyle = 'position:absolute;right:0;bottom: 0;top: 0;overflow: unset;z-index:1000;';
+            // 设定为浮动打开还是不浮动打开
+            self.isMouseOver = true;
           } else {
             console.log("屏幕够大了")
             self.leftTreeWidth = 'auto';
             self.rightTreeWidth = 'auto';
+            // 设定为浮动打开还是不浮动打开
+            self.isMouseOver = false;
           }
         }
 
@@ -1822,34 +1927,35 @@
            */
           // 获取ifame中的window
           const editor = document.getElementsByTagName('iframe')[1].contentWindow;
-          editor.onmousedown = function(){    
-            if(!this.editor.onmouseup){
-                this.onmouseover = function(){              
-                this.editor.onmouseup = function(){
-                    console.log("鼠标抬起了")
-                    // debugger
-                    // 输出点击时获取的数据
-                    let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow);
+          editor.onmousedown = function () {
+            if (!this.editor.onmouseup) {
+              this.onmouseover = function () {
+                this.editor.onmouseup = function () {
+                  console.log("鼠标抬起了")
+                  // debugger
+                  // 输出点击时获取的数据
+                  let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow);
 
-                    let selText = getSelected.selectedText;
-                    let selHtml = getSelected.selectedHtml;
-                    let selectedDOM = getSelected.selectedDOM;
+                  let selText = getSelected.selectedText;
+                  let selHtml = getSelected.selectedHtml;
+                  let selectedDOM = getSelected.selectedDOM;
 
-                    console.log(selectedDOM)
+                  console.log(selectedDOM)
 
-                    console.log(selHtml)
+                  console.log(selHtml)
 
-                    // 防止被无聊的点击覆盖了
-                    self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
-                    self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml : self.selectedHtml;
+                  // 防止被无聊的点击覆盖了
+                  self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
+                  self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') ===
+                    -1 ? selHtml : self.selectedHtml;
 
-                    self.saveAble = 'normal'; // 保证弹出窗口
+                  self.saveAble = 'normal'; // 保证弹出窗口
                 }
-            }             
-            }        
-            
+              }
+            }
+
           }
-          
+
         }, 1500)
 
 
@@ -1858,7 +1964,7 @@
 
       });
 
-     
+
 
 
     },
@@ -1870,120 +1976,126 @@
 </script>
 
 <style>
-/* jimmyFok's CSS style */
-.krcd-section::before{
-  content: "我是标签"
-}
-.krcd-root{
-  display: flex;
-  flex-direction: row;
-}
+  /* jimmyFok's CSS style */
+  .krcd-section::before {
+    content: "我是标签"
+  }
 
-.editor-box{
-  display: flex;
-  flex-direction: column;
-}
+  .krcd-root {
+    display: flex;
+    flex-direction: row;
+  }
 
-.nav-tools{
-  display: flex;
-  flex-direction: flex-start;
-  align-items: center
-}
+  .editor-box {
+    display: flex;
+    flex-direction: column;
+  }
 
-.nav-tools>*{
-  padding:8px;
-}
+  .nav-tools {
+    display: flex;
+    flex-direction: flex-start;
+    align-items: center
+  }
 
-.left-tree{
-  position: relative;
-}
+  .nav-tools>* {
+    padding: 8px;
+  }
 
-.showBtnLeft{
-  display: inline-block;
-  position: absolute;  
-  color: #F2F6FC;
-  left: 0;
-  top: 88px;
-  margin-top: -45px;
-  
-  height: 85px;
-  border-bottom-right-radius: 6px;
-  border-top-right-radius: 6px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  border: 0;
-  width: 6px;
-  background-color: #65B1FF;
-  box-shadow: rgba(64, 158, 255, 0.11) 2px 0px 8px;
-  z-index:1;
-  /* background-color: #ffffff;
+  .left-tree {
+    position: relative;
+  }
+
+  .showBtnLeft {
+    display: inline-block;
+    position: absolute;
+    color: #F2F6FC;
+    left: 100%;
+    top: 88px;
+    margin-top: -45px;
+
+    height: 85px;
+    border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    border: 0;
+    width: 8px;
+    background-color: #65B1FF;
+    box-shadow: rgba(64, 158, 255, 0.11) 2px 0px 8px;
+    z-index: 1;
+    /* background-color: #ffffff;
   border: 10px solid #65B1FF;
   width: 24px; */
-}
+  }
 
-.showBtnRight{
-  display: inline-block;
-  position: absolute;  
-  right: 0;  
-  top: 88px;
-  margin-top: -45px;
-  width: 24px;
-  height: 85px;
-  border-bottom-left-radius: 6px;
-  border-top-left-radius: 6px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;  
-  border: 0;
-  width: 6px;
-  background-color: #65B1FF;
-  box-shadow: rgba(64, 158, 255, 0.11) -2px 0px 8px;
-  z-index:1;
-  /* background-color: #ffffff;
+  .showBtnRight {
+    display: inline-block;
+    position: absolute;
+    right: 100%;
+    top: 88px;
+    margin-top: -45px;
+    width: 24px;
+    height: 85px;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    border: 0;
+    width: 8px;
+    background-color: #65B1FF;
+    box-shadow: rgba(64, 158, 255, 0.11) -2px 0px 8px;
+    z-index: 1;
+    /* background-color: #ffffff;
   border: 10px solid #65B1FF;
   width: 24px; */
-}
+  }
 
-/* .showBtnLittle{
+  /* .showBtnLittle{
   border: 0;
   width: 6px;
   background: #65B1FF;
 } */
 
-/*
+  /*
 * 改造右方保证表格隐藏滚动
 */
-.widget-list{
-  flex-grow: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
+  .widget-list {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-.el-tabs--border-card>.el-tabs__content{
-  padding: 0;  
-}
+  .el-tabs--border-card>.el-tabs__content {
+    padding: 0;
+  }
 
-.el-tabs--border-card, .el-tabs__content, .el-tabs__content>.el-tab-pane, .el-tabs__content>.el-tab-pane>div, .el-tabs__content>.el-tab-pane>div>div{
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+  .el-tabs--border-card,
+  .el-tabs__content,
+  .el-tabs__content>.el-tab-pane,
+  .el-tabs__content>.el-tab-pane>div,
+  .el-tabs__content>.el-tab-pane>div>div {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-.el-tabs__content>.el-tab-pane>div>div>.el-table__header-wrapper{
-  flex-shrink: 0;
-  box-shadow: 0px 2px 8px #409eff1c;
-  z-index: 1;
-}
+  .el-tabs__content>.el-tab-pane>div>div>.el-table__header-wrapper {
+    flex-shrink: 0;
+    box-shadow: 0px 2px 8px #409eff1c;
+    z-index: 1;
+  }
 
-.el-table__body-wrapper{
-  overflow: auto
-}
+  .el-table__body-wrapper {
+    overflow: auto
+  }
 
-.editor-box>div:nth-child(2){
-  flex-grow: 1;
-  overflow: auto
-}
+  .editor-box>div:nth-child(2) {
+    flex-grow: 1;
+    overflow: auto
+  }
+
 </style>

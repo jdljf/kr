@@ -205,12 +205,14 @@
         padding-right: 10px;
         box-sizing: border-box;
         padding-bottom: 8px;
+        background-color: #ffffff;
     }
     .input-box{
         box-sizing: border-box;
         width: 100%;
         padding: 8px;
-        flex-shrink: 0
+        flex-shrink: 0;
+        background-color: #ffffff;
     }
     /* 自定义工具样式 */
     .custom-tree-node {

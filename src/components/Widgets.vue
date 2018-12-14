@@ -1,6 +1,5 @@
 <template>  
-  <div style="height:100%;display: flex;
-    flex-direction: column;">
+  <div class="widget-container">
     <el-header style="height: 30px;
       box-sizing: border-box;
       background-color: #409EFF;
@@ -49,6 +48,14 @@ export default {
 </script>
 
 <style scoped>
+
+.widget-container{
+  height:100%;
+  display: flex;
+  overflow:hidden;
+  flex-direction: column;
+}
+
 .title{
     height: 29px;
     background-color: #F1F1F1;
