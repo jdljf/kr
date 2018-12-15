@@ -80,7 +80,8 @@ export default {
       alert(this.$refs.krcdEditor.getHTML());
     },
     setHTML() {
-      // this.$refs.setContentInp.value
+      // this.$refs.setContentInp.value】
+      // debugger
       this.$refs.krcdEditor.setHTML(this.$refs.setContentInp.value);
     },
     importXML() {
