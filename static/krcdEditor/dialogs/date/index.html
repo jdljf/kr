@@ -55,7 +55,7 @@
         </tr>
         <tr>
           <th><span>控件模式</span> </th>
-          <th><span></span> </th>
+          <th><span>字体大小</span> </th>
         </tr>
         <tr>
           <td><select id="txtMODE">
@@ -63,6 +63,26 @@
                     <option value="READONLY">只读模式</option>
                   </select></td>
           <td>
+              <select id="textFont">
+                  <option value="5.5">七号</option>
+                  <option value="6.5">小六</option>
+                  <option value="7.5">六号</option>
+                  <option value="9">小五</option>
+                  <option value="10.5" selected>五号</option>
+                  <option value="12">小四</option>
+                  <option value="14">四号</option>
+                  <option value="15">小三</option>
+                  <option value="16">三号</option>
+                  <option value="18">小二</option>
+                  <option value="22">二号</option>
+                  <option value="24">小一</option>
+                  <option value="26">一号</option>
+                  <option value="36">小初</option>
+                  <option value="42">初号</option>
+                  <option value="54">特号</option>
+                  <option value="63">大特号</option>
+                  <option value="72">一英寸</option>
+                </select>
           </td>
         </tr>
         <tr>
@@ -183,6 +203,7 @@
               $G('txtNOTDEL').checked = true;
             }
             $('#txtMODE').val(opt.mode);
+            $("#textFont").val(opt.textFont);
             if (domValue.style.color.indexOf('rgb') === 0) {
               var tempColor = formatRGB((domValue.style.color || '').trim('#'));
               document.getElementById('txtCOLOR').jscolor.fromRGB(tempColor[0], tempColor[1], tempColor[2]);
@@ -218,6 +239,7 @@
           newOpt.max = $('#txtMax').val();
           newOpt.format = $('#txtFORMAT').val();
           newOpt.defvalue = $('#txtDEFVALUE').val();
+          newOpt.textFont=$("#textFont").val();
           if (!!domCtrl) {
             //修改
             var domValue = ctrl.getValueElement();
@@ -232,6 +254,7 @@
             } else {
               domValue.style.backgroundColor = '';
             }
+            domValue.style.fontSize = $('#textFont').val()+'pt';
             //修改
             ctrl.setOpt(newOpt);
             domValue.innerHTML = newOpt.desc;
@@ -260,6 +283,7 @@
             if ($('#txtBACKGROUND').val().length > 0) {
               domValue.style.backgroundColor = '#' + $('#txtBACKGROUND').val();
             }
+            domValue.style.fontSize = $('#textFont').val()+'pt';
             editor.execCommand('insertControl', domCtrl, newOpt);
           }
         };
