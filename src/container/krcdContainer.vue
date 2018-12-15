@@ -270,7 +270,7 @@
         tarEl: null, // 每次点击获取的DOM对象
         tarCtrl: null, // 每次点击获取的控件
         self: this, // 让this.self可以引用this
-        iframeWin: null, // 将iframe下的window对象
+        iframeWin: ()=>{return document.getElementsByTagName('iframe')[1].contentWindow}, // 将iframe下的window对象
         krcd: null, // krcd
         onOffStatus: true,
         toolStyle: {}, // 初始化工具条样式
@@ -580,6 +580,7 @@
 
         // 获取整个文档的html
         getHtmlContent: () => {
+
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
           let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML;  // 获取对应内容的innerHTML（content中的内容）
 
@@ -1974,9 +1975,6 @@
             }
 
             e = e || window.event;
-                // console.log("抬起的对象",e)
-                // console.log("抬起的对象",this)
-
             
             if (!mouseuped) {
               this.onmouseover = function (e) {
@@ -2019,36 +2017,40 @@
 
         }, 1500)
 
+        // 将改变内容的监听放到加载后
+          this.addListener("contentchange", function () {
+              console.log("内容改变了");
+              console.log(self.$parent.$refs)
+
+              // debugger
+
+              const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
+
+              self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
+              console.log(self.$parent.$refs.setContentInp.value);
+
+              // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
+                const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+                self.iframeWin = iframeWin;
+                        
+                let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+                let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
+
+
+              if(self.$parent.$refs.setContentInp.value===''){
+                headerValue.innerHTML = '<p><br></p>';  // 页头
+                footerValue.innerHTML = '<p><br></p>';  // 页脚
+              }else{          
+                headerValue.innerHTML = self.headerValue;  // 页头
+                footerValue.innerHTML = self.footerValue;  // 页脚
+              }
+              
+              
+            });
 
       });
 
-      this.krcd.addListener("contentchange", function () {
-        console.log("内容改变了");
-        console.log(self.$parent.$refs)
-
-        // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
-        const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-        self.iframeWin = iframeWin;
-
-        const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
-
-        self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
-        console.log(self.$parent.$refs.setContentInp.value);
-                          
-        let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
-        let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
-
-
-        if(self.$parent.$refs.setContentInp.value===''){
-          headerValue.innerHTML = '<p><br></p>';  // 页头
-          footerValue.innerHTML = '<p><br></p>';  // 页脚
-        }else{          
-          headerValue.innerHTML = self.headerValue;  // 页头
-          footerValue.innerHTML = self.footerValue;  // 页脚
-        }
-         
-        
-      });
+      
 
 
     },
