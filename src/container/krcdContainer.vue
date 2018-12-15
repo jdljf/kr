@@ -2029,17 +2029,25 @@
         const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
 
         self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
+        console.log(self.$parent.$refs.setContentInp.value);
+
+        // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
+          const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+          self.iframeWin = iframeWin;
+                  
+          let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+          let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
+
+
+        if(self.$parent.$refs.setContentInp.value===''){
+          headerValue.innerHTML = '<p><br></p>';  // 页头
+          footerValue.innerHTML = '<p><br></p>';  // 页脚
+        }else{          
+          headerValue.innerHTML = self.headerValue;  // 页头
+          footerValue.innerHTML = self.footerValue;  // 页脚
+        }
          
-        // 为了保证页眉页脚保留原来的数据
-        const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-        self.iframeWin = iframeWin;
-                
-        let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
-        let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
-
-        headerValue.innerHTML = self.headerValue;  // 页头
-        footerValue.innerHTML = self.footerValue;  // 页脚
-
+        
       });
 
 
