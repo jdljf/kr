@@ -1721,7 +1721,6 @@
           let toolbtnH = document.querySelector('.tools-btn').offsetHeight
           let listW= document.querySelector('.widget-container').offsetWidth
           let fileListW = document.querySelector('.list-main').offsetWidth
-          debugger
           // 设定工具条的样式
           const sources = {
             "flex": 1,
