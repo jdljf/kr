@@ -521,24 +521,39 @@
          * params {string} styleString  head>style标签中的样式文本
          */
         replaceFun: (content, styleString) => {
-          console.log(this)
           
-          // 需要判断是什么模式才决定倒入的content还是all
-          console.log(this.iframeWin)
-
           const docThreePart = this.docSplit(this.iframeWin.document, content);
+          // this.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML;     // 这里改变内容的事件里面已经有了。
+          
+          // 这里清空了再插入，但是页面会出问题。。。 因为一直都是那个文档，每次的插入都会影响了页面数，而不会重置，所以要用this.krcd.html好了。
+          // this.iframeWin.document.querySelector('.krcd-tmp-content-value').innerHTML = '';
+          // this.poLastDiv(this.iframeWin.document.querySelector('.krcd-tmp-content-value'), this.iframeWin)          
+          // this.krcd.execCommand('inserthtml', docThreePart.contentValue?docThreePart.contentValue.innerHTML:'');
 
-          this.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML;
-          
-          this.krcd.html(docThreePart.contentValue?docThreePart.contentValue.innerHTML:'');
-          
-          let headerValue = this.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
-          let footerValue = this.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
+          // 清空文档并重新创建文档，保证文档页码没问题。
+          this.krcd.html(''); // 这个会影响当前的iframeWin，之后的操作需要重新获取。
+
+          const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+
+          this.iframeWin = iframeWin; // 替换现有的iframeWin
+
+          this.poLastDiv(iframeWin.document.querySelector('.krcd-tmp-content-value'), iframeWin) // 重新聚焦到最后 
+          this.krcd.execCommand('inserthtml', docThreePart.contentValue?docThreePart.contentValue.innerHTML:'');
+                 
+          let headerValue = iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+          let footerValue = iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
           headerValue.innerHTML = docThreePart.headerValue?docThreePart.headerValue.innerHTML:'';  // 页头
           footerValue.innerHTML = docThreePart.footerValue?docThreePart.footerValue.innerHTML:'';  // 页脚
 
+          // 把页头和页脚保存到数据中
+          this.headerValue = headerValue.innerHTML;
+          this.footerValue = footerValue.innerHTML;
+
         },
+
+        headerValue: "",
+        footerValue: "",
 
         // 提示输入模版名称弹窗
         inputName: (fun) => {
@@ -566,8 +581,7 @@
         // 获取整个文档的html
         getHtmlContent: () => {
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
-          let htmlAll = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML; // 获取对应的innerHTML  
-          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-content')[0].innerHTML;  // 获取对应内容的innerHTML（content中的内容）
+          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML;  // 获取对应内容的innerHTML（content中的内容）
 
           const headStyleString = (() => {
             const arr = innerDoc.querySelectorAll('style[stylename]');
@@ -578,7 +592,6 @@
             return newArr.join('')
           })()
           return {
-            htmlAll,
             htmlContent,
             headStyleString
           }
@@ -595,7 +608,6 @@
             id: '', // 因为是模版所以不设置了
             styleString: docContent.headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
             content: docContent.htmlContent,
-            allhtml: docContent.htmlAll,
             scope: '全院',
             discribe: '描述', // 描述
             tag: docContent.tag, // 模版类型
@@ -1373,8 +1385,9 @@
           } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
             //标准浏览器
 
-            let selectionObj = iframeObj.getSelection() || window.getSelection();
-            
+            let selectionObj = iframeObj.getSelection() 
+            // || window.getSelection();
+            // debugger
             console.log(selectionObj)
             // selectionObj = selectionObj.anchorNode ===null?selectionObj.anchorNod='text':selectionObj.anchorNode;  // 防止报错的
             let selectedText = selectionObj.toString();
@@ -1392,10 +1405,6 @@
               selectedDOM: tempDiv
             }
           }
-
-        // } else {
-        //   console.log("你没点中编辑区")
-        // }
 
       },
 
@@ -1721,7 +1730,7 @@
           let toolbtnH = document.querySelector('.tools-btn').offsetHeight
           let listW= document.querySelector('.widget-container').offsetWidth
           let fileListW = document.querySelector('.list-main').offsetWidth
-          debugger
+          // debugger
           // 设定工具条的样式
           const sources = {
             "flex": 1,
@@ -1762,6 +1771,22 @@
       setHTML(html) {
         this.krcd.html(html);
       },
+
+      // 定位div(contenteditable = "true")聚焦点到最后的函数
+      poLastDiv(obj, docObj) {
+            if (window.getSelection) { //ie11 10 9 ff safari  
+              // obj.focus(); //解决ff不获取焦点无法定位问题              // 这里会让我的直接到元素的位置处
+              var range = docObj.getSelection(); //创建range
+              range.selectAllChildren(obj); //range 选择obj下所有子内容
+              range.collapseToEnd(); //光标移至最后
+            } else if (document.selection) { //ie10 9 8 7 6 5
+              var range = document.selection.createRange(); //创建选择对象
+              //var range = docObj.body.createTextRange();
+              range.moveToElementText(obj); //range定位到obj
+              range.collapse(false); //光标移至最后
+              range.select();
+            }
+          }
 
 
     },
@@ -1819,6 +1844,7 @@
 
       // 点击聚焦
       this.krcd.addListener('click', function (event) {
+        
 
         console.log(arguments);
         // 获取ifame中的window
@@ -1868,24 +1894,7 @@
         }
 
         // 选择空白处自动聚焦
-        if (arguments[0].path[0].className === "krcd-tmp-content") {
-
-          // 定位div(contenteditable = "true")聚焦点到最后的函数
-          function po_Last_Div(obj, docObj) {
-            if (window.getSelection) { //ie11 10 9 ff safari  
-              // obj.focus(); //解决ff不获取焦点无法定位问题              // 这里会让我的直接到元素的位置处
-              var range = docObj.getSelection(); //创建range
-              range.selectAllChildren(obj); //range 选择obj下所有子内容
-              range.collapseToEnd(); //光标移至最后
-            } else if (document.selection) { //ie10 9 8 7 6 5
-              var range = document.selection.createRange(); //创建选择对象
-              //var range = docObj.body.createTextRange();
-              range.moveToElementText(obj); //range定位到obj
-              range.collapse(false); //光标移至最后
-              range.select();
-            }
-
-          }
+        if (arguments[0].path[0].className === "krcd-tmp-content") {          
 
           const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
           const len = editDOM.length;
@@ -1896,7 +1905,7 @@
           }
 
           // 聚焦到最后
-          po_Last_Div(editDOM, self.iframeWin)
+          self.poLastDiv(editDOM, self.iframeWin)
 
         }
 
@@ -1949,21 +1958,40 @@
           // 默认设定为设计模式
           self.mode(self.modelsData, 0);
 
-          
-
           /***
            * 给编辑器增加鼠标抬起事件
            */
           // 获取ifame中的window
           const editor = document.getElementsByTagName('iframe')[1].contentWindow;
-          editor.onmousedown = function () {
-            console.log("aaaa")
+          editor.onmousedown = function (e) {
+            // console.log("aaaa")
+            self.args = arguments; // 获取点中的对象
+
+            // 判断是否有onmouseup
+            let mouseuped = false;
+            this.onmouseup = function(){                
+                mouseuped = true;
+            }
+
+            e = e || window.event;
+                // console.log("抬起的对象",e)
+                // console.log("抬起的对象",this)
+
             
-            if (!this.editor.onmouseup) {
-              this.onmouseover = function () {
-                this.editor.onmouseup = function () {
-                  console.log("鼠标抬起了")
-                  
+            if (!mouseuped) {
+              this.onmouseover = function (e) {
+                // 要拿的是mouseover的event，mouseup是没有的
+                e = e || window.event;
+                // console.log("抬起的对象",e)
+                // console.log("抬起的对象",this)
+
+                this.onmouseup = function (e) {
+                  // console.log("鼠标抬起了")      
+                  e = e || window.event;           
+                  // console.log("抬起的对象",e)
+
+                  // debugger
+
                   // 输出点击时获取的数据
                   let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow, self);
                   
@@ -2001,7 +2029,16 @@
         const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
 
         self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
-        // this.krcd.html(content);
+         
+        // 为了保证页眉页脚保留原来的数据
+        const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+        self.iframeWin = iframeWin;
+                
+        let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+        let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
+
+        headerValue.innerHTML = self.headerValue;  // 页头
+        footerValue.innerHTML = self.footerValue;  // 页脚
 
       });
 

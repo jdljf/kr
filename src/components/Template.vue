@@ -281,6 +281,7 @@ import funs from '../common/funs';
         this.todo(this.fun,row.content,row.styleString,row.command)
 
         console.log(this.$refs)
+        // debugger
         // this.$refs.navTable.$children[0].type="index" // 单向数据流的问题
 
         // refs绑定好对应的对象就可以运用它的方法(这个会与上面的函数有冲突)
