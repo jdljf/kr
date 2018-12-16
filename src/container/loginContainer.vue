@@ -25,7 +25,7 @@ export default {
     name:'loginContainer', 
     components:{
         Login 
-    },
+    },   
     data(){
         return{
             imgsrc: `background-image:url(${src}); background-repeat:no-repeat; background-size:120% auto;-moz-background-size:120% auto;background-position: 60% 60%`,

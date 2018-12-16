@@ -87,7 +87,8 @@ export default {
         tabsArray: Array,
     },
     mounted(){        
-       console.log(this);
+        // debugger
+    //    console.log(this);
     },
     computed:{
         

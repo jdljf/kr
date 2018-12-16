@@ -1,3 +1,92 @@
+<template>
+  <el-container style="height: 100%;" class="krcd-root height-ful" v-loading.fullscreen.lock="fullscreenLoading">
+    <el-container>
+      <el-aside @mouseover="showHideLeft" @mouseout="showHideLeft" :style="`width:${leftTreeWidth};position: relative; overflow:unset;border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;box-shadow: 2px 0 8px #409eff1c;z-index: 1;${leftOtherStyle};`">
+        <div class="showBtnLeft showBtnLittle" @click="showHideLeft" @mouseover="longer" @mouseout="shorter">
+          <!-- <span>展开收起</span> -->
+        </div>
+
+        <!-- <div @mouseout="showHideLeft('hide')">       -->
+        <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist">
+          <Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag"></Tree>
+        </Widgets>
+        <!-- </div>        -->
+      </el-aside>
+      <div class="tools" v-show="toolsShow">
+        <NavMenu class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false"
+          :self="self" />
+        <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
+      </div>
+      <el-container style="overflow: hidden;" class="left-tree">
+        <el-container>
+
+          <el-aside style="width:auto;display: flex;">
+            <FileList :imgsArr="imgsArr" :getPatMsg="getPatMsg">
+              <!-- 病人信息和文档信息 -->
+            </FileList>
+          </el-aside>
+
+          <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
+
+        </el-container>
+
+        <el-footer style="z-index: 999;height: 42px;padding: 5px;background-color: white;border: 1px solid rgb(220, 223, 230);">
+          <el-row style="display:flex;justify-content: flex-end;">
+            <!--1. DESIGN 设计模式；
+                2. EDITOR 编辑模式；
+                3. STRICT 严格模式（表单模式）；
+                4. READONLY 只读模式； -->
+            <el-tooltip v-for="(item,index) in modelsData" :key="index" class="item" effect="dark" :content="item.tip"
+              placement="top">
+              <el-button size="mini" round @click="mode(modelsData,index)" :type="item.type" ref="modstyle">{{item.name}}</el-button>
+            </el-tooltip>
+          </el-row>
+        </el-footer>
+      </el-container>
+      <el-aside @mouseover="showHideRight" @mouseout="showHideRight" :style="`width:${rightTreeWidth};position: relative;overflow:unset;transition: width 10s;display:flex;flex-direction:column;box-shadow:-2px 0 8px #409eff1c;z-index: 1;${rightOtherStyle};`">
+        <!-- 为了隐藏而用 -->
+        <!-- <div @mouseout="showHideRight('hide')"> -->
+
+        <div class="showBtnRight showBtnLittle" @click="showHideRight" @mouseover="longer" @mouseout="shorter">
+          <!-- <span>展开收起</span> -->
+        </div>
+
+        <el-header style="height: 30px;
+                box-sizing: border-box;
+                background-color: #409EFF;
+                color: #F2F6FC;
+                line-height: 30px;
+                font-size: 13px;
+                text-align: left;
+                padding: 0px 12px;"></el-header>
+        <div class="widget-list">
+          <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;background-color:#ffffff">
+            <div class="nav-tools">
+              <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
+              <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
+              <el-button v-show="this.saveAble==='ctrlAble'" type="success" size="mini" plain @click="commitShow.OnOff=true">保存动态模版</el-button>
+              <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>
+              <!-- 这里是保存模版用的隐藏按钮 -->
+              <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" />
+            </div>
+          </el-header>
+          <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
+          <!-- <Models :list="widgetlist" :fun="insert"/> -->
+          <tabContainer :tabsArray="tabsArray" :templeCtrl="templeCtrl" :ctrlist="ctrlist" :ctrlfun="insertDynamicWidget"
+            :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun"
+            :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)"
+            :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxFunTemp" :back2font="back2font"
+            :getHtmlContent="getHtmlContent">
+          </tabContainer>
+        </div>
+
+        <!-- </div> -->
+      </el-aside>
+
+    </el-container>
+  </el-container>
+</template>
+
 <script>
   import Tools from '../components/Tools'
   import Widgets from '../components/Widgets'
@@ -20,10 +109,9 @@
   export default {
     name: 'krcdContainer',
     extends: krcdEditor,
-
     beforeCreate() {
-      console.log('krcd components created.');
-      
+      // console.log('krcd components created.');
+
       let self = this;
       async function asyncGetTemp(self) {
         await ajax.post(
@@ -73,25 +161,6 @@
         console.log(err)
       })
 
-      // // 为什么不能这样？！
-      // 应该是因为this.ajaxFunTemp还没加载出来，所以无效
-      // const content = {
-      //       "deptCode": "",
-      //       "creatorUserId": 0,
-      //        "id": 0
-      //    }
-
-      // this.ajaxFunTemp('GetList', content ,()=>{
-      //     console.log('成功了！',typeof res.data.data) 
-
-      //     const templataData = res.data.data;
-
-      //     // 后端数组转为前端数组
-      //     const templateArr = templataData.map(this.back2font)  
-
-      //     // 修改templatelist的数据
-      //     this.templatelist.push(...templateArr)
-      // });
     },
 
     created() {
@@ -203,14 +272,8 @@
           }
         ],
 
-        // tab子页的呈现
-        // tabshow:{
-        //   templatelist: true,
-        //   widgetlist: true,
-        //   ctrllist: true,
-        // },
         fullscreenLoading: true, // true时显示loading
-        args: null,  // 点击获得的arguments
+        args: null, // 点击获得的arguments
         isMouseOver: false, // 判断用什么事件驱动展示工具栏
         leftTreeWidth: 0, // 左方收起展开
         rightTreeWidth: 0, // 左方收起展开
@@ -270,7 +333,9 @@
         tarEl: null, // 每次点击获取的DOM对象
         tarCtrl: null, // 每次点击获取的控件
         self: this, // 让this.self可以引用this
-        iframeWin: ()=>{return document.getElementsByTagName('iframe')[1].contentWindow}, // 将iframe下的window对象
+        iframeWin: () => {
+          return document.getElementsByTagName('iframe')[1].contentWindow
+        }, // 将iframe下的window对象
         krcd: null, // krcd
         onOffStatus: true,
         toolStyle: {}, // 初始化工具条样式
@@ -278,23 +343,6 @@
         // 模版类型
         templateTag: [],
 
-        // [{
-        //     id: "0",
-        //     title: "住院病案首页"
-        //   },
-        //   {
-        //     id: "1",
-        //     title: "病程记录"
-        //   },
-        //   {
-        //     id: "2",
-        //     title: "入院记录"
-        //   },
-        //   {
-        //     id: "4",
-        //     title: "24小时内入出院记录"
-        //   },
-        // ],
         // 组件类型（归属于哪种表）
         widgetTag: [{
             id: "0",
@@ -320,7 +368,7 @@
 
         // 工具条所有可用按钮数组
         arrBtnsFun: (self) => {
-          
+
           return [
             // 暂时不要它
             {
@@ -501,19 +549,19 @@
           alert(`你点击的是：第${+e.currentTarget.getAttribute('index')+1}个病人`)
         },
 
-        docSplit: (doc ,content)=>{
-              const div = doc.createElement('div');
-              div.innerHTML = content;
-              let contentValue = div.getElementsByClassName("krcd-tmp-content-value")[0];
-              let headerValue = div.getElementsByClassName("krcd-tmp-header-value")[0];
-              let footerValue = div.getElementsByClassName("krcd-tmp-footer-value")[0];
+        docSplit: (doc, content) => {
+          const div = doc.createElement('div');
+          div.innerHTML = content;
+          let contentValue = div.getElementsByClassName("krcd-tmp-content-value")[0];
+          let headerValue = div.getElementsByClassName("krcd-tmp-header-value")[0];
+          let footerValue = div.getElementsByClassName("krcd-tmp-footer-value")[0];
 
-              return{
-                contentValue,
-                headerValue,
-                footerValue
-              }
-          },
+          return {
+            contentValue,
+            headerValue,
+            footerValue
+          }
+        },
 
         /**
          * 0、模版插入替换
@@ -521,10 +569,10 @@
          * params {string} styleString  head>style标签中的样式文本
          */
         replaceFun: (content, styleString) => {
-          
+
           const docThreePart = this.docSplit(this.iframeWin.document, content);
           // this.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML;     // 这里改变内容的事件里面已经有了。
-          
+
           // 这里清空了再插入，但是页面会出问题。。。 因为一直都是那个文档，每次的插入都会影响了页面数，而不会重置，所以要用this.krcd.html好了。
           // this.iframeWin.document.querySelector('.krcd-tmp-content-value').innerHTML = '';
           // this.poLastDiv(this.iframeWin.document.querySelector('.krcd-tmp-content-value'), this.iframeWin)          
@@ -538,13 +586,13 @@
           this.iframeWin = iframeWin; // 替换现有的iframeWin
 
           this.poLastDiv(iframeWin.document.querySelector('.krcd-tmp-content-value'), iframeWin) // 重新聚焦到最后 
-          this.krcd.execCommand('inserthtml', docThreePart.contentValue?docThreePart.contentValue.innerHTML:'');
-                 
+          this.krcd.execCommand('inserthtml', docThreePart.contentValue ? docThreePart.contentValue.innerHTML : '');
+
           let headerValue = iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
           let footerValue = iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
-          headerValue.innerHTML = docThreePart.headerValue?docThreePart.headerValue.innerHTML:'';  // 页头
-          footerValue.innerHTML = docThreePart.footerValue?docThreePart.footerValue.innerHTML:'';  // 页脚
+          headerValue.innerHTML = docThreePart.headerValue ? docThreePart.headerValue.innerHTML : ''; // 页头
+          footerValue.innerHTML = docThreePart.footerValue ? docThreePart.footerValue.innerHTML : ''; // 页脚
 
           // 把页头和页脚保存到数据中
           this.headerValue = headerValue.innerHTML;
@@ -582,7 +630,7 @@
         getHtmlContent: () => {
 
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
-          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML;  // 获取对应内容的innerHTML（content中的内容）
+          let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML; // 获取对应内容的innerHTML（content中的内容）
 
           const headStyleString = (() => {
             const arr = innerDoc.querySelectorAll('style[stylename]');
@@ -641,7 +689,7 @@
             innerDoc.getElementsByClassName('krcd-tmp-content-value')[0].focus();
 
             // 所有有stylename的属性的style标签，并最后一个中增加样式
-            this.insertStyle('stylename',innerDoc, styleString);
+            this.insertStyle('stylename', innerDoc, styleString);
 
             this.krcd.execCommand('inserthtml', content); // 聚焦点插入内容
             // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content
@@ -776,21 +824,21 @@
       insertStyle(type, innerDoc, styleString) {
         const headStyle = document.createElement('style');
         headStyle.innerHTML = styleString; // head中加入style
-        
-        if(type==='stylename'){
+
+        if (type === 'stylename') {
           if (innerDoc.querySelectorAll('style[stylename]').length !== 0) { // 当拥有stylename属性的标签时
             let len = innerDoc.querySelectorAll('style[stylename]').length;
             innerDoc.querySelectorAll('style[stylename]')[len - 1].innerHTML += styleString;
-          }else{
-            headStyle.setAttribute('stylename','stylename');
+          } else {
+            headStyle.setAttribute('stylename', 'stylename');
             innerDoc.getElementsByTagName('head')[0].appendChild(headStyle);
           }
-        }else if(type==='modename'){
+        } else if (type === 'modename') {
           if (innerDoc.querySelectorAll('style[modename]').length !== 0) { // 当拥有stylename属性的style标签时
-            let len = innerDoc.querySelectorAll('style[modename]').length;            
+            let len = innerDoc.querySelectorAll('style[modename]').length;
             innerDoc.querySelectorAll('style[modename]')[len - 1].innerHTML = styleString;
-          }else{
-            headStyle.setAttribute('modename','modename')
+          } else {
+            headStyle.setAttribute('modename', 'modename')
             innerDoc.getElementsByTagName('head')[0].appendChild(headStyle);
           }
         } else { // 当不拥有时插入对应dom
@@ -1239,7 +1287,7 @@
           //     }
           // }
         })
-        
+
         console.log(newDiv.getCtrlElement())
         newDiv.refreshData([true])
 
@@ -1306,7 +1354,7 @@
           // }
         })
 
-        
+
         newDiv.refreshData([true]);
         newDiv.setValue([{
             "label": "感觉很好",
@@ -1365,47 +1413,44 @@
        * 获取选中字体的方法来调出工具栏并用函数插进去对应控件
        * 获取text和html
        */
-      selectText(iframeObj,self) {
-        
+      selectText(iframeObj, self) {
         console.log(arguments[0])
         // if (self.args!==null&&self.args[0].path[0].className === "krcd-tmp-content") {  
-          if (iframeObj.document.selection) {
+        if (iframeObj.document.selection) {
 
-            let selectionObj = iframeObj.document.selection;
-            let rangeObj = selectionObj.createRange();
-            let selectedText = rangeObj.text;
-            let selectedHtml = rangeObj.htmlText;
+          let selectionObj = iframeObj.document.selection;
+          let rangeObj = selectionObj.createRange();
+          let selectedText = rangeObj.text;
+          let selectedHtml = rangeObj.htmlText;
 
-            //ie浏览器
-            return {
-              selectedText,
-              selectedHtml,
-              selectedDOM: rangeObj
-            }
-
-          } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
-            //标准浏览器
-
-            let selectionObj = iframeObj.getSelection() 
-            // || window.getSelection();
-            // debugger
-            console.log(selectionObj)
-            // selectionObj = selectionObj.anchorNode ===null?selectionObj.anchorNod='text':selectionObj.anchorNode;  // 防止报错的
-            let selectedText = selectionObj.toString();
-            // selectedText = selectedText.length===0?' ':selectedText;  // 防止文本为空是报错
-            let rangeObj = selectionObj.getRangeAt(0);
-            // console.log(rangObj)
-            let docFragment = rangeObj.cloneContents();
-            let tempDiv = document.createElement("div");
-            tempDiv.appendChild(docFragment);
-            let selectedHtml = tempDiv.innerHTML;
-
-            return {
-              selectedText,
-              selectedHtml,
-              selectedDOM: tempDiv
-            }
+          //ie浏览器
+          return {
+            selectedText,
+            selectedHtml,
+            selectedDOM: rangeObj
           }
+
+        } else if (iframeObj.getSelection) { // 以免出现错误，所以先判断大于0
+          //标准浏览器
+
+          let selectionObj = iframeObj.getSelection()
+          // || window.getSelection();
+          // debugger
+          console.log(selectionObj)
+          let selectedText = selectionObj.toString();
+          let rangeObj = selectionObj.getRangeAt(0);
+          // console.log(rangObj)
+          let docFragment = rangeObj.cloneContents();
+          let tempDiv = document.createElement("div");
+          tempDiv.appendChild(docFragment);
+          let selectedHtml = tempDiv.innerText;
+
+          return {
+            selectedText,
+            selectedHtml,
+            selectedDOM: tempDiv
+          }
+        }
 
       },
 
@@ -1439,6 +1484,8 @@
         }
         // 判断
         let newDiv;
+
+        debugger
         // let selectedHtml = this.selectedHtml;
         // let selectedText = this.selectedText;
         let selectedHtml = paste ? this.selectedHtml : '';
@@ -1463,15 +1510,6 @@
             newDiv = this.createText(domSet, Opt, selectedText).newDiv
             break
           case "SECTION":
-            // this.addSection([], {
-            //   'ctrlName': ctrlName,
-            //   'ctrlId': ctrlId,
-            //   'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
-            //   'selectedText': this.selectedHtml
-            //   // `${ctrlStyle}
-            //   // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
-            //   // `
-            // })
             newDiv = this.createSection({
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
@@ -1662,7 +1700,7 @@
             const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 获取iframe中的document
             let headerTag = innerDoc.getElementsByTagName('head')[0];
             let styleDOM = innerDoc.createElement('style');
-            
+
             console.log(typeof insertStyle)
             insertStyle('modename', innerDoc, modeStyle);
           }
@@ -1715,57 +1753,57 @@
           });
         } else {
           return this.krcd.mode();
-        }   
+        }
       },
-           /**
-         * 工具栏定位
-         */
-        // 根据点击对象的坐标给组件传值来定位
-        getPositon(){
-          let editorX = document.querySelector('.krcd-editor-inner').offsetLeft
-          let editorY = document.querySelector('.krcd-editor-inner').offsetTop
-          let scrTop = document.querySelector('.krcd-editor').scrollTop // 滚动的高度
-          let toolsH = document.querySelector('.krcd-toolbars').offsetHeight
-          console.log(document.querySelector('.tools-btn'))
-          let toolbtnW = document.querySelector('.tools-btn').offsetWidth
-          let toolbtnH = document.querySelector('.tools-btn').offsetHeight
-          let listW= document.querySelector('.widget-container').offsetWidth
-          let fileListW = document.querySelector('.list-main').offsetWidth
-          // debugger
-          // 设定工具条的样式
-          const sources = {
-            "flex": 1,
-            "display": "flex",
-            "align-items": "center",
-            "flex-direction": "column", // 改变column再扩展字典
-            "line-height": "30px",
-            "background-color": "white",
-            'position': 'absolute',
-            'left': editorX + this.args[0].clientX +
-              // (toolbtnW===0?65:toolbtnW)/2 + // 因为原来就是0，所以不应该是这个值
-              listW + 
-              fileListW +  // 新增的左边list的距离
-              'px',
-            // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
+      /**
+       * 工具栏定位
+       */
+      // 根据点击对象的坐标给组件传值来定位
+      getPositon() {
+        let editorX = document.querySelector('.krcd-editor-inner').offsetLeft
+        let editorY = document.querySelector('.krcd-editor-inner').offsetTop
+        let scrTop = document.querySelector('.krcd-editor').scrollTop // 滚动的高度
+        let toolsH = document.querySelector('.krcd-toolbars').offsetHeight
+        console.log(document.querySelector('.tools-btn'))
+        let toolbtnW = document.querySelector('.tools-btn').offsetWidth
+        let toolbtnH = document.querySelector('.tools-btn').offsetHeight
+        let listW = document.querySelector('.widget-container').offsetWidth
+        let fileListW = document.querySelector('.list-main').offsetWidth
+        // debugger
+        // 设定工具条的样式
+        const sources = {
+          "flex": 1,
+          "display": "flex",
+          "align-items": "center",
+          "flex-direction": "column", // 改变column再扩展字典
+          "line-height": "30px",
+          "background-color": "white",
+          'position': 'absolute',
+          'left': editorX + this.args[0].clientX +
+            // (toolbtnW===0?65:toolbtnW)/2 + // 因为原来就是0，所以不应该是这个值
+            listW +
+            fileListW + // 新增的左边list的距离
+            'px',
+          // 'top': toolsH + editorY + arguments[0].clientY - scrTop + 55*2 +  // 为了要输入的时候不要被影响到
+          //       // toolbtnH + 
+          //       'px',  
+          'top': this.args[0].clientY - scrTop > (this.args[0].screenY * 1 / 2) ? editorY + this.args[0].clientY -
+            scrTop - 55 * 2 - toolsH + // 为了要输入的时候不要被影响到
+            // toolbtnH + 
+            'px' : toolsH + editorY + this.args[0].clientY - scrTop + 55 * 2 + // 为了要输入的时候不要被影响到
             //       // toolbtnH + 
-            //       'px',  
-            'top': this.args[0].clientY - scrTop > (this.args[0].screenY * 1 / 2) ? editorY + this.args[0].clientY -
-              scrTop - 55 * 2 - toolsH + // 为了要输入的时候不要被影响到
-              // toolbtnH + 
-              'px' : toolsH + editorY + this.args[0].clientY - scrTop + 55 * 2 + // 为了要输入的时候不要被影响到
-              //       // toolbtnH + 
-              'px',
-            "margin-top": "-30px",
-            'z-index': '1005',
-            'box-shadow': '1px 1px 4px #00000033'
-          }
+            'px',
+          "margin-top": "-30px",
+          'z-index': '1005',
+          'box-shadow': '1px 1px 4px #00000033'
+        }
 
-          // 改变工具条数据
-          this.toolStyle = {
-            ...this.toolStyle,
-            ...sources
-          }
-        },
+        // 改变工具条数据
+        this.toolStyle = {
+          ...this.toolStyle,
+          ...sources
+        }
+      },
       getHTML() {
         return this.krcd.html();
       },
@@ -1775,19 +1813,19 @@
 
       // 定位div(contenteditable = "true")聚焦点到最后的函数
       poLastDiv(obj, docObj) {
-            if (window.getSelection) { //ie11 10 9 ff safari  
-              // obj.focus(); //解决ff不获取焦点无法定位问题              // 这里会让我的直接到元素的位置处
-              var range = docObj.getSelection(); //创建range
-              range.selectAllChildren(obj); //range 选择obj下所有子内容
-              range.collapseToEnd(); //光标移至最后
-            } else if (document.selection) { //ie10 9 8 7 6 5
-              var range = document.selection.createRange(); //创建选择对象
-              //var range = docObj.body.createTextRange();
-              range.moveToElementText(obj); //range定位到obj
-              range.collapse(false); //光标移至最后
-              range.select();
-            }
-          }
+        if (window.getSelection) { //ie11 10 9 ff safari  
+          // obj.focus(); //解决ff不获取焦点无法定位问题              // 这里会让我的直接到元素的位置处
+          var range = docObj.getSelection(); //创建range
+          range.selectAllChildren(obj); //range 选择obj下所有子内容
+          range.collapseToEnd(); //光标移至最后
+        } else if (document.selection) { //ie10 9 8 7 6 5
+          var range = document.selection.createRange(); //创建选择对象
+          //var range = docObj.body.createTextRange();
+          range.moveToElementText(obj); //range定位到obj
+          range.collapse(false); //光标移至最后
+          range.select();
+        }
+      }
 
 
     },
@@ -1845,7 +1883,7 @@
 
       // 点击聚焦
       this.krcd.addListener('click', function (event) {
-        
+
 
         console.log(arguments);
         // 获取ifame中的window
@@ -1895,7 +1933,7 @@
         }
 
         // 选择空白处自动聚焦
-        if (arguments[0].path[0].className === "krcd-tmp-content") {          
+        if (arguments[0].path[0].className === "krcd-tmp-content") {
 
           const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
           const len = editDOM.length;
@@ -1970,12 +2008,12 @@
 
             // 判断是否有onmouseup
             let mouseuped = false;
-            this.onmouseup = function(){                
-                mouseuped = true;
+            this.onmouseup = function () {
+              mouseuped = true;
             }
 
             e = e || window.event;
-            
+
             if (!mouseuped) {
               this.onmouseover = function (e) {
                 // 要拿的是mouseover的event，mouseup是没有的
@@ -1985,30 +2023,31 @@
 
                 this.onmouseup = function (e) {
                   // console.log("鼠标抬起了")      
-                  e = e || window.event;           
+                  e = e || window.event;
                   // console.log("抬起的对象",e)
 
                   // debugger
 
                   // 输出点击时获取的数据
-                  let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow, self);
-                  
+                  let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow,
+                    self);
+
                   let selText = getSelected.selectedText;
                   let selHtml = getSelected.selectedHtml;
                   let selectedDOM = getSelected.selectedDOM;
 
-                  console.log(selectedDOM)
+                  // console.log(selectedDOM)
 
-                  console.log(selHtml)
+                  // console.log(selHtml)
 
                   // 防止被无聊的点击覆盖了
                   self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
-                  self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') === -1 ? selHtml : self.selectedHtml;
+                  self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') ===
+                    -1 ? selHtml : self.selectedHtml;
+                  // debugger
 
-                  self.getPositon()  // 工具栏定位
 
-                  self.saveAble = 'normal'; // 保证弹出窗口
-                  
+                  self.getPositon() // 工具栏定位
                 }
               }
             }
@@ -2018,44 +2057,45 @@
         }, 1500)
 
         // 将改变内容的监听放到加载后
-          this.addListener("contentchange", function () {
-              console.log("内容改变了");
-              console.log(self.$parent.$refs)
+        this.addListener("contentchange", function () {
+          console.log("内容改变了");
+          console.log(self.$parent.$refs)
 
-              // debugger
+          console.log(self)
+          // debugger
 
-              const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
+          const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
 
-              self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
-              console.log(self.$parent.$refs.setContentInp.value);
+          self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
+          console.log(self.$parent.$refs.setContentInp.value);
 
-              // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
-                const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-                self.iframeWin = iframeWin;
-                        
-                let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
-                let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
+          // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
+          const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+          self.iframeWin = iframeWin;
+
+          let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+          let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
 
-              if(self.$parent.$refs.setContentInp.value===''){
-                headerValue.innerHTML = '<p><br></p>';  // 页头
-                footerValue.innerHTML = '<p><br></p>';  // 页脚
-              }else{          
-                headerValue.innerHTML = self.headerValue;  // 页头
-                footerValue.innerHTML = self.footerValue;  // 页脚
-              }
-              
-              
-            });
+          if (self.$parent.$refs.setContentInp.value === '') {
+            headerValue.innerHTML = '<p><br></p>'; // 页头
+            footerValue.innerHTML = '<p><br></p>'; // 页脚
+          } else {
+            headerValue.innerHTML = self.headerValue; // 页头
+            footerValue.innerHTML = self.footerValue; // 页脚
+          }
+
+
+        });
 
       });
 
-      
+
 
 
     },
 
-    
+
     beforeDestroy() {
       this.krcd.__ue__.destroy();
     },

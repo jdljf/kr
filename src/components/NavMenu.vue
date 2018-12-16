@@ -121,6 +121,7 @@
         // 调用对应的插入方法
         // this.self.krcd.execCommand('inserthtml',item)
         // this.self.onOff = {...this.self.off};
+       
 
         this.self.krcd.insertControl(
           item.newDiv.getCtrlElement(),  //  获取会对应的Element
