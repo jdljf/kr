@@ -1973,23 +1973,25 @@
            */
           // 获取ifame中的window
           const editor = document.getElementsByTagName('iframe')[1].contentWindow;
+          console.log(editor)
           editor.onmousedown = function (e) {
-            // console.log("aaaa")
-            // self.args = arguments; // 获取点中的对象
+            e = e || window.event;
+            // e.preventDefault();
+            // debugger
 
-            console.log(self.args)
+            // console.log(self.args)
 
             // 判断是否有onmouseup
             let mouseuped = false;
             this.onmouseup = function () {
-              mouseuped = true;
+              mouseuped = true; 
+              // return             
+              // console.log("抬起了")
             }
-
-            e = e || window.event;
-
             if (!mouseuped) {
               this.onmousemove = function (e) {  // 可能是因为onmouseover是不包含子dom的，改用move；但是连带一个问题，第一个点击的过程中第一个点击的不是window时也不会触发
                 // 要拿的是mouseover的event，mouseup是没有的
+                let _this = this;
                 e = e || window.event;
                 console.log("经过")
                 // console.log("抬起的对象",e)
@@ -1997,6 +1999,8 @@
                 console.log("移动到的对象",e.target)
             
                 this.onmouseup = function (e) {
+                 
+                  console.log(this.onmousemove)
                   // console.log("鼠标抬起了")      
                   e = e || window.event;
                   console.log("抬起的对象",e.target)
@@ -2004,8 +2008,7 @@
                   // debugger
 
                   // 输出点击时获取的数据
-                  let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow,
-                    self);
+                  let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow,self);
 
                   let selText = getSelected.selectedText;
                   let selHtml = getSelected.selectedHtml;
@@ -2021,10 +2024,18 @@
                     -1 )? selHtml : self.selectedHtml;
                   // debugger
 
+                 
 
                   self.getPositon() // 工具栏定位
+                   
                 }
+                
+                
+                // 必须清楚之前的事件
+                _this.onmousemove = null;
               }
+            }else{
+              this.onmousemove = null;
             }
 
           }
