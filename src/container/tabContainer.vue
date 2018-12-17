@@ -3,7 +3,11 @@
         <el-tab-pane style="padding:0" v-for="(item,index) in tabsArray" :key="index">
             <!-- slot 属性可以自定义标签内容而不像下面那些那样 -->
             <span slot="label">
-                <i class="el-icon-document"></i>  {{item.name}}<i :class="`circle circle-${item.clsType}`">{{returnProps(item.list).length}}</i>
+                <i class="el-icon-document"></i>
+                <span class="title">{{item.name}}</span>
+                <i :class="`circle circle-${item.clsType}`">
+                    <span>{{returnProps(item.list).length}}</span>
+                </i>
             </span> 
             <Template 
                 :templeCtrl="templeCtrl" 
@@ -100,32 +104,67 @@ export default {
 </script>
 
 <style scoped>
+
+.title{
+    padding-right: 9px;
+}
+
 .el-icon-date{
     padding: 0 8px 0 0;
 }
 .circle{
     display: inline-block;
-    width: 18px;
+    /* width: 18px; */
     height: 18px;
     line-height: 18px;
     font-size: 13px;
     text-align: center;
-    border-radius: 50%;    
+    /* border-radius: 50%;     */
     vertical-align: middle;
     color:#F2F6FC;
     margin-left: 8px;
     margin-bottom: 2px;
+    position: relative;
 }
 
-.circle-ctrl{
+.circle>span{
+    z-index: 1;
+    position: relative;
+}
+
+.circle::before{
+    content: " ";
+    width: 18px;
+    height: 18px;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    position: absolute;
+    left: 0;
+    margin-left: -9px;
+    /* background-color: #409EFF; */
+}
+
+.circle::after{
+    content: " ";
+    width: 18px;
+    height: 18px;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    position: absolute;
+    right: 0;
+    margin-right: -9px;    
+    /* background-color: #409EFF; */
+}
+
+.circle-ctrl,.circle-ctrl::after,.circle-ctrl::before{
     background-color: #67C23A;
 }
 
-.circle-template{
+.circle-template,.circle-template::after,.circle-template::before{
     background-color: #409EFF;
 }
 
-.circle-widget{
+.circle-widget,.circle-widget::after,.circle-widget::before{
     background-color: #E6A23C;
 }
 </style>
