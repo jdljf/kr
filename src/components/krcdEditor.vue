@@ -1,91 +1,4 @@
-<template>
-  <el-container style="height: 100%;" class="krcd-root height-ful" v-loading.fullscreen.lock="fullscreenLoading">
-    <el-container>
-      <el-aside @mouseover="showHideLeft" @mouseout="showHideLeft" :style="`width:${leftTreeWidth};position: relative; overflow:unset;border:none;border-right: 1px solid rgb(220, 223, 230);transition: width 10s;box-shadow: 2px 0 8px #409eff1c;z-index: 1;${leftOtherStyle};`">
-        <div class="showBtnLeft showBtnLittle" @click="showHideLeft" @mouseover="longer" @mouseout="shorter">
-          <!-- <span>展开收起</span> -->
-        </div>
 
-        <!-- <div @mouseout="showHideLeft('hide')">       -->
-        <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist">
-          <Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag"></Tree>
-        </Widgets>
-        <!-- </div>        -->
-      </el-aside>
-      <div class="tools" v-show="toolsShow">
-        <NavMenu class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false"
-          :self="self" />
-        <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
-      </div>
-      <el-container style="overflow: hidden;" class="left-tree">
-        <el-container>
-
-          <el-aside style="width:auto;display: flex;">
-            <FileList :imgsArr="imgsArr" :getPatMsg="getPatMsg">
-              <!-- 病人信息和文档信息 -->
-            </FileList>
-          </el-aside>
-
-          <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
-
-        </el-container>
-
-        <el-footer style="z-index: 999;height: 42px;padding: 5px;background-color: white;border: 1px solid rgb(220, 223, 230);">
-          <el-row style="display:flex;justify-content: flex-end;">
-            <!--1. DESIGN 设计模式；
-                2. EDITOR 编辑模式；
-                3. STRICT 严格模式（表单模式）；
-                4. READONLY 只读模式； -->
-            <el-tooltip v-for="(item,index) in modelsData" :key="index" class="item" effect="dark" :content="item.tip"
-              placement="top">
-              <el-button size="mini" round @click="mode(modelsData,index)" :type="item.type" ref="modstyle">{{item.name}}</el-button>
-            </el-tooltip>
-          </el-row>
-        </el-footer>
-      </el-container>
-      <el-aside  @mouseover="showHideRight" @mouseout="showHideRight" :style="`width:${rightTreeWidth};position: relative;overflow:unset;transition: width 10s;display:flex;flex-direction:column;box-shadow:-2px 0 8px #409eff1c;z-index: 1;${rightOtherStyle};`">
-        <!-- 为了隐藏而用 -->
-        <!-- <div @mouseout="showHideRight('hide')"> -->
-
-        <div class="showBtnRight showBtnLittle" @click="showHideRight" @mouseover="longer" @mouseout="shorter">
-          <!-- <span>展开收起</span> -->
-        </div>
-
-        <el-header style="height: 30px;
-                box-sizing: border-box;
-                background-color: #409EFF;
-                color: #F2F6FC;
-                line-height: 30px;
-                font-size: 13px;
-                text-align: left;
-                padding: 0px 12px;"></el-header>
-        <div class="widget-list">
-          <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;background-color:#ffffff">
-            <div class="nav-tools">
-              <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
-              <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
-              <el-button v-show="this.saveAble==='ctrlAble'" type="success" size="mini" plain @click="commitShow.OnOff=true">保存动态模版</el-button>
-              <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>
-              <!-- 这里是保存模版用的隐藏按钮 -->
-              <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" />
-            </div>
-          </el-header>
-          <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
-          <!-- <Models :list="widgetlist" :fun="insert"/> -->
-          <tabContainer :tabsArray="tabsArray" :templeCtrl="templeCtrl" :ctrlist="ctrlist" :ctrlfun="insertDynamicWidget"
-            :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun"
-            :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)"
-            :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxFunTemp" :back2font="back2font"
-            :getHtmlContent="getHtmlContent">
-          </tabContainer>
-        </div>
-
-        <!-- </div> -->
-      </el-aside>
-
-    </el-container>
-  </el-container>
-</template>
 
 <script>
   import "../../static/krcdEditor/krcd.config.js?t=88";
@@ -258,11 +171,11 @@
           resettingPrint(opt, viewDom) {}, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
           resetedPrint(opt, viewDom) {}, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
           renderHeader(index, page) {
-            return `<div style="line-height:55px;background:#c23a3a78;border:1px solid yellow;">这里是header</div>`;
+            // return `<div style="line-height:55px;background:#c23a3a78;border:1px solid yellow;">这里是header</div>`;
           }, //返回要渲染的页眉。默认从零开始
           renderFooter(index, page) {
-            return `<div style="line-height:35px;background:#3a65c278;border:1px solid green;"><center>第${index +
-            1}页<center></div>`;
+            // return `<div style="line-height:35px;background:#3a65c278;border:1px solid green;"><center>第${index +
+            // 1}页<center></div>`;
           }, //返回要渲染的页脚。默认从零开始
           renderedHeader(index, count, page, header) {}, //渲染后
           renderedFooter(index, count, page, footer) {}, //渲染后

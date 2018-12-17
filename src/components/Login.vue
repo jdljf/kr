@@ -19,7 +19,9 @@
 // import Router from 'vue-router'
   export default {
     name: "Login",
-   
+    beforeDestroy(){
+        // debugger
+    },
     data() {
         // 用户名验证
       var checkUser = (rule, value, callback) => {
@@ -87,7 +89,7 @@
           if (valid){  // 当值验证true
             if(this.loginForm.rightpass[this.loginForm.user]===this.loginForm.pass){
               console.log('登录成功');  
-              this.$router.push({ path: `/home` })
+              this.$router.replace({ path: `/home` })
               return true;
             }
             this.$message.error('抱歉您输入密码不正确');

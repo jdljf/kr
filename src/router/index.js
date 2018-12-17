@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import index from '../view/index'
+// import index from '../view/index'
 import loginContainer from '../container/loginContainer'
 import CommitTable from '../components/CommitTable'
-import Home from '../container/home'
 
 Vue.use(Router)
 
@@ -11,9 +10,8 @@ export default new Router({
   mode:'history',
   routes: [{
     path: '/',
-    name: 'index',
-    component: index,
-    redirect: loginContainer
+    // component: index,
+    redirect: loginContainer  // 这里的重定向导致了两次的编辑器加载
   },
   {
     path: '/login',
@@ -23,20 +21,12 @@ export default new Router({
   {
     path: '/home',
     name: 'home',
-    component: index
-  },
-  {
-    path: '/home2',
-    name: 'Home',
-    component: Home
-  },
+    component: () => import('@/view/index'), 
+  },  
   {
     path: '/commit',
     name: 'CommitTable',
     component: CommitTable
   }
-
-
-  
 ]
 })
