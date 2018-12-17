@@ -70,7 +70,7 @@
           pass: '',          
           // 验证用的数组
           rightpass: {
-            "kremr":'0000' 
+            "system":'0000' 
           }         
         },
         rules: {

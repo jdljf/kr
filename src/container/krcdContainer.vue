@@ -1416,8 +1416,8 @@
        * 获取text和html
        */
       selectText(iframeObj, self) {
+        // debugger
         console.log(arguments[0])
-        // if (self.args!==null&&self.args[0].path[0].className === "krcd-tmp-content") {  
         if (iframeObj.document.selection) {
 
           let selectionObj = iframeObj.document.selection;
@@ -1436,7 +1436,6 @@
           //标准浏览器
 
           let selectionObj = iframeObj.getSelection()
-          // || window.getSelection();
           // debugger
           console.log(selectionObj)
           let selectedText = selectionObj.toString();
@@ -1923,7 +1922,6 @@
         // 工具栏定位
         self.getPositon()
 
-
       });
 
       this.krcd.addListener("ready", function () {
@@ -1969,14 +1967,17 @@
           // 默认设定为设计模式
           self.mode(self.modelsData, 0);
 
-          /***
+
+           /***
            * 给编辑器增加鼠标抬起事件
            */
           // 获取ifame中的window
           const editor = document.getElementsByTagName('iframe')[1].contentWindow;
           editor.onmousedown = function (e) {
             // console.log("aaaa")
-            self.args = arguments; // 获取点中的对象
+            // self.args = arguments; // 获取点中的对象
+
+            console.log(self.args)
 
             // 判断是否有onmouseup
             let mouseuped = false;
@@ -1987,16 +1988,18 @@
             e = e || window.event;
 
             if (!mouseuped) {
-              this.onmouseover = function (e) {
+              this.onmousemove = function (e) {  // 可能是因为onmouseover是不包含子dom的，改用move；但是连带一个问题，第一个点击的过程中第一个点击的不是window时也不会触发
                 // 要拿的是mouseover的event，mouseup是没有的
                 e = e || window.event;
+                console.log("经过")
                 // console.log("抬起的对象",e)
                 // console.log("抬起的对象",this)
-
+                console.log("移动到的对象",e.target)
+            
                 this.onmouseup = function (e) {
                   // console.log("鼠标抬起了")      
                   e = e || window.event;
-                  // console.log("抬起的对象",e)
+                  console.log("抬起的对象",e.target)
 
                   // debugger
 
@@ -2013,9 +2016,9 @@
                   // console.log(selHtml)
 
                   // 防止被无聊的点击覆盖了
-                  self.selectedText = selText.length !== 0 ? selText : self.selectedText;  // 原来这里写错了selHtml所以一直两个都是selHtml
-                  self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') ===
-                    -1 ? selHtml : self.selectedHtml;
+                  self.selectedText = (selText.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') ===-1 )? selText : self.selectedText;  // 原来这里写错了selHtml所以一直两个都是selHtml
+                  self.selectedHtml = (selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') ===
+                    -1 )? selHtml : self.selectedHtml;
                   // debugger
 
 
@@ -2025,6 +2028,9 @@
             }
 
           }
+
+
+         
 
         }, 1500)
 
