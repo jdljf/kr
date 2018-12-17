@@ -484,7 +484,7 @@
               dic: [{
                 group: "粘贴嵌套模块", // 分组名
                 groupItems: [{
-                  name: self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
+                  name: self.selectedText !== '' ? self.selectedText : "（没内容）",
                   // content: '['+ self.createDate({ctrlId:null,ctrlStyle:null}, null, self.selectedHtml).show +']',
                   obj: self.createSection({
                     'ctrlName': self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
@@ -1138,6 +1138,7 @@
         ctrlStyle: null
       }, defOpt, desc) {
         let div = document.createElement('span');
+        console.log(desc)
         div.innerHTML =
           `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true"></span></span>`;
         div = div.firstElementChild;
@@ -1149,6 +1150,7 @@
           "required": 0, //是否必填
           "desc": desc.length !== 0 ? desc : "文本", //控件描述值
         })
+
         return {
           newDiv,
           show: newDiv.getValueElement().parentNode.innerHTML // 为模版展示用, 取出生成的html
@@ -1443,7 +1445,9 @@
           let docFragment = rangeObj.cloneContents();
           let tempDiv = document.createElement("div");
           tempDiv.appendChild(docFragment);
-          let selectedHtml = tempDiv.innerText;
+          let selectedHtml = tempDiv.innerHTML;
+          selectedText = tempDiv.innerText.trim(); // 为了能呈现，去前后空格
+          console.log(selectedText)
 
           return {
             selectedText,
@@ -1461,22 +1465,6 @@
        */
       addCtrl(type, ctrlName, ctrlId = '', ctrlStyle = '', Opt = null, paste = false) {
 
-        // // 获取选中的文字
-        // function selectText() {
-        //   if (document.Selection) {
-        //     //ie浏览器
-        //     return document.selection.createRange().text;
-        //   } else {
-        //     //标准浏览器
-        //     return window.getSelection().toString();
-        //   }
-        // }
-
-        // let selResult = selectText();
-        // if (selResult.length !== 0) {
-        //   // alert(selResult)
-        // }
-
         let domSet = {
           'ctrlName': ctrlName,
           'ctrlId': ctrlId,
@@ -1485,9 +1473,6 @@
         // 判断
         let newDiv;
 
-        debugger
-        // let selectedHtml = this.selectedHtml;
-        // let selectedText = this.selectedText;
         let selectedHtml = paste ? this.selectedHtml : '';
         let selectedText = paste ? this.selectedText : '';
         switch (type) {
@@ -1558,17 +1543,7 @@
             newDiv.getCtrlElement(), //  获取会对应的Element
             newDiv.getOpt() //  获取会对应的opt
           )
-
-          // const ele = this.krcd.getControlByEl(newDiv.getCtrlElement());
-
-          // ele.setValue(newDiv.getOpt().bindingdata[0])
-
-          // console.log(newDiv.getOpt().bindingdata[0])
         }
-
-
-        // console.log(newDiv.getCtrlElement())
-
         // 插入后隐藏工具条
         // this.onOff = {...this.off}  
         this.saveAble = null; // 有一个渐变的的问题
@@ -1592,12 +1567,9 @@
           "desc": selectedHtml ? selectedHtml : '', //描述
         })
 
-        console.log(selectedHtml)
-        console.log(newDiv.getValueElement().parentNode)
-
         return {
           newDiv,
-          show: selectedHtml,
+          show: newDiv.getValueElement().parentNode.innerHTML,
           // newDiv.getValueElement().parentNode.innerHTML // 为模版展示用, 取出生成的html
         }
       },
@@ -2041,7 +2013,7 @@
                   // console.log(selHtml)
 
                   // 防止被无聊的点击覆盖了
-                  self.selectedText = selText.length !== 0 ? selHtml : self.selectedText;
+                  self.selectedText = selText.length !== 0 ? selText : self.selectedText;  // 原来这里写错了selHtml所以一直两个都是selHtml
                   self.selectedHtml = selHtml.length !== 0 && selHtml.indexOf('krcd-ctrl krcd-section') ===
                     -1 ? selHtml : self.selectedHtml;
                   // debugger
