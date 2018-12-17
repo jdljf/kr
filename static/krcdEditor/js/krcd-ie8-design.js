@@ -21518,6 +21518,7 @@
     plugin: function (e) {
       var t = this.name,
         n = a["default"].getDialog(e, t, "pdfviewer/web/viewer.html", "PDFViewer", null, null);
+        console.log(n)
       e.commands[t] = {
         execCommand: function (e, t) {
           n.render(), n.open();
