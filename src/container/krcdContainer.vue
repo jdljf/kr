@@ -1609,36 +1609,26 @@
         }
       },
 
-      // 插入Section区域控件（文档段）
-      // addSection(newDiv, domSet = {
-      //   ctrlId: null,
-      //   ctrlName: null,
-      //   ctrlStyle: null,
-      //   selectedText: null
-      // }) {
-      //   let div = document.createElement('div');
-      //   div.innerHTML =
-      //     `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><p contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;">${domSet.selectedText}</p></div>`
-      //   div = div.firstElementChild;
+      // 选择空白处自动聚焦
+      autoFocus(targetObj){
+        // this.args[0].path[0]
+        console.log("自动聚焦")
+        if (targetObj.className === "krcd-tmp-content") {
 
-      //   let sp;
-      //   if (newDiv) {
-      //     sp = document.createElement('div');
-      //     // 遍历数组控件，返回dom
-      //     newDiv.forEach(item => {
-      //       sp.appendChild(item.getCtrlElement());
-      //     })
-      //     console.log(sp)
-      //   }
+          const editDOM = targetObj.querySelector('.krcd-tmp-content-value');
+          const len = editDOM.length;
 
-      //   // 插入控制器
-      //   this.krcd.insertControl(div, {
-      //       "mode": "EDITOR", //当前模式
-      //       "originalmode": "EDITOR", //原始模式
-      //       "desc": sp ? sp.innerHTML : '', //描述
-      //     } //区域控件有时会随着当前业务的要求而进行模式的变更，在控件被渲染时默认将mode与originalmode进行同步。originalmode的存在也是为了方便区域控件模式重置)
-      //   )
-      // },
+          // 初始化的时候只有一个p
+          if (editDOM.querySelectorAll('p').length === 1 && !editDOM.querySelector('p').className) {
+            editDOM.removeChild(editDOM.querySelector('p'))
+          }
+
+          // 聚焦到最后
+          this.poLastDiv(editDOM, this.iframeWin)
+
+        }
+        
+      },       
 
       execCommand() {
         return this.krcd.execCommand.apply(this.krcd, arguments);
@@ -1936,21 +1926,24 @@
           self.unSaveAble = false // 改回来
         }
 
-        // 选择空白处自动聚焦
-        if (arguments[0].path[0].className === "krcd-tmp-content") {
+        // // 选择空白处自动聚焦
+        // if (arguments[0].path[0].className === "krcd-tmp-content") {
 
-          const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
-          const len = editDOM.length;
+        //   const editDOM = arguments[0].path[0].querySelector('.krcd-tmp-content-value');
+        //   const len = editDOM.length;
 
-          // 初始化的时候只有一个p
-          if (editDOM.querySelectorAll('p').length === 1 && !editDOM.querySelector('p').className) {
-            editDOM.removeChild(editDOM.querySelector('p'))
-          }
+        //   // 初始化的时候只有一个p
+        //   if (editDOM.querySelectorAll('p').length === 1 && !editDOM.querySelector('p').className) {
+        //     editDOM.removeChild(editDOM.querySelector('p'))
+        //   }
 
-          // 聚焦到最后
-          self.poLastDiv(editDOM, self.iframeWin)
+        //   // 聚焦到最后
+        //   self.poLastDiv(editDOM, self.iframeWin)
 
-        }
+        // }
+
+        // 自动聚焦
+        self.autoFocus(self.args[0].path[0]);
 
         // 工具栏定位
         self.getPositon()
@@ -2012,25 +2005,35 @@
           let onmousedowning = false; // 状态存储
 
           editor.onmousedown = function (e) {
+
             e = e || window.event;
+
+            // e.target = null;
+            
+            // // 自动聚焦
+            // if(e.target.className ==="krcd-tmp-content"){
+            //     self.autoFocus(this.document.querySelector('.krcd-tmp-content-value'));
+            // }            
+
             const editableArr = [...this.document.querySelectorAll(".krcd-ctrl[contenteditable='false']")];
             onmousedowning = false;
-
-            // 改变editor属性
-            editableArr.forEach(function (item) {
-              item.setAttribute('contenteditable', 'true');
-            })
 
             onMouseIngTimer = setTimeout(function () {
               onmousedowning = true // 证明点击已经够久了              
               self.editableArr = editableArr;
+
+              // 改变editor属性
+              editableArr.forEach(function (item) {
+                item.setAttribute('contenteditable', 'true');
+              })
+
             }, 200)
 
             this.onmouseup = function (e) {
-
               e = e || window.event;
               if (onmousedowning) {
-
+                
+                console.log('点超过200ms了')
                 // 输出点击时获取的数据
                 let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow,
                   self);
@@ -2085,12 +2088,12 @@
                 // self.getPositon()
 
                 // 将onmousedown开始改变属性改回来
-                self.editableArr.forEach(function (item) {
+                editableArr.forEach(function (item) {
                   item.setAttribute('contenteditable', 'false');
                 })
 
               } else {
-                clearTimeout(onMouseIngTimer)
+                clearTimeout(onMouseIngTimer)                
               }
             }
 
