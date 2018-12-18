@@ -1,10 +1,10 @@
 <template>
     <el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-width="100px" class="loginForm">
         <el-form-item label="用户名" prop="user">
-            <el-input v-model.number="loginForm.user"></el-input>
+            <el-input v-model.number="loginForm.user" :clearable="true"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="loginForm.pass" autocomplete="off" :disabled="passdisable"></el-input>
+            <el-input type="password" v-model="loginForm.pass" autocomplete="off"  :clearable="true"></el-input>
         </el-form-item>
         
         <el-form-item>
@@ -59,7 +59,8 @@
           callback();
         }
       };
-      
+
+      console.log(this)//config.keyCodes      
       
       return {
         passdisable: true,

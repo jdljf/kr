@@ -12,6 +12,8 @@ export default {
 
 <style>
 @import "./assets/css/css-reset.css";
+@import "./assets/css/editor.css";
+
 html,body{
   padding: 0;
   margin: 0;

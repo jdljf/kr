@@ -21132,7 +21132,7 @@
             if (null !== a && (r.hide(), "text" === a.getAttribute("krcd-type"))) {
               var A = a.querySelector(".krcd-value"),
                 o = A.getAttribute("title") || "文本框",
-                s = r.formatHtml("<nobr> " + o + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
+                s = r.formatHtml("<nobr> " + "<div> " + o + "</div> " + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
               s ? (r.getDom("content").innerHTML = s, r.anchorEl = a, r.showAnchor(r.anchorEl)) : r.hide()
             }
           }
@@ -21209,7 +21209,7 @@
             if (null !== a && (r.hide(), "select" === a.getAttribute("krcd-type"))) {
               var A = a.querySelector(".krcd-value"),
                 o = A.getAttribute("title") || "下拉选项",
-                s = r.formatHtml("<nobr> " + o + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
+                s = r.formatHtml("<nobr> " + "<div> " + o + "</div> " + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
               s ? (r.getDom("content").innerHTML = s, r.anchorEl = a, r.showAnchor(r.anchorEl)) : r.hide()
             }
           }
@@ -21286,7 +21286,7 @@
             if (null !== a && (r.hide(), "checkbox" === a.getAttribute("krcd-type"))) {
               var A = a.querySelector(".krcd-value"),
                 o = A.getAttribute("title") || "复选框",
-                s = r.formatHtml("<nobr> " + o + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
+                s = r.formatHtml("<nobr> " + "<div> " + o + "</div> " + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
               s ? (r.getDom("content").innerHTML = s, r.anchorEl = a, r.showAnchor(r.anchorEl)) : r.hide()
             }
           }
@@ -21363,7 +21363,7 @@
             if (null !== a && (r.hide(), "radio" === a.getAttribute("krcd-type"))) {
               var A = a.querySelector(".krcd-value"),
                 o = A.getAttribute("title") || "单选框",
-                s = r.formatHtml("<nobr> " + o + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
+                s = r.formatHtml("<nobr> " + "<div> " + o + "</div> " + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
               s ? (r.getDom("content").innerHTML = s, r.anchorEl = a, r.showAnchor(r.anchorEl)) : r.hide()
             }
           }
@@ -32983,7 +32983,7 @@
             if (null !== a && (r.hide(), "date" === a.getAttribute("krcd-type"))) {
               var A = a.querySelector(".krcd-value"),
                 o = A.getAttribute("title") || "日期控件",
-                s = r.formatHtml("<nobr> " + o + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
+                s = r.formatHtml("<nobr> " + "<div> " + o + "</div> " + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
               s ? (r.getDom("content").innerHTML = s, r.anchorEl = a, r.showAnchor(r.anchorEl)) : r.hide()
             }
           }
@@ -33060,7 +33060,7 @@
             if (null !== a && (r.hide(), "section" === a.getAttribute("krcd-type"))) {
               var A = a.querySelector(".krcd-value"),
                 o = A.getAttribute("title") || "文档段",
-                s = r.formatHtml("<nobr> " + o + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
+                s = r.formatHtml("<nobr> " + "<div> " + o + "</div> " + ': <span onclick=$$._edit() class="edui-clickable">编辑</span>&nbsp;&nbsp;<span onclick=$$._delete() class="edui-clickable">删除</span></nobr>');
               s ? (r.getDom("content").innerHTML = s, r.anchorEl = a, r.showAnchor(r.anchorEl)) : r.hide()
             }
           }

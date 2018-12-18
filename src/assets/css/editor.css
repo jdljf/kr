@@ -1,0 +1,25 @@
+.edui-default .edui-bubble .edui-popup-content{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.edui-default .edui-bubble .edui-popup-content>nobr{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.edui-default .edui-bubble .edui-popup-content>nobr>div{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    /* -webkit-box-orient: vertical; */
+}
+
+.edui-default .edui-popup{
+    max-width: 600px;
+}
