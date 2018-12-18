@@ -225,7 +225,7 @@
             // const newTools = [...this.arrBtns.slice(1,2), 
             //                   // this.arrBtns[this.arrBtns.length - 2],  这个是保存按钮
             //                   ...this.arrBtns.slice(2, this.arrBtns.length - 3)];
-            return [...this.arrBtns.slice(1,2),...this.arrBtns.slice(2, this.arrBtns.length - 3)]
+            return [...this.arrBtns.slice(1, 2), ...this.arrBtns.slice(2, this.arrBtns.length - 3)]
             break
           case 'normal':
             this.toolsShow = true;
@@ -272,8 +272,8 @@
             fun: "ctrlfun",
           }
         ],
-        
-        upSaveAble: false,  // 鼠标抬起的时候判断改变的
+
+        unSaveAble: false, // 鼠标抬起的时候判断改变的
         fullscreenLoading: true, // true时显示loading
         args: null, // 点击获得的arguments
         isMouseOver: false, // 判断用什么事件驱动展示工具栏
@@ -1449,7 +1449,7 @@
 
           let selectionObj = iframeObj.getSelection()
           // debugger
-          
+
           let selectedText = selectionObj.toString();
           let rangeObj = selectionObj.getRangeAt(0);
           // console.log(rangObj)
@@ -1469,8 +1469,8 @@
           // console.log(allSectionArr)
           // console.log(allSectionArr instanceof Array)
 
-          for (var i = 0, len = allSectionNodes.length; i < len ; i++) {
-            const needNodes = allSectionNodes[i].firstElementChild;    // 调用 myNodeList.item(i) 是没有必要的
+          for (var i = 0, len = allSectionNodes.length; i < len; i++) {
+            const needNodes = allSectionNodes[i].firstElementChild; // 调用 myNodeList.item(i) 是没有必要的
             allSectionNodes[i].parentNode.appendChild(needNodes);
             allSectionNodes[i].parentNode.removeChild(allSectionNodes[i]);
             // console.log(allSectionNodes[i].parentNode)
@@ -1591,6 +1591,7 @@
         ctrlStyle: null,
       }, defOpt, selectedHtml) {
         let div = document.createElement('div');
+        // debugger
         div.innerHTML =
           `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><div contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></div></div>`
         div = div.firstElementChild;
@@ -1800,7 +1801,7 @@
             //       // toolbtnH + 
             'px',
           "margin-top": "-30px",
-          'z-index': '1005',
+          'z-index': '1010',
           'box-shadow': '1px 1px 4px #00000033'
         }
 
@@ -1879,9 +1880,7 @@
       console.log(funs)
       console.log(this.$refs.modstyle[0].$el)
 
-
       const self = this;
-
 
       /**
        * 点击编辑区获取聚焦的控制
@@ -1900,17 +1899,16 @@
         console.log(self.tarEl)
         // console.log(e)
         self.tarCtrl = arguments[1]; //  控件类型名           self.tarCtrl.TYPE_NAME对应的是就是组件
-
+        // debugger
         // 判断点击的控件是否在section中，并控制工具条呈现的功能
-        if (arguments[1] !== null) {
+        if (arguments[1] !== null && self.unSaveAble === false) { // 控制onmouseup改变的值
 
           // inSection或inCtrl 的情况
           if (arguments[1]['TYPE_NAME'] !== 'section') {
 
             // 情况1: inCtrl
             self.inCtrl = true; // 为了显示与否服务
-            self.inSection = false; // 是否在section中
-            
+            self.inSection = false; // 是否在section中           
 
             self.saveAble = 'ctrlAble'; // 调整工具栏用的
 
@@ -1925,22 +1923,15 @@
           } else {
             self.inCtrl = false; // 为了显示与否服务
             self.inSection = true; // 是否在section中
-
             self.saveAble = 'sectionAble'; // 调整工具栏用的
 
           }
-        } else if (arguments[1] === null) {             
-         
-          if(self.upSaveAble === true){ // 之前onmouseup已经控制了
-            self.saveAble = null;
-            self.inCtrl = true; // 为了显示与否服务
-            self.inSection = false; // 是否在section中 
-          }else{
-            // 回复原始状态的工具栏
-            self.inCtrl = false;
-            self.inSection = false;
-            self.saveAble = 'normal';
-          }
+        } else if (arguments[1] === null && self.unSaveAble === false) {
+
+          // 回复原始状态的工具栏
+          self.inCtrl = false;
+          self.inSection = false;
+          self.saveAble = 'normal';
         }
 
         // 选择空白处自动聚焦
@@ -1961,12 +1952,7 @@
 
         // 工具栏定位
         self.getPositon()
-        // debugger
-        
-        // 将onmousedown开始改变属性改回来
-        self.editableArr.forEach(function(item){              
-              item.setAttribute('contenteditable','false');
-            })
+        // debugger    
 
       });
 
@@ -2009,103 +1995,104 @@
         setTimeout(function () {
           self.fullscreenLoading = false
           window.onresize(); // 初始化一次 
-
-          //  console.log(self.insertDynamicWidget())
-
           // 默认设定为设计模式
           self.mode(self.modelsData, 0);
 
-           /***
+
+          /***
            * 给编辑器增加鼠标抬起事件
            */
           // 获取ifame中的window
           const editor = document.getElementsByTagName('iframe')[1].contentWindow;
           console.log(editor)
+
+          let onMouseIngTimer = null // 用来存计时器
+          let onmousedowning = false; // 状态存储
+
           editor.onmousedown = function (e) {
             e = e || window.event;
-            // e.preventDefault();
-            // debugger
+            const editableArr = [...this.document.querySelectorAll(".krcd-ctrl[contenteditable='false']")];
+            onmousedowning = false;
 
-            // console.log(self.args)
-
-            const editableArr = [...this.document.querySelectorAll(".krcd-ctrl[contenteditable='false']")]; 
-            self.editableArr =  editableArr;
-            console.log(editableArr)
-            // debugger
-            editableArr.forEach(function(item){              
-              item.setAttribute('contenteditable','true');
+            // 改变editor属性
+            editableArr.forEach(function (item) {
+              item.setAttribute('contenteditable', 'true');
             })
-            
-              this.onmousemove = function (e) {  // 可能是因为onmouseover是不包含子dom的，改用move；但是连带一个问题，第一个点击的过程中第一个点击的不是window时也不会触发
-                // 要拿的是mouseover的event，mouseup是没有的
-                let _this = this;
-                e = e || window.event;
-                console.log("经过")
-                // console.log("抬起的对象",e)
-                // console.log("抬起的对象",this)
-                console.log("移动到的对象",e.target)
-            
-                this.onmouseup = function (e) {
-                 
-                  console.log(this.onmousemove)
-                  // console.log("鼠标抬起了")      
-                  e = e || window.event;
-                  console.log("抬起的对象",e.target)
 
-                  console.log(e)      
-                  // debugger
+            onMouseIngTimer = setTimeout(function () {
+              onmousedowning = true // 证明点击已经够久了              
+              self.editableArr = editableArr;
+            }, 200)
 
-                  // 输出点击时获取的数据
-                  let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow,self);
+            this.onmouseup = function (e) {
 
-                  let selText = getSelected.selectedText;
-                  let selHtml = getSelected.selectedHtml;
-                  let selectedDOM = getSelected.selectedDOM;
-                  let maybeHasSectionDiv = getSelected.maybeHasSectionDiv
+              e = e || window.event;
+              if (onmousedowning) {
 
-                  // console.log(selectedDOM)
+                // 输出点击时获取的数据
+                let getSelected = self.selectText(document.getElementsByTagName('iframe')[1].contentWindow,
+                  self);
 
-                  // console.log(selHtml)
+                let selText = getSelected.selectedText;
+                let selHtml = getSelected.selectedHtml;
+                let selectedDOM = getSelected.selectedDOM;
+                let maybeHasSectionDiv = getSelected.maybeHasSectionDiv;
 
-                  // 防止被无聊的点击覆盖了
-                  self.selectedText = (selText.length !== 0 )  //&& selHtml.indexOf('krcd-ctrl krcd-section') ===-1
-                                      ? selText 
-                                      : self.selectedText;  // 原来这里写错了selHtml所以一直两个都是selHtml
-                  self.selectedHtml = (selHtml.length !== 0 )  // && selHtml.indexOf('krcd-ctrl krcd-section') === -1
-                                      ? selHtml 
-                                      : self.selectedHtml;
-                  // debugger
+                // 防止被无聊的点击覆盖了
+                self.selectedText = (selText.length !== 0) //&& selHtml.indexOf('krcd-ctrl krcd-section') ===-1
+                  ?
+                  selText // 原来这里写错了selHtml所以一直两个都是selHtml
+                  :
+                  self.selectedText;
+                self.selectedHtml = (selHtml.length !== 0) // && selHtml.indexOf('krcd-ctrl krcd-section') === -1
+                  ?
+                  selHtml :
+                  self.selectedHtml;
 
+                self.unSaveAble = false;
 
-                  // self.getPositon() // 工具栏定位
-
-                  self.upSaveAble = false;
-                  
-
-                  // 通过抬起来判断是否在section中，而不能用click的arguments来判断
+                // 通过抬起来判断是否在section中，而不能用click的arguments来判断
+                let isInSection = (e) => {
                   for (let i = 0, arr = e.path, len = arr.length; i < len; i++) {
-                    if (arr[i].className === "krcd-ctrl krcd-section") {
-                      self.upSaveAble = true; 
-                      console.log(selHtml)                                                     
-                      return // 跳出循环
+                    if (arr[i].className === "krcd-ctrl krcd-section") { // 判断是否停在section中                          
+                      return true
                     }
-                    if(selHtml.length!==0&&maybeHasSectionDiv.innerHTML.indexOf("krcd-ctrl krcd-section")!==-1){  // 为了做判断而增加了有section的div
-                        self.$message({
-                          message: '选择区域含有文档段内容，请点选空白处插入内容',
-                          type: 'warning'
-                        });    
-                      }             
-                  }                 
-                   
-                }              
-                
-                // 必须清楚之前的事件
-                _this.onmousemove = null;
-              }          
+                  }
+                  return false
+                }
+
+                if (isInSection === true) {
+                  self.$message({
+                    message: '选择区域含有文档段内容，请点选空白处插入内容',
+                    type: 'warning'
+                  });
+                  self.saveAble = null;
+                  self.unSaveAble = true;
+                } else if (selHtml.length !== 0 && maybeHasSectionDiv.innerHTML.indexOf(
+                    "krcd-ctrl krcd-section") !== -1) { // 为了判断开始就是section的结束不是section的情况
+                  self.$message({
+                    message: '选择区域含有文档段内容，请点选空白处插入内容',
+                    type: 'warning'
+                  });
+                  self.saveAble = null;
+                  self.unSaveAble = true;
+                } else {
+                  self.saveAble = 'normal';
+                }
+
+                // self.getPositon()
+
+                // 将onmousedown开始改变属性改回来
+                self.editableArr.forEach(function (item) {
+                  item.setAttribute('contenteditable', 'false');
+                })
+
+              } else {
+                clearTimeout(onMouseIngTimer)
+              }
+            }
 
           }
-
-         
 
         }, 1500)
 
