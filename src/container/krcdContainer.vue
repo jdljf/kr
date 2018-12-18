@@ -493,7 +493,8 @@
                   obj: self.createSection({
                     'ctrlName': self.selectedHtml !== '' ? self.selectedHtml : "（没内容）",
                     'ctrlId': null,
-                    'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
+                    'ctrlStyle': null,
+                    // 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
                     // `${ctrlStyle}
                     // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
                     // `
@@ -1532,7 +1533,8 @@
             newDiv = this.createSection({
               'ctrlName': ctrlName,
               'ctrlId': ctrlId,
-              'ctrlStyle': 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
+              'ctrlStyle':  null
+              // 'border-bottom-width:1px;border-right-width:10px;border-left-width:10px;border-top-width:1px;border-style:solid;border-color:#006ffc7d;padding-left:10px;padding-right:10px;',
               // `${ctrlStyle}
               // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
               // `
@@ -1593,11 +1595,10 @@
         let div = document.createElement('div');
         // debugger
         div.innerHTML =
-          `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style=${domSet.ctrlStyle ? domSet.ctrlStyle: ''} krcd-isloadasyncdata="false"><div contenteditable="true" class="krcd-value" style="padding-left:5px;padding-right:5px;"></div></div>`
+          `<div class="krcd-ctrl krcd-section" contenteditable="false" krcd-type="section" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-section'} style="${domSet.ctrlStyle ? domSet.ctrlStyle: ''}" krcd-isloadasyncdata="false"><div contenteditable="true" class="krcd-value"></div></div>`
         div = div.firstElementChild;
 
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
-          "mode": "EDITOR", //当前模式
           "originalmode": "EDITOR", //原始模式
           "desc": selectedHtml ? selectedHtml : '', //描述
         })
@@ -1663,6 +1664,12 @@
                 color: #0000ff;
                 padding-left: 3px;
                 content: attr(krcd-right);
+              }.krcd-warning {
+                background-color: yellow;
+                color: red;
+              }.krcd-ctrl.krcd-section {
+                box-sizing: border-box;
+                border: 1px #006ffc7d dotted;
               }
           `
           }
@@ -1673,21 +1680,28 @@
                 display: inline;
                 background-color: transparent;
               }.krcd-ctrl:after{
-                color: red;
-                content: '';
+                color: transparent;
+                content: attr(krcd-right);
                 font-weight: bold;
                 position: relative;
                 bottom: -2px;
               }.krcd-ctrl>.krcd-value:before,.krcd-ctrl>.krcd-revise>.krcd-value-revise:before {
-                color: #0000ff;
+                color: transparent;
                 padding-right: 3px;
-                content: ''
+                content: attr(krcd-left);
               }.krcd-ctrl>.krcd-value:after,.krcd-ctrl>.krcd-revise>.krcd-value-revise:after {
-                color: #0000ff;
+                color: transparent;
                 padding-left: 3px;
-                content: '';
-              };
+                content: attr(krcd-right);
+              }.krcd-warning {
+                background-color: transparent;
+                color: transparent;
+              }.krcd-ctrl.krcd-section {
+                box-sizing: border-box;
+                border: 1px transparent dotted;
+              }
           `
+          // 后面三个新的是为了清楚section职工对应的before和after
           }
 
           /** 
@@ -1959,22 +1973,22 @@
         // 根据屏幕变化
         window.onresize = function () {
           console.log(window.innerWidth)
-          if (window.innerWidth <= 900) {
+          if (window.innerWidth <= 1275) {
             self.leftTreeWidth = 0;
             self.rightTreeWidth = 0;
-            self.leftOtherStyle = 'position:absolute;left:0;bottom: 0;top: 0;overflow: unset;z-index:1000;';
-            self.rightOtherStyle = 'position:absolute;right:0;bottom: 0;top: 0;overflow: unset;z-index:1000;'
+            // self.leftOtherStyle = 'position:absolute;left:0;bottom: 0;top: 0;overflow: unset;z-index:1000;';
+            // self.rightOtherStyle = 'position:absolute;right:0;bottom: 0;top: 0;overflow: unset;z-index:1000;'
             // 设定为浮动打开还是不浮动打开
-            self.isMouseOver = true;
+            // self.isMouseOver = true;
             console.log("屏幕太小了")
           } else if (window.innerWidth <= 1680) {
             console.log("屏幕还算可以")
             self.leftTreeWidth = 'auto';
             self.rightTreeWidth = 0;
             self.leftOtherStyle = '';
-            self.rightOtherStyle = 'position:absolute;right:0;bottom: 0;top: 0;overflow: unset;z-index:1000;';
+            // self.rightOtherStyle = 'position:absolute;right:0;bottom: 0;top: 0;overflow: unset;z-index:1000;';
             // 设定为浮动打开还是不浮动打开
-            self.isMouseOver = true;
+            // self.isMouseOver = true;
           } else {
             console.log("屏幕够大了")
             self.leftTreeWidth = 'auto';
@@ -1982,7 +1996,7 @@
             self.leftOtherStyle = '';
             self.rightOtherStyle = '';
             // 设定为浮动打开还是不浮动打开
-            self.isMouseOver = false;
+            // self.isMouseOver = false;
           }
         }
 
@@ -2121,10 +2135,10 @@
           let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
           let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
-
           if (self.$parent.$refs.setContentInp.value === '') {
-            headerValue.innerHTML = '<p><br></p>'; // 页头
-            footerValue.innerHTML = '<p><br></p>'; // 页脚
+            headerValue.innerHTML = '<p></p>'; // 页头 '<p><br></p>'
+            footerValue.innerHTML = '<p></p>'; // 页脚 '<p><br></p>'
+            // console.log(headerValue.parentNode.innerHTML.NodeValue);
           } else {
             headerValue.innerHTML = self.headerValue; // 页头
             footerValue.innerHTML = self.footerValue; // 页脚
@@ -2268,7 +2282,23 @@
 
   .editor-box>div:nth-child(2) {
     flex-grow: 1;
+  }
+
+  .editor-box>div:nth-child(2)>div:nth-child(1) {
     overflow: auto
   }
+  
+
+  /* 页眉页脚的样式 */
+  /* .krcd-editor-page_header_footer .bg {    
+    background-color: #409eff7a;
+  } */
+
+
+  /* 重新设置section外样式 */
+  /* .krcd-tmp-root .krcd-ctrl.krcd-section{
+      border:1px solid #000000;
+  } */
+  
 
 </style>
