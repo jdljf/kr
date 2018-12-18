@@ -1932,6 +1932,8 @@
           self.inCtrl = false;
           self.inSection = false;
           self.saveAble = 'normal';
+        } else{
+          self.unSaveAble = false // 改回来
         }
 
         // 选择空白处自动聚焦
