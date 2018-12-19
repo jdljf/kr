@@ -54,7 +54,7 @@
             </el-table-column>
             <el-table-column
               label="权限分配"
-              width="150">
+              width="80">
               <template slot-scope="scope">
                 <el-popover trigger="hover" placement="top">
                   <!-- <p>模版类型: {{ scope.row.tag}}</p> -->
@@ -77,7 +77,7 @@
                 <el-button
                   v-if="templeCtrl"
                   size="mini"
-                  @click.stop="handleEdit(scope.$index, scope.row)">替换</el-button>
+                  @click.stop="handleEdit(scope.$index, scope.row)">导入</el-button>
                 <el-button
                   size="mini"
                   type="danger"
@@ -170,14 +170,14 @@ import funs from '../common/funs';
       
       handleEdit(index, row) {
         console.log(index, row);
-        // 改成保存替换
+        // 改成保存导入
         // 删除警告
         const replaceWarn= (title,todo)=>{
                 this.$prompt(`当前模版 “ ${row.name?row.name:' '} ” ，请输入新的模版名称`, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         // 规定匹配模式
-                        inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,10}$/,
+                        inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,23}$/,
                         // 输入的错误信息
                         inputErrorMessage: '名称范围2-10位',
                         // input的初始值

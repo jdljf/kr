@@ -9,14 +9,14 @@
             >
         </el-input>
         <!-- <el-button @click="change">方式简单看了附近卡斯蒂略附近的</el-button> -->
-
         
-        <div class="tree">
+        <!-- 非编辑人员的 -->
+        <div v-show="currentMode!==editmode" class="tree">
           <el-tree            
             :props="treeProps"
             :load="loadNode"
             lazy
-            show-checkbox
+            :show-checkbox="false"
             default-expand-all
             @node-click="handleNodeClick"
             @check-change="handleCheckChange(node,data)"            
@@ -47,6 +47,44 @@
             </span>
           </el-tree>    
         </div>
+
+        <!-- 编辑人员的 -->
+        <div v-show="currentMode===editmode" class="tree">
+          <el-tree            
+            :props="treeProps"
+            :load="loadNode"
+            lazy
+            show-checkbox
+            default-expand-all
+            @node-click="handleNodeClick"
+            @check-change="handleCheckChange(node,data)"            
+            :filter-node-method="filterNode"
+            :data='treeData'       
+            ref='list'
+            >
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span>{{ node.label }}</span>              
+              <span>
+                <!-- 第二层而且可以有子类的就有对应的按钮 -->
+                <el-button
+                  v-if="node.level === 2&&node.data['hasChild']"
+                  type="text"
+                  size="mini"
+                  @click="() => append(node,data)">
+                  <i class="el-icon-plus"></i>
+                </el-button>
+                <!-- 第三层而且二次允许删除的会展示 -->
+                <el-button
+                  v-if="node.level === 2&&node.data['hasChild']&&node.data['children'].length>0"
+                  type="text"
+                  size="mini"
+                  @click="() => remove(node, data)">
+                  <i class="el-icon-delete"></i>
+                </el-button>
+              </span>
+            </span>
+          </el-tree>    
+        </div>
     </div>    
 </template>
 
@@ -69,6 +107,8 @@
     props:{
         list: Array,  // 传入病人列表
         templateTag: Array,
+        currentMode: String, // 当前的模式
+        editmode: String, // 可以编辑tree的模式名
     },    
     // vue观察的函数
     watch: {

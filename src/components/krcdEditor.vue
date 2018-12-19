@@ -166,16 +166,19 @@
         // el: editor,
         iframe_css_src: null, //string/Array数组 扩展css
         iframe_js_src: null, //string/Array数组 扩展js
-        page_start_num: 6, //页面起始页//默认为1
+        page_start_num: 1, //页面起始页//默认为1
         print: {
-          resettingPrint(opt, viewDom) {}, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
-          resetedPrint(opt, viewDom) {}, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
+          resettingPrint(opt, viewDom) {
+            return `<p><br></p>`
+          }, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
+          resetedPrint(opt, viewDom) {
+            return `<p><br></p>`
+          }, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
           renderHeader(index, page) {
-            // return `<div style="line-height:55px;background:#c23a3a78;border:1px solid yellow;">这里是header</div>`;
+            return that.headerValue.innerHTML
           }, //返回要渲染的页眉。默认从零开始
           renderFooter(index, page) {
-            // return `<div style="line-height:35px;background:#3a65c278;border:1px solid green;"><center>第${index +
-            // 1}页<center></div>`;
+            return `<div style="line-height:20px;font-size:12px"><center>第${index + 1}页<center></div>`;
           }, //返回要渲染的页脚。默认从零开始
           renderedHeader(index, count, page, header) {}, //渲染后
           renderedFooter(index, count, page, footer) {}, //渲染后
@@ -186,12 +189,12 @@
           pageMode: "A4", //页面模式:A3|A4|A5 ……
           width: 794, //以下默认值
           height: 1123,
-          top: 72,
-          right: 72,
-          bottom: 72,
-          left: 72,
+          top: 8,
+          right: 8,
+          bottom: 8,
+          left: 8,
           printMode: "normal", //打印模式：normal|neat|revise|comment
-          ctrlMode: "normal", //控件模式：normal|hidden|remove
+          ctrlMode: "remove", //控件模式：normal|hidden|remove
           printDirection: "vertical", //打印方向 vertical|horizontal
           printCssUrl: null, //打印的样式表，可以是string，也可以是array
           printJsUrl: null //打印的js，可以是string，也可以是array

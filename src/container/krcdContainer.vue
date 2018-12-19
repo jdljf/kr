@@ -8,11 +8,11 @@
 
         <!-- <div @mouseout="showHideLeft('hide')">       -->
         <Widgets :fun="patlistOnoff" type="pat-list" :list="patlist">
-          <Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag"></Tree>
+          <Tree v-if="templateTag.length!==0" :list="patlist" :templateTag="templateTag" :currentMode="currentMode" :editmode="modelsData[0].name"></Tree>
         </Widgets>
         <!-- </div>        -->
       </el-aside>
-      <div class="tools" v-show="toolsShow">
+      <div class="tools" v-if="ableShow" v-show="toolsShow">
         <NavMenu class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false"
           :self="self" />
         <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
@@ -61,13 +61,12 @@
                 padding: 0px 12px;"></el-header>
         <div class="widget-list">
           <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;background-color:#ffffff">
-            <div class="nav-tools">
+            <div class="nav-tools">               
               <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
-              <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button>
-              <el-button v-show="this.saveAble==='ctrlAble'" type="success" size="mini" plain @click="commitShow.OnOff=true">保存动态模版</el-button>
-              <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button>
-              <!-- 这里是保存模版用的隐藏按钮 -->
-              <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" />
+              <el-button type="primary" size="mini" plain @click="()=>inputName('保存文档模版',saveHtmlContent)">存文档模版</el-button>
+              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="()=>inputName('保存文档段模版',saveCtrl2Widget)">存文档段</el-button>
+              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true">存动态模版</el-button>
+              <!-- <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button> -->
             </div>
           </el-header>
           <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
@@ -82,7 +81,8 @@
 
         <!-- </div> -->
       </el-aside>
-
+      <!-- 这里是保存模版用的隐藏按钮 -->
+      <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" />
     </el-container>
   </el-container>
 </template>
@@ -110,57 +110,7 @@
     name: 'krcdContainer',
     extends: krcdEditor,
     beforeCreate() {
-      // console.log('krcd components created.');
-
-      let self = this;
-      async function asyncGetTemp(self) {
-        await ajax.post(
-          '/ParagraphTheme/GetList',
-          ''
-        ).then((res) => {
-          console.log('成功了！', res.data.data)
-          // 转换一下数据
-          const newArr = res.data.data.map(function (item) {
-            return { ...item,
-              name: item['theme'],
-              children: [],
-              id: item['id'],
-              hasChild: (Math.random() > 0.5) ? true : false,
-              count: 1
-            }
-          })
-          self.templateTag.push(...newArr)
-          console.log(self.templateTag)
-        }).catch((err) => {
-          console.log(err)
-        })
-      }
-
-      asyncGetTemp(self);
-
-
-      /**
-       * 请求模版数据
-       */
-      ajax.post(
-        '/DocumentTemplate/GetList', {
-          "deptCode": "",
-          "creatorUserId": 0,
-          "id": 0
-        }).then((res) => {
-        console.log('成功了！', typeof res.data.data)
-
-        const templataData = res.data.data;
-
-        // 后端数组转为前端数组
-        const templateArr = templataData.map(this.back2font)
-
-        // 修改templatelist的数据
-        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
-      }).catch((err) => {
-        console.log(err)
-      })
-
+      
     },
 
     created() {
@@ -214,29 +164,34 @@
       // },
       // 工具栏展示状态
       toolBtns: function () {
-        switch (this.saveAble) {
-          case 'ctrlAble':
-            this.toolsShow = false;
-            return []
-            // [...this.arrBtns.slice(this.arrBtns.length-1)]
-            break
-          case 'sectionAble':
-            this.toolsShow = true;
-            // const newTools = [...this.arrBtns.slice(1,2), 
-            //                   // this.arrBtns[this.arrBtns.length - 2],  这个是保存按钮
-            //                   ...this.arrBtns.slice(2, this.arrBtns.length - 3)];
-            return [...this.arrBtns.slice(1, 2), ...this.arrBtns.slice(2, this.arrBtns.length - 3)]
-            break
-          case 'normal':
-            this.toolsShow = true;
-            return [...this.arrBtns.slice(1, this.arrBtns.length - 2)]
-            break
-          default:
-            this.toolsShow = false;
-            return []
-            // [...this.arrBtns.slice(0, this.arrBtns.length-2)]
-            break
-        }
+          switch (this.saveAble) {
+            case 'ctrlAble':
+              this.toolsShow = false;
+              return []
+              // [...this.arrBtns.slice(this.arrBtns.length-1)]
+              break
+            case 'sectionAble':
+              this.toolsShow = true;
+              // const newTools = [...this.arrBtns.slice(1,2), 
+              //                   // this.arrBtns[this.arrBtns.length - 2],  这个是保存按钮
+              //                   ...this.arrBtns.slice(2, this.arrBtns.length - 3)];
+              // 展示按钮
+              return [...this.arrBtns.slice(1, 2), ...this.arrBtns.slice(2, this.arrBtns.length - 3)]
+              break
+            case 'normal':            
+              this.toolsShow = true;
+              return [...this.arrBtns.slice(1, this.arrBtns.length - 2)]
+              break
+            case 'ctrlInSection':
+              this.toolsShow = false;            
+              return []
+              break
+            default:
+              this.toolsShow = false;
+              return []
+              // [...this.arrBtns.slice(0, this.arrBtns.length-2)]
+              break
+          }
       },
       arrBtns: function () {
         // console.log(this.selectedHtml)
@@ -267,12 +222,12 @@
           {
             clsType: 'ctrl',
             iconCls: 'el-icon-edit-outline',
-            name: '元素（动态）模版',
+            name: '动态模版',
             list: "ctrlist",
             fun: "ctrlfun",
           }
         ],
-
+        currentMode: null, // 当前模式
         unSaveAble: false, // 鼠标抬起的时候判断改变的
         fullscreenLoading: true, // true时显示loading
         args: null, // 点击获得的arguments
@@ -283,6 +238,8 @@
         rightOtherStyle: '', // 附带的右工具样式
         templeCtrl: false, // 整个模版的编辑和删除的控制
         toolsShow: false, // 工具的隐藏
+        ableShow: false, // 控制工具消失 
+        shadowDivStyle: "position: absolute;width: 100%;height: 100%;background-color: transparent;", // 遮罩的div的样式
         /**
          * 切换模式的数据
          * 1. DESIGN 设计模式；
@@ -613,8 +570,8 @@
         footerValue: "",
 
         // 提示输入模版名称弹窗
-        inputName: (fun) => {
-          this.$prompt('请输入模版名', '保存模版', {
+        inputName: (name, fun) => {
+          this.$prompt('请输入模版名', name, {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,10}$/, // 自己写的
@@ -792,7 +749,14 @@
           console.log(content)
           return ajax.post(
             `${type}`,
-            JSON.stringify(content)
+            JSON.stringify(content),
+            // 为确保token就加上了
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+              }
+            }
           ).then((res) => {
             this.saveSuccess(successMsg)
             sucessFun(res)
@@ -1719,21 +1683,21 @@
           // 扩展功能的模式限制
           switch (opt[i].name) {
             case "DESIGN":
-              this.toolsShow = true;
+              this.ableShow = true;
               this.templeCtrl = true;
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
               addModeStyle(this.insertStyle, modeStyleDef())
               break
             case "EDITOR":
-              this.toolsShow = true;
+              this.ableShow = true;
               this.templeCtrl = true;
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
               addModeStyle(this.insertStyle, modeStyleDef())
               break
             case "STRICT":
-              this.toolsShow = false;
+              this.ableShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
@@ -1741,10 +1705,11 @@
               addModeStyle(this.insertStyle, modeStyleDef())
               break
             case "READONLY":
-              this.toolsShow = false;
+              this.ableShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
-              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
+              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';              
+
               // this.tabshow.templatelist = false; 
               // 插对应的模版样式
               addModeStyle(this.insertStyle, modeStyle())
@@ -1762,6 +1727,9 @@
             position: 'top-left',
             duration: 1500,
           });
+
+          // 将mode状态的存起来
+          this.currentMode = opt[i].name;
         } else {
           return this.krcd.mode();
         }
@@ -1886,12 +1854,83 @@
 
       const self = this;
 
+
+      /**
+       * 请求文档段的类型
+       */ 
+      async function asyncGetTemp(self) {
+        await ajax.post(
+          '/ParagraphTheme/GetList',
+          '',  // 传空参数
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+            }
+          }
+        ).then(async (res)=>{
+          console.log('成功了！', res.data.data)
+          // 转换一下数据
+          const newArr = res.data.data.map(function (item) {
+            return { ...item,
+              name: item['theme'],
+              children: [],
+              id: item['id'],
+              hasChild: (Math.random() > 0.5) ? true : false,
+              count: 1
+            }
+          })
+          await self.templateTag.push(...newArr)
+          console.log(self.templateTag)
+        }).catch((err) => {
+          console.log(err)
+        })
+      }
+      asyncGetTemp(self);
+
+      /**
+       * 请求模版数据
+       */
+      ajax.post(
+        '/DocumentTemplate/GetList', {
+            "deptCode": "",
+            "creatorUserId": 0,
+            "id": 0
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+            }
+          }
+        
+        ).then((res) => {
+        console.log('成功了！', typeof res.data.data)
+
+        const templataData = res.data.data;
+
+        // 后端数组转为前端数组
+        const templateArr = templataData.map(this.back2font)
+
+        // 修改templatelist的数据
+        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
+      }).catch((err) => {
+        console.log(err)
+      })
+
       /**
        * 点击编辑区获取聚焦的控制
        */
 
       // 点击聚焦
       this.krcd.addListener('click', function (event) {
+
+        // 将onmousedown开始改变属性改回来（当mode不是design也不是editor时）
+        if((self.modelsData==='EDITOR'||'DESIGN')&&(self.modelsData!=='READONLY')){
+              self.editableArr.forEach(function (item) {
+                item.setAttribute('contenteditable', 'false');
+              })
+            }   
 
         console.log(arguments);
         // 获取ifame中的window
@@ -1913,13 +1952,13 @@
             // 情况1: inCtrl
             self.inCtrl = true; // 为了显示与否服务
             self.inSection = false; // 是否在section中           
-
             self.saveAble = 'ctrlAble'; // 调整工具栏用的
 
             // 情况2: inSectionCtrl,在情况1下的一种特殊情况
             for (let i = 0, arr = arguments[0].path, len = arr.length; i < len; i++) {
               if (arr[i].className === "krcd-ctrl krcd-section") {
-                self.saveAble = 'sectionAble';
+                // self.saveAble = 'sectionAble';
+                self.saveAble = 'ctrlInSection'; // 在section中的ctrl
                 return // 跳出循环
               }
             }
@@ -1967,9 +2006,15 @@
 
       this.krcd.addListener("ready", function () {
         console.log("krcd 初始化完成！");
+        console.log(this)
 
+        // 增加一个遮罩的div
         self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-
+        const shadowDiv = self.iframeWin.document.createElement('div');
+        shadowDiv.style = self.shadowDivStyle;        
+        console.log(self.iframeWin)
+        self.iframeWin.document.querySelector('body').appendChild(shadowDiv);
+        
         // 根据屏幕变化
         window.onresize = function () {
           console.log(window.innerWidth)
@@ -2007,7 +2052,6 @@
           // 默认设定为设计模式
           self.mode(self.modelsData, 0);
 
-
           /***
            * 给编辑器增加鼠标抬起事件
            */
@@ -2022,25 +2066,26 @@
 
             e = e || window.event;
 
-            // e.target = null;
+            console.log(event.path)
             
-            // // 自动聚焦
-            // if(e.target.className ==="krcd-tmp-content"){
-            //     self.autoFocus(this.document.querySelector('.krcd-tmp-content-value'));
-            // }            
-
-            const editableArr = [...this.document.querySelectorAll(".krcd-ctrl[contenteditable='false']")];
+            // 设计模式需要控制
+            self.editableArr = [...this.document.querySelectorAll(".krcd-ctrl[contenteditable='false']")];
             onmousedowning = false;
 
-            onMouseIngTimer = setTimeout(function () {
-              onmousedowning = true // 证明点击已经够久了              
-              self.editableArr = editableArr;
-
-              // 改变editor属性
-              editableArr.forEach(function (item) {
+            // 改变editor属性(DESIGN和EDITOR时控制)
+            if((self.modelsData==='EDITOR'||'DESIGN')&&(self.modelsData!=='READONLY')){
+              self.editableArr.forEach(function (item) {
                 item.setAttribute('contenteditable', 'true');
               })
+            }            
 
+            onMouseIngTimer = setTimeout(function () {
+              onmousedowning = true // 证明点击已经够久了   
+              if((!(self.modelsData==='EDITOR'||'DESIGN'))&&(self.modelsData!=='READONLY')){
+                self.editableArr.forEach(function (item) {
+                  item.setAttribute('contenteditable', 'true');
+                })
+              }                
             }, 200)
 
             this.onmouseup = function (e) {
@@ -2099,18 +2144,27 @@
                   self.saveAble = 'normal';
                 }
 
-                // self.getPositon()
-
-                // 将onmousedown开始改变属性改回来
-                editableArr.forEach(function (item) {
-                  item.setAttribute('contenteditable', 'false');
-                })
-
+                if((!(self.modelsData==='EDITOR'||'DESIGN'))&&(self.modelsData!=='READONLY')){
+                  self.editableArr.forEach(function (item) {
+                    item.setAttribute('contenteditable', 'false');
+                  })
+                }          
+                
               } else {
-                clearTimeout(onMouseIngTimer)                
+                clearTimeout(onMouseIngTimer)   
+                
               }
-            }
 
+              // 将onmousedown开始改变属性改回来
+               if((self.modelsData==='EDITOR'||'DESIGN')&&(self.modelsData!=='READONLY')){
+                  self.editableArr.forEach(function (item) {
+                    item.setAttribute('contenteditable', 'false');
+                  })
+                }    
+              
+            }
+            
+            
           }
 
         }, 1500)
@@ -2136,8 +2190,8 @@
           let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
           if (self.$parent.$refs.setContentInp.value === '') {
-            headerValue.innerHTML = '<p></p>'; // 页头 '<p><br></p>'
-            footerValue.innerHTML = '<p></p>'; // 页脚 '<p><br></p>'
+            headerValue.innerHTML = '<p><br></p>'; // 页头 '<p><br></p>'
+            footerValue.innerHTML = '<p><br></p>'; // 页脚 '<p><br></p>'
             // console.log(headerValue.parentNode.innerHTML.NodeValue);
           } else {
             headerValue.innerHTML = self.headerValue; // 页头
@@ -2149,9 +2203,7 @@
 
       });
 
-
-
-
+     
     },
 
 
@@ -2282,6 +2334,8 @@
 
   .editor-box>div:nth-child(2) {
     flex-grow: 1;
+    /* padding: 0 12px; */
+    background-color: #ececec;
   }
 
   .editor-box>div:nth-child(2)>div:nth-child(1) {

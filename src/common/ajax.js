@@ -1,13 +1,15 @@
 import axios from 'axios';
 import baseUrls from '../../static/baseConfig/baseUrl'
 
-var settings = {
+
+var settings = {    
     baseURL:baseUrls.SetBaseUrl(),
     // baseURL:'http://192.168.1.50:62114/api',
 //   baseURL: 'http://kpjkglwxgl.krmanager.com/api',
   timeout: 3000,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
   }
 }
 

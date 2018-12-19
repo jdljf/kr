@@ -1,49 +1,53 @@
 <template>
-    <el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-width="100px" class="loginForm">
-        <el-form-item label="用户名" prop="user">
-            <el-input v-model.number="loginForm.user" :clearable="true"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="loginForm.pass" autocomplete="off"  :clearable="true"></el-input>
-        </el-form-item>
-        
-        <el-form-item>
-            <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
-            <el-button @click="resetForm('loginForm')">重置</el-button>
-        </el-form-item>
-    </el-form>
+  <el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-width="100px" class="loginForm">
+    <el-form-item label="用户名" prop="username">
+      <el-input v-model.number="loginForm.username" :clearable="true"></el-input>
+    </el-form-item>
+    <el-form-item label="密码" prop="password">
+      <el-input type="password" v-model="loginForm.password" autocomplete="off" :clearable="true"></el-input>
+    </el-form-item>
+
+    <el-form-item>
+      <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
+      <el-button @click="resetForm('loginForm')">重置</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 
 <script>
-// import Router from 'vue-router'
+  import {
+    ajax
+  } from '../common'
+
+
   export default {
     name: "Login",
-    beforeDestroy(){
-        // debugger
+    beforeDestroy() {
+      // debugger
     },
     data() {
-        // 用户名验证
-      var checkUser = (rule, value, callback) => {
+      // 用户名验证
+      var checkuserName = (rule, value, callback) => {
         this.passdisable = true;
-        if (!value) {          
+        if (!value) {
           return callback(new Error('用户名不能为空'));
         }
 
         // setTimeout(() => {
-           // 判断是不是不含中文
-          if (new RegExp(/[\u4e00-\u9fa5]/).test(value)) {
-            callback(new Error('用户名不支持中文字符'));
-          } else if(new RegExp(/\s/).test(value)){
-            callback(new Error('用户名不支持空格'));
-          } else if(new RegExp(/[^\x00-\xff]/).test(value)){
-            callback(new Error('用户名不支持双字节字符'));
-          } else if(new RegExp(/^[1-9^\d#\$\*\+@!%\^&-=]/).test(value)){
-            callback(new Error('用户名必须非数字或特殊符号开头'))
-          } else{
-            this.passdisable = false;
-            callback();
-          }
+        // 判断是不是不含中文
+        if (new RegExp(/[\u4e00-\u9fa5]/).test(value)) {
+          callback(new Error('用户名不支持中文字符'));
+        } else if (new RegExp(/\s/).test(value)) {
+          callback(new Error('用户名不支持空格'));
+        } else if (new RegExp(/[^\x00-\xff]/).test(value)) {
+          callback(new Error('用户名不支持双字节字符'));
+        } else if (new RegExp(/^[1-9^\d#\$\*\+@!%\^&-=]/).test(value)) {
+          callback(new Error('用户名必须非数字或特殊符号开头'))
+        } else {
+          this.passdisable = false;
+          callback();
+        }
         // }, 0);
       };
 
@@ -52,7 +56,7 @@
         if (value === '') {
           callback(new Error('请输入密码'));
         } else {
-          if (this.loginForm.pass !== '') {
+          if (this.loginForm.password !== '') {
             // validateField 对部分表单字段进行校验的方法
             // this.$refs.loginForm.validateField('rightpass');  // 这里是验证与再输入时是否相符的             
           }
@@ -60,63 +64,107 @@
         }
       };
 
-      console.log(this)//config.keyCodes      
-      
+      console.log(this) //config.keyCodes      
+
       return {
         passdisable: true,
 
         // 这里是数据
         loginForm: {
-          user: '',
-          pass: '',          
+          username: '',
+          password: '',
           // 验证用的数组
-          rightpass: {
-            "system":'0000' 
-          }         
+          rightpass:{},
         },
         rules: {
-          pass: [
-            { validator: validatePass, trigger: 'blur' }
-          ],          
-          user: [
-            { validator: checkUser, trigger: 'blur' }
-          ]
+          password: [{
+            validator: validatePass,
+            trigger: 'blur'
+          }],
+          username: [{
+            validator: this.checkUser,
+            trigger: 'blur'
+          }]
         }
       };
     },
-    methods: {       
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {   
-          if (valid){  // 当值验证true
-            if(this.loginForm.rightpass[this.loginForm.user]===this.loginForm.pass){
-              console.log('登录成功');  
-              this.$router.replace({ path: `/home` })
-              return true;
+    methods: {
+      asyncAjax(callback) {
+        const checkUser = async (inputJson)=>{
+          await ajax.post(
+            '/User/Login',
+            /**
+             * {
+                "username": "string",
+                "password": "string"
+                }
+             */
+            JSON.stringify(inputJson) // 传json
+          ).then((res) => {
+            console.log('用户验证成功！', res.data.data)
+            // 转换一下数据
+            const newObj = {};
+            newObj[inputJson["username"]] = inputJson["password"];
+            this.loginForm.rightpass={...newObj};
+            // 设定sessionStorage
+            sessionStorage.setItem('token', res.data.data[0].token);
+            if(callback){
+              callback()
             }
-            this.$message.error('抱歉您输入密码不正确');
-            this.loginForm.pass = '';
-            this.$refs[formName].clearValidate('pass')  // 清空指定pass的验证结果            
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+          }).catch((err) => {
+            console.log(err)
+          })
+        }
+
+        // 正式请求
+        checkUser({
+          "username": this.loginForm.username,
+          "password": this.loginForm.password
+        })
+      },
+      submitForm(formName) {
+        const _this = this;
+        this.asyncAjax(()=>{
+            this.$refs[formName].validate((valid) => {
+                if (valid) { // 当本地验证都输入好
+                  // debugger
+                  if (_this.loginForm.rightpass[_this.loginForm.username] === _this.loginForm.password) {
+                    console.log('登录成功');
+                    _this.$router.push({
+                      path: '/home'
+                    })
+                    _this.loginForm.password = '';
+                    _this.$refs[formName].clearValidate('password') // 清空指定pass的验证结果  
+                    return true;                    
+                  } else{
+                    _this.$message.error('抱歉您输入密码不正确');
+                  }   
+                } else {
+                  _this.$message.error('抱歉您输入密码不正确');
+                  return false;
+                }                   
+            })
+        })
+                
+   
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
       }
     }
   }
+
 </script>
 
 
 <style scoped>
-.loginForm{
-  display:flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 0 80px 10px 20px ;
-  background-color: rgba(255, 255, 255, 0.9); 
-}
+  .loginForm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 80px 10px 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
 </style>
