@@ -64,8 +64,8 @@
             <div class="nav-tools">               
               <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
               <el-button type="primary" size="mini" plain @click="()=>inputName('保存文档模版',saveHtmlContent)">存文档模版</el-button>
-              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="()=>inputName('保存文档段模版',saveCtrl2Widget)">存文档段</el-button>
-              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true">存动态模版</el-button>
+              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="()=>inputName('保存文档段',saveSection2Widget)">存文档段</el-button>
+              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true">存动态模版</el-button>
               <!-- <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button> -->
             </div>
           </el-header>
@@ -239,7 +239,7 @@
         templeCtrl: false, // 整个模版的编辑和删除的控制
         toolsShow: false, // 工具的隐藏
         ableShow: false, // 控制工具消失 
-        shadowDivStyle: "position: absolute;width: 100%;height: 100%;background-color: transparent;", // 遮罩的div的样式
+        shadowDivStyle: "position: absolute;width: 100%;height: 100%;background-color: transparent;z-index:1", // 遮罩的div的样式
         /**
          * 切换模式的数据
          * 1. DESIGN 设计模式；
@@ -574,8 +574,8 @@
           this.$prompt('请输入模版名', name, {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
-            inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,10}$/, // 自己写的
-            inputErrorMessage: '模版名必须大于2不得超过9个字符'
+            inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,17}$/, // 自己写的
+            inputErrorMessage: '模版名必须大于2不得超过16个字符'
           }).then(({
             value
           }) => {
@@ -2012,8 +2012,9 @@
         self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
         const shadowDiv = self.iframeWin.document.createElement('div');
         shadowDiv.style = self.shadowDivStyle;        
-        console.log(self.iframeWin)
-        self.iframeWin.document.querySelector('body').appendChild(shadowDiv);
+        console.log(self.iframeWin.document.querySelector('body'))
+        // self.iframeWin.document.querySelector('html').appendChild(shadowDiv);
+        // self.iframeWin.document.querySelector('body').inserBefore(shadowDiv, self.iframeWin.document.querySelector('body').childNodes[0]);
         
         // 根据屏幕变化
         window.onresize = function () {
