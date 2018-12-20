@@ -191,12 +191,16 @@
              */
             const iframes = document.getElementsByTagName('iframe');             
             const printIframe = Array.prototype.slice.call(iframes,-1);              
-            const printPage = printIframe[0].contentDocument.querySelectorAll('.krcd-panel')[index]
-            let printPageWidth = printPage.offsetWidth;
+            const printPagePanel = printIframe[0].contentDocument.querySelectorAll('.krcd-panel')[index]
+            let printPageWidth = printPagePanel.offsetWidth;
             const shadowDiv = document.createElement('div');
             shadowDiv.style = `display:block;position:absolute;width: 100%;height: 100%;background-color: transparent;left:50%;margin-left:-${printPageWidth/2}px;z-index:1`;
-            printPage.style="position:relative;padding:8px";
-            printPage.insertBefore(shadowDiv,printPage.children[0]);   
+            printPagePanel.style= "position:relative;padding:8px";
+            printPagePanel.insertBefore(shadowDiv,printPagePanel.children[0]);   
+            // krcd-page的contenteditable是true，而刚好遮罩是每页的所以不包含它，需要修改它
+            const printPage = printIframe[0].contentDocument.querySelectorAll('.krcd-page')[index];
+            printPage.setAttribute('contenteditable','false');
+
           }, //渲染后
           scale: 2, //放大比例，默认2倍，越大越清晰，相应的渲染也更慢
           autoPrint: true, //是否默认打开pdfviewer即执行打印操作
