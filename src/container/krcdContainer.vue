@@ -64,8 +64,8 @@
             <div class="nav-tools">               
               <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
               <el-button type="primary" size="mini" plain @click="()=>inputName('保存文档模版',saveHtmlContent)">存文档模版</el-button>
-              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="()=>inputName('保存文档段',saveSection2Widget)">存文档段</el-button>
-              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true">存动态模版</el-button>
+              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="()=>inputName('保存文档段',saveSection2Widget)">存文档段</el-button>
+              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true">存动态元素</el-button>
               <!-- <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button> -->
             </div>
           </el-header>
@@ -438,7 +438,16 @@
                 },
 
               ]
-            },
+            },            
+            // {
+            //   name: '释放控件',
+            //   type: 'BREAK',
+            //   iconCls: 'el-icon-loading',
+            //   // 预留每个类型的字典
+            //   dic: [
+
+            //   ]
+            // },
             {
               name: '文档段',
               type: 'SECTION',
@@ -572,14 +581,13 @@
 
         // 提示输入模版名称弹窗
         inputName: (name, fun) => {
+          debugger
           this.$prompt('请输入模版名', name, {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,17}$/, // 自己写的
             inputErrorMessage: '模版名必须大于2不得超过16个字符'
-          }).then(({
-            value
-          }) => {
+          }).then(({ value }) => {
             this.$message({
               // type: 'success',
               message: value + '  模版，正在保存...'
@@ -1902,36 +1910,69 @@
       })
 
       /**
-       * 请求文档段的类型
-       */ 
+       * 请求模版数据
+       */
       async function asyncGetTemp(self) {
         await ajax.post(
-          '/ParagraphTheme/GetList',
-          '',  // 传空参数
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+          '/DocumentType/GetList', 
+            '',
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+              }
             }
-          }
-        ).then(async (res)=>{
-          console.log('成功了！', res.data.data)
-          // 转换一下数据
-          const newArr = res.data.data.map(function (item) {
-            return { ...item,
-              name: item['theme'],
-              children: [],
-              id: item['id'],
-              hasChild: (Math.random() > 0.5) ? true : false,
-              count: 1
-            }
+          
+          ).then(async (res)=>{
+            console.log('成功了！', res.data.data)
+            // 转换一下数据
+            const newArr = res.data.data.map(function (item) {
+              return { ...item,
+                name: item['typeName'], // 类型名
+                children: [],
+                id: item['id'],
+                hasChild: (Math.random() > 0.5) ? true : false,
+                count: 1
+              }
+            })
+            await self.templateTag.push(...newArr)
+            console.log(self.templateTag)
+          }).catch((err) => {
+            console.log(err)
           })
-          await self.templateTag.push(...newArr)
-          console.log(self.templateTag)
-        }).catch((err) => {
-          console.log(err)
-        })
       }
+
+      /**
+       * 请求文档段的类型
+       */ 
+      // async function asyncGetTemp(self) {
+      //   await ajax.post(
+      //     '/ParagraphTheme/GetList',
+      //     '',  // 传空参数
+      //     {
+      //       headers: {
+      //         'Content-Type': 'application/json',
+      //         'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+      //       }
+      //     }
+      //   ).then(async (res)=>{
+      //     console.log('成功了！', res.data.data)
+      //     // 转换一下数据
+      //     const newArr = res.data.data.map(function (item) {
+      //       return { ...item,
+      //         name: item['theme'],
+      //         children: [],
+      //         id: item['id'],
+      //         hasChild: (Math.random() > 0.5) ? true : false,
+      //         count: 1
+      //       }
+      //     })
+      //     await self.templateTag.push(...newArr)
+      //     console.log(self.templateTag)
+      //   }).catch((err) => {
+      //     console.log(err)
+      //   })
+      // }
       asyncGetTemp(self);      
 
       /**

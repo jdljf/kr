@@ -4,7 +4,7 @@
     <!-- 第一层按钮 -->
     <el-menu default-active="" class="el-menu-vertical" :collapse="isCollapse" v-for="(item,index) in toolBtns" :key="index">
       <!-- el-submenu是含子菜单的菜单项。submenu 子菜单 -->
-      <el-submenu :index="index+1+''" :hide-timeout="0" :show-timeout="0">
+      <el-submenu v-if="item.dic.length!==0" :index="index+1+''" :hide-timeout="0" :show-timeout="0">
         <template slot="title">
           <!-- template中可以用click, 为了点击的区域变大而用样式定位来实现-->
           <div @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`)" style="position: absolute;left: 0;right: 0;">
@@ -49,6 +49,11 @@
                 <el-menu-item index="1-4-1">选项1</el-menu-item>
               </el-submenu> -->
       </el-submenu>
+
+      <el-menu-item v-if="item.dic.length===0" :index="index+1+''" :hide-timeout="0" :show-timeout="0" @click="addCtrl(item.type,item.name, `krcd-${item.type.toLowerCase()}-${index}`)">
+        <i :class="item.iconCls"></i>
+        <span slot="title">{{item.name}}</span>
+      </el-menu-item>     
 
     </el-menu>
   </div>

@@ -158,7 +158,7 @@
     },
     mounted() {
       //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');
-      console.log(UE.getEditor("editor"));
+      
       console.log(ajax);
       var that = this;
       // const printcssSrc = require('@/assets/css/print.css');
@@ -171,6 +171,7 @@
         page_start_num: 1, //页面起始页//默认为1
         print: {
           resettingPrint(opt, viewDom) {
+            that.toolsShow=false;
             return 
           }, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
           resetedPrint(opt, viewDom) {                  
