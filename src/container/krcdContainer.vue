@@ -239,7 +239,8 @@
         templeCtrl: false, // 整个模版的编辑和删除的控制
         toolsShow: false, // 工具的隐藏
         ableShow: false, // 控制工具消失 
-        shadowDivStyle: "position: absolute;width: 100%;height: 100%;background-color: transparent;z-index:1", // 遮罩的div的样式
+        shadowDivStyle: (shadowDivShow)=> {return `position:absolute;width: 100%;height: 100%;background-color: transparent;left:0;top:0;right:0;bottom;${shadowDivShow}`}, // 遮罩的div的样式
+        shadowDiv: null, // 存dom对象
         /**
          * 切换模式的数据
          * 1. DESIGN 设计模式；
@@ -786,6 +787,14 @@
             type: TEXT,
             isDynamic: true, // 是动态元素
           }
+        },
+
+         // 增加一个遮罩的div
+        markShadow:(self)=>{
+            self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+            self.shadowDiv = self.iframeWin.document.createElement('div');
+            self.shadowDiv.style = self.shadowDivStyle('display:none');  
+            self.iframeWin.document.querySelector('html').appendChild(self.shadowDiv);
         }
 
       }
@@ -1688,6 +1697,8 @@
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
               addModeStyle(this.insertStyle, modeStyleDef())
+
+              this.shadowDiv.style = this.shadowDivStyle('display:none');
               break
             case "EDITOR":
               this.ableShow = true;
@@ -1695,6 +1706,8 @@
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
               addModeStyle(this.insertStyle, modeStyleDef())
+
+              this.shadowDiv.style = this.shadowDivStyle('display:none');
               break
             case "STRICT":
               this.ableShow = false;
@@ -1703,12 +1716,16 @@
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
               // this.tabshow.templatelist = false; 
               addModeStyle(this.insertStyle, modeStyleDef())
+
+              this.shadowDiv.style = this.shadowDivStyle('display:none');
               break
             case "READONLY":
               this.ableShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
-              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';              
+              this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';     
+              
+              this.shadowDiv.style = this.shadowDivStyle('display:block');
 
               // this.tabshow.templatelist = false; 
               // 插对应的模版样式
@@ -1854,6 +1871,35 @@
 
       const self = this;
 
+      /**
+       * 请求模版数据
+       */
+      ajax.post(
+        '/DocumentTemplate/GetList', {
+            "deptCode": "",
+            "creatorUserId": 0,
+            "id": 0
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
+            }
+          }
+        
+        ).then((res) => {
+        console.log('成功了！', typeof res.data.data)
+
+        const templataData = res.data.data;
+
+        // 后端数组转为前端数组
+        const templateArr = templataData.map(this.back2font)
+
+        // 修改templatelist的数据
+        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
+      }).catch((err) => {
+        console.log(err)
+      })
 
       /**
        * 请求文档段的类型
@@ -1886,37 +1932,7 @@
           console.log(err)
         })
       }
-      asyncGetTemp(self);
-
-      /**
-       * 请求模版数据
-       */
-      ajax.post(
-        '/DocumentTemplate/GetList', {
-            "deptCode": "",
-            "creatorUserId": 0,
-            "id": 0
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
-            }
-          }
-        
-        ).then((res) => {
-        console.log('成功了！', typeof res.data.data)
-
-        const templataData = res.data.data;
-
-        // 后端数组转为前端数组
-        const templateArr = templataData.map(this.back2font)
-
-        // 修改templatelist的数据
-        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
-      }).catch((err) => {
-        console.log(err)
-      })
+      asyncGetTemp(self);      
 
       /**
        * 点击编辑区获取聚焦的控制
@@ -2007,14 +2023,8 @@
       this.krcd.addListener("ready", function () {
         console.log("krcd 初始化完成！");
         console.log(this)
-
-        // 增加一个遮罩的div
-        self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-        const shadowDiv = self.iframeWin.document.createElement('div');
-        shadowDiv.style = self.shadowDivStyle;        
-        console.log(self.iframeWin.document.querySelector('body'))
-        // self.iframeWin.document.querySelector('html').appendChild(shadowDiv);
-        // self.iframeWin.document.querySelector('body').inserBefore(shadowDiv, self.iframeWin.document.querySelector('body').childNodes[0]);
+       
+        self.markShadow(self);        
         
         // 根据屏幕变化
         window.onresize = function () {

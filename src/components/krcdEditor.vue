@@ -161,6 +161,8 @@
       console.log(UE.getEditor("editor"));
       console.log(ajax);
       var that = this;
+      // const printcssSrc = require('@/assets/css/print.css');
+      // console.log(printcssSrc)
       this.krcd = new KRCD({
         el: this.$refs.editor,
         // el: editor,
@@ -169,23 +171,37 @@
         page_start_num: 1, //页面起始页//默认为1
         print: {
           resettingPrint(opt, viewDom) {
-            return `<p><br></p>`
+            return 
           }, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
-          resetedPrint(opt, viewDom) {
-            return `<p><br></p>`
+          resetedPrint(opt, viewDom) {                  
+            return 
           }, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
           renderHeader(index, page) {
-            return that.headerValue.innerHTML
+            return that.headerValue
           }, //返回要渲染的页眉。默认从零开始
           renderFooter(index, page) {
             return `<div style="line-height:20px;font-size:12px"><center>第${index + 1}页<center></div>`;
           }, //返回要渲染的页脚。默认从零开始
-          renderedHeader(index, count, page, header) {}, //渲染后
-          renderedFooter(index, count, page, footer) {}, //渲染后
+          renderedHeader(index, count, page, header) {
+           
+          }, //渲染后
+          renderedFooter(index, count, page, footer) {     
+            /**
+             * 每页增加一个遮罩层
+             */
+            const iframes = document.getElementsByTagName('iframe');             
+            const printIframe = Array.prototype.slice.call(iframes,-1);              
+            const printPage = printIframe[0].contentDocument.querySelectorAll('.krcd-panel')[index]
+            let printPageWidth = printPage.offsetWidth;
+            const shadowDiv = document.createElement('div');
+            shadowDiv.style = `display:block;position:absolute;width: 100%;height: 100%;background-color: transparent;left:50%;margin-left:-${printPageWidth/2}px;z-index:1`;
+            printPage.style="position:relative;padding:8px";
+            printPage.insertBefore(shadowDiv,printPage.children[0]);   
+          }, //渲染后
           scale: 2, //放大比例，默认2倍，越大越清晰，相应的渲染也更慢
           autoPrint: true, //是否默认打开pdfviewer即执行打印操作
           isDownload: false, //是否下载，如果为true，则不再打开pdfviewer页面
-          fileName: "KRCD 测试打印", //如果isDownload=true时的pdf文件下载名称
+          fileName: "康软高级打印", //如果isDownload=true时的pdf文件下载名称
           pageMode: "A4", //页面模式:A3|A4|A5 ……
           width: 794, //以下默认值
           height: 1123,
@@ -196,13 +212,15 @@
           printMode: "normal", //打印模式：normal|neat|revise|comment
           ctrlMode: "remove", //控件模式：normal|hidden|remove
           printDirection: "vertical", //打印方向 vertical|horizontal
-          printCssUrl: null, //打印的样式表，可以是string，也可以是array
-          printJsUrl: null //打印的js，可以是string，也可以是array
+          printCssUrl: ['../static/krcdEditor/css/print.css',]
+          , //打印的样式表，可以是string，也可以是array
+          printJsUrl: null // ['../static/krcdEditor/js/print.js',] 
+          //打印的js，可以是string，也可以是array
         },
         user: {
           //主要用于修订
-          name: "krcd", //必须有name，用来判断是否是本人修改
-          displayname: "KRCD默认用户56465465465" //支持扩展，但displayname 为必有项
+          name: "系统管理员", //必须有name，用来判断是否是本人修改
+          displayname: "system" //支持扩展，但displayname 为必有项
         },
         ctrl_remote_handle: function (data) {
           //这里可以处理url，对url进行再加工。比如重置data.url值

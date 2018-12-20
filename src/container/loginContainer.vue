@@ -18,7 +18,7 @@
 <script>
 import Login from '../components/Login';
 
-const src = require('../assets/img/login.png');
+const src = require('../assets/img/login.jpg');
 const logo = require('../assets/img/logo.png');
 
 export default {  
