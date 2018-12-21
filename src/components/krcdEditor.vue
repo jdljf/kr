@@ -6,6 +6,7 @@
   import "../../static/krcdEditor/ueditor/ueditor.all.min.js";
   import "../../static/krcdEditor/ueditor/lang/zh-cn/zh-cn.js";
   import "../../static/krcdEditor/js/krcd-ie8-design.js";
+  import {dataUtils} from '../common'
   import {
     ajax
   } from "../common";
@@ -151,6 +152,51 @@
             }
           }
         });
+      },
+      //打印的所有页码
+      pageNum(index,num){
+            var iframeWrap=document.getElementsByClassName("%%-iframe")[0].contentWindow;
+            // console.log(iframeWrap.contentWindow.document.getElementsByClassName("krcd-page").length)
+            var pageCode=iframeWrap.document.getElementsByClassName("page-num")[0];
+            pageCode.innerHTML=num;
+            
+            if(index+1==num){
+              var pages=iframeWrap.document.getElementsByClassName("krcd-page");
+              function scrollFun(){
+                
+                var pagesLen=pages.length;
+                for(var i=0;i<pagesLen;i++){
+                  if(pages[i].getBoundingClientRect().y>0 && pages[i].getBoundingClientRect().y<iframeWrap.document.documentElement.clientHeight/2){
+                    
+                    iframeWrap.document.getElementsByClassName("pageItemInp")[0].value=i+1;
+                  }
+                }
+                //  console.log(iframeWrap.document.getElementsByClassName("krcd-page")[1].getBoundingClientRect().y)
+                
+              }
+              //侦听滚动条
+              iframeWrap.document.getElementsByClassName("krcdcontent")[0].addEventListener("scroll",scrollFun);
+              //页码输入框的回车跳转页码
+              function keyFun(){
+                
+              }
+              iframeWrap.document.getElementsByClassName("pageItemInp")[0].addEventListener("keyup",function(e){
+                var numCode=e.target.value;
+                if(numCode>num){
+                  numCode=num;
+                  e.target.value=num;
+                }
+                if(dataUtils.checkRate(numCode)){
+                  if(e.keyCode==13){
+                    iframeWrap.document.getElementsByClassName("krcdcontent")[0].scrollTop=(pages[0].offsetHeight+10)*(Number(numCode)-1);
+                  }
+                }
+                
+              })
+            }
+
+
+            // iframeWrap.document.documentElement.clientHeight
       }
     },
     created() {
@@ -181,7 +227,10 @@
             return `<div style="line-height:20px;font-size:12px"><center>第${index + 1}页<center></div>`;
           }, //返回要渲染的页脚。默认从零开始
           renderedHeader(index, count, page, header) {}, //渲染后
-          renderedFooter(index, count, page, footer) {}, //渲染后
+          renderedFooter(index, count, page, footer) {
+            that.pageNum(index,count)
+            
+          }, //渲染后
           scale: 2, //放大比例，默认2倍，越大越清晰，相应的渲染也更慢
           autoPrint: true, //是否默认打开pdfviewer即执行打印操作
           isDownload: false, //是否下载，如果为true，则不再打开pdfviewer页面
