@@ -42,4 +42,5 @@ export const ajax={
     put(url,data,options){
         return request("put",url,data,options);
     },
+    request: request
 }

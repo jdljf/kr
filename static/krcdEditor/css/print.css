@@ -1,0 +1,38 @@
+  .krcd-ctrl{
+    display: inline;
+    background-color: transparent !important;
+  }
+  
+  .krcd-ctrl:after{
+    color: transparent  !important;
+    content: attr(krcd-right);
+    font-weight: bold;
+    position: relative;
+    bottom: -2px;
+  }
+  
+  .krcd-ctrl>.krcd-value:before,.krcd-ctrl>.krcd-revise>.krcd-value-revise:before {
+    color: transparent  !important;
+    padding-right: 3px;
+    content: attr(krcd-left);
+  }
+  
+  .krcd-ctrl>.krcd-value:after,.krcd-ctrl>.krcd-revise>.krcd-value-revise:after {
+    color: transparent  !important;
+    padding-left: 3px;
+    content: attr(krcd-right);
+  }
+  
+  .krcd-warning {
+    background-color: transparent  !important;
+    color: transparent  !important;
+  }
+  
+  .krcd-ctrl.krcd-section {
+    box-sizing: border-box;
+    border: 1px transparent dotted  !important;
+  }
+
+  .krcd-tmp-header, .krcd-tmp-footer{
+      display:none
+  }

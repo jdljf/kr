@@ -10,6 +10,7 @@
   import {
     ajax
   } from "../common";
+  import axios from 'axios';
 
   export default {
     name: "krcdEditor",
@@ -203,10 +204,11 @@
       console.log("krcd components created.");
     },
     mounted() {
-      //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');
-      console.log(UE.getEditor("editor"));
+      //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');      
       console.log(ajax);
       var that = this;
+      // const printcssSrc = require('@/assets/css/print.css');
+      // console.log(printcssSrc)
       this.krcd = new KRCD({
         el: this.$refs.editor,
         // el: editor,
@@ -215,13 +217,16 @@
         page_start_num: 1, //页面起始页//默认为1
         print: {
           resettingPrint(opt, viewDom) {
-            return `<p><br></p>`
+            that.toolsShow=false;
+            return 
           }, //默认重置（包括首次设置）打印页面前触发。优先级高于render系列函数
-          resetedPrint(opt, viewDom) {
-            return `<p><br></p>`
+          resetedPrint(opt, viewDom) {                  
+            return 
           }, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
           renderHeader(index, page) {
-            return that.headerValue.innerHTML
+            // debugger
+            console.log(that.headerValue)
+            return that.headerValue
           }, //返回要渲染的页眉。默认从零开始
           renderFooter(index, page) {
             return `<div style="line-height:20px;font-size:12px"><center>第${index + 1}页<center></div>`;
@@ -229,12 +234,26 @@
           renderedHeader(index, count, page, header) {}, //渲染后
           renderedFooter(index, count, page, footer) {
             that.pageNum(index,count)
-            
+            /**
+             * 每页增加一个遮罩层
+             */
+            const iframes = document.getElementsByTagName('iframe');             
+            const printIframe = Array.prototype.slice.call(iframes,-1);              
+            const printPagePanel = printIframe[0].contentDocument.querySelectorAll('.krcd-panel')[index]
+            let printPageWidth = printPagePanel.offsetWidth;
+            const shadowDiv = document.createElement('div');
+            shadowDiv.style = `display:block;position:absolute;width: 100%;height: 100%;background-color: transparent;left:50%;margin-left:-${printPageWidth/2}px;z-index:1`;
+            printPagePanel.style= "position:relative;padding:8px";
+            printPagePanel.insertBefore(shadowDiv,printPagePanel.children[0]);   
+            // krcd-page的contenteditable是true，而刚好遮罩是每页的所以不包含它，需要修改它
+            const printPage = printIframe[0].contentDocument.querySelectorAll('.krcd-page')[index];
+            printPage.setAttribute('contenteditable','false');
+
           }, //渲染后
           scale: 2, //放大比例，默认2倍，越大越清晰，相应的渲染也更慢
           autoPrint: true, //是否默认打开pdfviewer即执行打印操作
           isDownload: false, //是否下载，如果为true，则不再打开pdfviewer页面
-          fileName: "KRCD 测试打印", //如果isDownload=true时的pdf文件下载名称
+          fileName: "康软高级打印", //如果isDownload=true时的pdf文件下载名称
           pageMode: "A4", //页面模式:A3|A4|A5 ……
           width: 794, //以下默认值
           height: 1123,
@@ -245,18 +264,47 @@
           printMode: "normal", //打印模式：normal|neat|revise|comment
           ctrlMode: "remove", //控件模式：normal|hidden|remove
           printDirection: "vertical", //打印方向 vertical|horizontal
-          printCssUrl: null, //打印的样式表，可以是string，也可以是array
-          printJsUrl: null //打印的js，可以是string，也可以是array
+          printCssUrl: ['../static/krcdEditor/css/print.css',]
+          , //打印的样式表，可以是string，也可以是array
+          printJsUrl: null // ['../static/krcdEditor/js/print.js',] 
+          //打印的js，可以是string，也可以是array
         },
         user: {
           //主要用于修订
-          name: "krcd", //必须有name，用来判断是否是本人修改
-          displayname: "KRCD默认用户56465465465" //支持扩展，但displayname 为必有项
+          name: "系统管理员", //必须有name，用来判断是否是本人修改
+          displayname: "system" //支持扩展，但displayname 为必有项
         },
-        ctrl_remote_handle: function (data) {
+        ctrl_remote_handle: function (remotedata) {
           //这里可以处理url，对url进行再加工。比如重置data.url值
           //data.url='static/krcdEditor/'+data.url;
-          return data;
+          // debugger
+          //   // ajax.request(
+          //   //   remotedata.method,
+          //   //   remotedata.url,
+          //   //   remotedata.data? remotedata:{}, 
+          //   //   {
+          //   //     baseURL:'http://localhost:8080'
+          //   //     },
+          //   // ).then((res)=>{             
+          //   //   console.log(res)
+          //   //   return res
+          //   // }).catch((err)=>{
+          //   //   console.log(err)
+          //   // })
+
+          //   axios.get('/douban/movie/top250', {
+          //       // params: {
+          //       //   // ID: 12345
+          //       // }
+          //     })
+          //     .then(function (response) {
+          //       console.log(response);
+          //     })
+          //     .catch(function (error) {
+          //       console.log(error);
+          //     });
+          
+          
         },
         default_open_toolbar: "krcd-toolbar-editor", //默认打开的toolbar的集合，如果不填，默认使用第一个集合
         toolbars: [{
