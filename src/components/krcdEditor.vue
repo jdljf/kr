@@ -178,6 +178,8 @@
             return 
           }, //默认重置（包括首次设置）打印页面后触发。优先级高于render系列函数
           renderHeader(index, page) {
+            // debugger
+            console.log(that.headerValue)
             return that.headerValue
           }, //返回要渲染的页眉。默认从零开始
           renderFooter(index, page) {

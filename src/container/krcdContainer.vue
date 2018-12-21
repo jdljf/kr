@@ -2184,16 +2184,16 @@
                 // 通过抬起来判断是否在section中，而不能用click的arguments来判断
                 let isInSection = (e) => {
                   for (let i = 0, arr = e.path, len = arr.length; i < len; i++) {
-                    if (arr[i].className === "krcd-ctrl krcd-section") { // 判断是否停在section中                          
+                    if (arr[i].className === "krcd-ctrl krcd-section" || arr[i].tagName === "TABLE"||arr[i].tagName === "TBODY"||arr[i].tagName === "TH"||arr[i].tagName === "TR"||arr[i].tagName === "TD" ) { // 判断是否停在section中，后来增加表格                          
                       return true
                     }
                   }
                   return false
                 }
 
-                if (isInSection === true) {
+                if (isInSection(e) === true) {
                   self.$message({
-                    message: '选择区域含有文档段内容，请点选空白处插入内容',
+                    message: '选择区域含有文档段或表格内容，请点选空白处插入内容',
                     type: 'warning'
                   });
                   self.saveAble = null;
@@ -2248,9 +2248,15 @@
           self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
           console.log(self.$parent.$refs.setContentInp.value);
 
-          // // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。(导致问题一直刷新)
-          // const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-          // self.iframeWin = iframeWin;
+          // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
+          const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+          self.iframeWin = iframeWin;
+
+          /**
+           * 因为打印的时候貌似要清空header和footer所以要避免这个
+           */
+          // self.headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+          // self.footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
           // let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
           // let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
@@ -2259,7 +2265,8 @@
           //   headerValue.innerHTML = '<p><br></p>'; // 页头 '<p><br></p>'
           //   footerValue.innerHTML = '<p><br></p>'; // 页脚 '<p><br></p>'
           //   // console.log(headerValue.parentNode.innerHTML.NodeValue);
-          // } else {
+          // } 
+          // else {
           //   headerValue.innerHTML = self.headerValue; // 页头
           //   footerValue.innerHTML = self.footerValue; // 页脚
           // }
