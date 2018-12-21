@@ -10,16 +10,12 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    // proxyTable: {
-    //   '/douban': {
-    //     target: 'http://api.douban.com/v2',// 有使用次数限制
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       '^/douban': ''
-    //     }
-    // },
+    proxyTable: {
+      '/data/': 'http://localhost:8080/static/krcdEditor/' //tlzzu for 设置异步请求代码
+    },
+
     // Various Dev Server settings
-    host: '192.168.1.49', // can be overwritten by process.env.HOST
+    host: '0.0.0.0', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,

@@ -2248,7 +2248,7 @@
           self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
           console.log(self.$parent.$refs.setContentInp.value);
 
-          // // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
+          // // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。(导致问题一直刷新)
           // const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
           // self.iframeWin = iframeWin;
 
