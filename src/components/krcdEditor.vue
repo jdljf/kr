@@ -9,6 +9,7 @@
   import {
     ajax
   } from "../common";
+  import axios from 'axios';
 
   export default {
     name: "krcdEditor",
@@ -157,8 +158,7 @@
       console.log("krcd components created.");
     },
     mounted() {
-      //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');
-      
+      //alert('新增扩展toolbar示例，详见krcdEditor.vue组件!');      
       console.log(ajax);
       var that = this;
       // const printcssSrc = require('@/assets/css/print.css');
@@ -227,10 +227,37 @@
           name: "系统管理员", //必须有name，用来判断是否是本人修改
           displayname: "system" //支持扩展，但displayname 为必有项
         },
-        ctrl_remote_handle: function (data) {
+        ctrl_remote_handle: function (remotedata) {
           //这里可以处理url，对url进行再加工。比如重置data.url值
           //data.url='static/krcdEditor/'+data.url;
-          return data;
+          // debugger
+          //   // ajax.request(
+          //   //   remotedata.method,
+          //   //   remotedata.url,
+          //   //   remotedata.data? remotedata:{}, 
+          //   //   {
+          //   //     baseURL:'http://localhost:8080'
+          //   //     },
+          //   // ).then((res)=>{             
+          //   //   console.log(res)
+          //   //   return res
+          //   // }).catch((err)=>{
+          //   //   console.log(err)
+          //   // })
+
+          //   axios.get('/douban/movie/top250', {
+          //       // params: {
+          //       //   // ID: 12345
+          //       // }
+          //     })
+          //     .then(function (response) {
+          //       console.log(response);
+          //     })
+          //     .catch(function (error) {
+          //       console.log(error);
+          //     });
+          
+          
         },
         default_open_toolbar: "krcd-toolbar-editor", //默认打开的toolbar的集合，如果不填，默认使用第一个集合
         toolbars: [{

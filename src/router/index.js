@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import index from '../view/index'
 import loginContainer from '../container/loginContainer'
-// import CommitTable from '../components/CommitTable'
+import Tag from '../components/Tag'
 
 Vue.use(Router)
 
@@ -23,10 +23,10 @@ export default new Router({
     name: 'home',
     component: index, 
   },  
-  // {
-  //   path: '/commit',
-  //   name: 'CommitTable',
-  //   component: CommitTable
-  // }
+  {
+    path: '/tag',
+    name: 'Tag',
+    component: Tag
+  }
 ]
 })

@@ -465,7 +465,7 @@
                     // `${ctrlStyle}
                     // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
                     // `
-                  }, null, self.selectedHtml),
+                  }, null, self.selectedHtml,self.selectedText),
                   date: "",
                 }] // 组项目
               }, ]
@@ -581,13 +581,14 @@
 
         // 提示输入模版名称弹窗
         inputName: (name, fun) => {
-          debugger
+          
           this.$prompt('请输入模版名', name, {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,17}$/, // 自己写的
             inputErrorMessage: '模版名必须大于2不得超过16个字符'
           }).then(({ value }) => {
+            debugger
             this.$message({
               // type: 'success',
               message: value + '  模版，正在保存...'
@@ -634,7 +635,8 @@
             content: docContent.htmlContent,
             scope: '全院',
             discribe: '描述', // 描述
-            tag: docContent.tag, // 模版类型
+            tag: docContent.tag, // 模版类型            
+            themeId: 0,   // 描述的id  
             // date: funs.nowtime(),          // 应该以后台返回数据为准
           }
 
@@ -755,6 +757,7 @@
 
         // 请求接口
         ajaxFunTemp: (type, content, successMsg, sucessFun = () => {}) => {
+          debugger
           console.log(content)
           return ajax.post(
             `${type}`,
@@ -942,6 +945,7 @@
           'elementDesc': newItem.describe,
           'command': newItem.command,
           'typeId': newItem.classified,
+          'themeId': newItem.themeId   // 描述的id只能单选，默认为0
         }
       },
 
@@ -958,18 +962,21 @@
           tag: newItem.tag,
           command: newItem.command,
           classified: newItem.typeId,
+          themeId: newItem.themeId   // 描述的id只能单选，默认为0
         }
       },
 
       // 保存文档段为控件
       saveSection2Widget(itemName = "文档段模版", callback = () => {}) {
+
         let target;
-        if (this.tarEl.className.indexOf('krcd-value') !== -1 && this.tarEl.parentNode.className.indexOf(
-            'krcd-ctrl krcd-section') !== -1) {
-          target = this.tarEl.parentNode
-        } else if (this.tarEl.className.indexOf('krcd-ctrl krcd-section') !== -1) {
-          target = this.tarEl
-        }
+        this.args[0].path.forEach((item,index)=>{
+            if(item.className === 'krcd-ctrl krcd-section'){
+              target = item;
+              return 
+            }
+        })
+
         const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document;
 
         // 克隆dom内容，移动到临时创建的div
@@ -990,13 +997,13 @@
 
         // 创建需要存到模版的对象
         const newItem = {
-          name: target.id,
+          name: itemName,   // 模版名字
           id: target.id,
           styleString: headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
           content: htmlContent,
           scope: '全院',
           discribe: '描述', // 描述
-          date: funs.nowtime(), //  存起来保存时间
+          date: funs.nowtime(), //  存起来保存时间          
         }
 
         // 将模版push到widgetlist数组中
@@ -1005,13 +1012,14 @@
         // 保存到localStorage
         localStorage.setItem('widget', JSON.stringify(this.widgetlist))
 
-        // this.saveSuccess('组件');
-
         // 将原来的转为接口的格式
         const postData = this.font2back(newItem)
 
-        this.ajaxFunTemp('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
-          this.templatelist.push(newItem);
+        debugger
+        
+        // 接口保存
+        this.ajaxFunTemp('/ParagraphTemplate/Save', postData, `${itemName}组件，保存成功`, () => {
+          this.widgetlist.push(newItem);
         });
 
         return callback()
@@ -1138,7 +1146,8 @@
           "strictverify": 0, //是否强制校验（不符合要求既不允许输入），默认为0不强制校验
           "verify": "", //验证输入是否符合要求，可自己定义表达式
           "required": 0, //是否必填
-          "desc": desc.length !== 0 ? desc : "文本", //控件描述值
+          "desc": desc.length !== 0 ? desc : "文本控件", //控件描述值
+          "descNEW":  desc.length !== 0 ? desc : "文本控件",
         })
 
         return {
@@ -1185,7 +1194,8 @@
           "strictverify": 0, //强制校验
           "required": 0, //是否必填
           "multi": 0, //是否多选，默认0为单选，1为多选
-          "desc": desc.length !== 0 ? desc : "下拉", //描述值
+          "desc": desc.length !== 0 ? desc : "下拉控件", //描述值
+          "descNEW":  desc.length !== 0 ? desc : "下拉控件",
           "bindingdata": bindingdata,
           // 下放注释预留请求接口用的
 
@@ -1236,7 +1246,8 @@
           "mode": "EDITOR", //当前模式
           "notdel": 0, //不许删除
           "strictverify": 0, //强制校验
-          "desc": desc.length !== 0 ? desc : "单选", //描述值
+          "desc": desc.length !== 0 ? desc : "单选控件", //描述值
+          "descNEW":  desc.length !== 0 ? desc : "单选控件",
           "required": 0, // 必须的
           "strictverify": 0, // 严格模式
           "multi": 1,
@@ -1317,7 +1328,8 @@
           "mode": "EDITOR", //当前模式
           "notdel": 0, //不许删除
           "strictverify": 0, //强制校验
-          "desc": desc.length !== 0 ? desc : "多选", //描述
+          "desc": desc.length !== 0 ? desc : "多选控件", //描述
+          "descNEW":  desc.length !== 0 ? desc : "多选控件",
           "bindingdata": desc.length !== 0 ? [{
             "value": "0",
             "label": desc,
@@ -1337,12 +1349,12 @@
             }
           ],
           // "remotedata":{//krcd v4的异步请求采用目前主流的axios，remotedata为发起异步请求时的配置项目
-          //     "url":"",//这里建议配置初始化KRCD时options中的ctrl_remote_handle一起用，因为存在你设置模板跟你打开模板时当前路径不一致的情况，导致如果用相对路径会出错的情况（如果用绝对路径也会存在换一家医院实施所有模板都需要改的情况）。故所有控件中的异步请求数据在发起请求前都会调用options.ctrl_remote_handle方法进行处理（也可以加一些权限控制）
+          //     "url":"/douban/movie/top250", //这里建议配置初始化KRCD时options中的ctrl_remote_handle一起用，因为存在你设置模板跟你打开模板时当前路径不一致的情况，导致如果用相对路径会出错的情况（如果用绝对路径也会存在换一家医院实施所有模板都需要改的情况）。故所有控件中的异步请求数据在发起请求前都会调用options.ctrl_remote_handle方法进行处理（也可以加一些权限控制）
           //     "method":"get",
-          //     "headers":{
-          //     },
-          //     "data":{
-          //     }
+          //     // "headers":{
+          //     // },
+          //     // "data":{
+          //     // }
           // }
         })
 
@@ -1386,7 +1398,8 @@
           "notdel": 0, //是否可以删除
           "strictverify": 0, //是否强制校验
           "required": 0, //是否必填
-          "desc": desc.length !== 0 ? desc : "日历", //描述
+          "desc": desc.length !== 0 ? desc : "日历控件", //描述
+           "descNEW":  desc.length !== 0 ? desc : "日历控件",
           "defvalue": funs.timestampToTime(Math.round(new Date().getTime() / 1000)), //默认值
           "format": "{yyyy}-{MM}-{dd} {hh}:{mm}:{ss}", //格式化要求。必须以大括号包裹。
           "min": "", //最小日期
@@ -1519,7 +1532,7 @@
               // `${ctrlStyle}
               // ;display:inline-block;position:relative;padding:4px;margin-top:20px;background-color:#006ffc14;border-width:1px;border-style:solid;border-color:#006ffc7d;margin-top:4px;box-sizing:border-box
               // `
-            }, Opt, selectedHtml).newDiv
+            }, Opt, selectedHtml, selectedText).newDiv
             break
           case 'WIDGET':
             if (this.inSection === true) {
@@ -1555,14 +1568,13 @@
         headerTag.appendChild(styleDOM);
 
         if (type !== "WIDGET" && type !== "CTRLS" && type !== "PASTE" && type !== "CLOSE") {
-          console.log(newDiv)
+          
           this.krcd.insertControl(
             newDiv.getCtrlElement(), //  获取会对应的Element
             newDiv.getOpt() //  获取会对应的opt
           )
         }
         // 插入后隐藏工具条
-        // this.onOff = {...this.off}  
         this.saveAble = null; // 有一个渐变的的问题
 
       },
@@ -1572,7 +1584,7 @@
         ctrlId: null,
         ctrlName: null,
         ctrlStyle: null,
-      }, defOpt, selectedHtml) {
+      }, defOpt, selectedHtml, selectedText) {
         let div = document.createElement('div');
         // debugger
         div.innerHTML =
@@ -1581,7 +1593,8 @@
 
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "originalmode": "EDITOR", //原始模式
-          "desc": selectedHtml ? selectedHtml : '', //描述
+          "desc": selectedHtml ?  selectedHtml : '', //描述
+          "descNEW":  selectedText ?  selectedText : '', 
         })
 
         return {
@@ -1693,7 +1706,7 @@
             let headerTag = innerDoc.getElementsByTagName('head')[0];
             let styleDOM = innerDoc.createElement('style');
 
-            console.log(typeof insertStyle)
+            // console.log(typeof insertStyle)
             insertStyle('modename', innerDoc, modeStyle);
           }
 
@@ -1879,6 +1892,7 @@
 
       const self = this;
 
+      
       /**
        * 请求模版数据
        */
@@ -2224,9 +2238,9 @@
         // 将改变内容的监听放到加载后
         this.addListener("contentchange", function () {
           console.log("内容改变了");
-          console.log(self.$parent.$refs)
+          // console.log(self.$parent.$refs)
 
-          console.log(self)
+          // console.log(self)
           // debugger
 
           const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
@@ -2234,21 +2248,21 @@
           self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
           console.log(self.$parent.$refs.setContentInp.value);
 
-          // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
-          const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
-          self.iframeWin = iframeWin;
+          // // 为了保证清空时取消保留原来页眉页脚的数据，以及确认后清空。
+          // const iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
+          // self.iframeWin = iframeWin;
 
-          let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
-          let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
+          // let headerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
+          // let footerValue = self.iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
-          if (self.$parent.$refs.setContentInp.value === '') {
-            headerValue.innerHTML = '<p><br></p>'; // 页头 '<p><br></p>'
-            footerValue.innerHTML = '<p><br></p>'; // 页脚 '<p><br></p>'
-            // console.log(headerValue.parentNode.innerHTML.NodeValue);
-          } else {
-            headerValue.innerHTML = self.headerValue; // 页头
-            footerValue.innerHTML = self.footerValue; // 页脚
-          }
+          // if (self.$parent.$refs.setContentInp.value === '') {
+          //   headerValue.innerHTML = '<p><br></p>'; // 页头 '<p><br></p>'
+          //   footerValue.innerHTML = '<p><br></p>'; // 页脚 '<p><br></p>'
+          //   // console.log(headerValue.parentNode.innerHTML.NodeValue);
+          // } else {
+          //   headerValue.innerHTML = self.headerValue; // 页头
+          //   footerValue.innerHTML = self.footerValue; // 页脚
+          // }
 
 
         });

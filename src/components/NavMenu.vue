@@ -111,17 +111,11 @@
       },
       // 点击插入对应字典
       addDic(item) {
-        console.log(item)
-        // 调用对应的插入方法
-        // this.self.krcd.execCommand('inserthtml',item)
-        // this.self.onOff = {...this.self.off};
-
-        console.log(item.newDiv.getCtrlElement().innerHTML)
+        
         this.self.krcd.insertControl(
           item.newDiv.getCtrlElement(), //  获取会对应的Element
           item.newDiv.getOpt() //  获取会对应的opt
         )
-
         this.self.saveAble = null; // 改变工具的状态为默认值
       },
 
