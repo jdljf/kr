@@ -8,20 +8,23 @@
                 <i :class="`circle circle-${item.clsType}`">
                     <span>{{returnProps(item.list).length}}</span>
                 </i>
-            </span> 
+            </span>             
             <Template
-                :index="index"
-                :templeCtrl="templeCtrl" 
-                :list="returnProps(item.list)"
-                :fun="returnProps(item.fun)"   
-                :savetemple="savetemplefun" 
-                :savewidget="savewidgetfun" 
-                :savectrl="savectrlfun" 
-                :ajaxtemple="ajaxtemple" 
-                :back2font="back2font" 
-                :getHtmlContent="getHtmlContent">
-                <!-- <MsgShow htmlContent="房间看了电视剧发看了电视剧"></MsgShow> -->
+                    :index="index"
+                    :templeCtrl="templeCtrl" 
+                    :list="returnProps(item.list)"
+                    :fun="returnProps(item.fun)"   
+                    :savetemple="savetemplefun" 
+                    :savewidget="savewidgetfun" 
+                    :savectrl="savectrlfun" 
+                    :ajaxtemple="ajaxtemple" 
+                    :back2font="back2font" 
+                    :getHtmlContent="getHtmlContent"
+                    :getClickHtmlContent="getClickHtmlContent"
+                    :templatehtmlContent="templatehtmlContent"
+                    >
             </Template>
+           
             <!-- 这里就是内容部分 -->
         </el-tab-pane>
         <!-- <el-tab-pane style="padding:0" v-show="tabshow.widgetlist">
@@ -61,21 +64,21 @@
 import Widgets from '../components/Widgets';
 import Template from '../components/Template';
 import Tree from '../components/Tree';
-import MsgShow from '../components/MsgShow'
 
 export default {
     data(){
         return{
+            htmlContent: '',
             returnProps:function(key){
                 return this[key]
             },
+            
         }
     },
     components:{
         Widgets,
         Template,
         Tree,
-        MsgShow
     },
     // 设置来纯粹做传递属性的
     props:{
@@ -94,6 +97,8 @@ export default {
         back2font: Function,
         getHtmlContent: Function,
         tabsArray: Array,
+        getClickHtmlContent: Function,
+        templatehtmlContent: String
     },
     mounted(){        
         // debugger

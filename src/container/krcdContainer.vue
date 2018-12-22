@@ -25,8 +25,10 @@
               <!-- 病人信息和文档信息 -->
             </FileList>
           </el-aside>
-
+        
           <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
+
+         
 
         </el-container>
 
@@ -71,12 +73,18 @@
           </el-header>
           <!-- <Widgets :list="widgetlist" :fun="insert"/> -->
           <!-- <Models :list="widgetlist" :fun="insert"/> -->
-          <tabContainer :tabsArray="tabsArray" :templeCtrl="templeCtrl" :ctrlist="ctrlist" :ctrlfun="insertDynamicWidget"
-            :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun"
-            :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)"
-            :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxFunTemp" :back2font="back2font"
-            :getHtmlContent="getHtmlContent">
-          </tabContainer>
+
+          <!-- 展示模版内容的页面 -->
+          
+            <tabContainer :tabsArray="tabsArray" :templeCtrl="templeCtrl" :ctrlist="ctrlist" :ctrlfun="insertDynamicWidget"
+              :templatelist="templatelist" :widgetlist="widgetlist" :patlist="patlist" :widgetfun="insert" :templatefun="replaceFun"
+              :savetemplefun="()=>inputName(saveHtmlContent)" :savewidgetfun="()=>inputName(saveHtmlContent)"
+              :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxFunTemp" :back2font="back2font"
+              :getHtmlContent="getHtmlContent"
+              :getClickHtmlContent="getClickHtmlContent"
+              :templatehtmlContent="templatehtmlContent">       
+            </tabContainer>
+          
         </div>
 
         <!-- </div> -->
@@ -203,6 +211,11 @@
 
     data() {
       return {
+        // 获取数据方法
+        getClickHtmlContent:(content)=>{
+          this.templatehtmlContent = content;
+        },
+        templatehtmlContent: null,
         themeId: null, // 选中的tag值
         imgsArr: [
           face01,
@@ -806,7 +819,7 @@
         dynamicTemplate: (ElementDesc, TypeId) => {
           return {
             ElementDesc: ElementDesc,
-            TypeId: TypeId,
+            TypeId: TypeId,  // 固定值 1:text 2:select  3:radio 4: checkbox 5:label 6:date
             type: TEXT,
             isDynamic: true, // 是动态元素
           }

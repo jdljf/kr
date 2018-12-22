@@ -2,25 +2,21 @@
 <template>
   <!--row-click 参数是row, event, column-->
   <!-- :data="list" :data中的filter筛选是搜索的关键-->
-  <div>
-       <!-- 
-      <div class="nav-tools">
-        <el-button type="primary" size="mini" plain @click="savetemple">文档存模版</el-button>
-        <el-button type="success" size="mini" plain @click="savewidget">文档存模版</el-button>
-        <el-button type="warning" size="mini" plain @click="showSelectShare">分享</el-button>
-      </div>      
-      -->
-      <el-table  
+    <div>
+       <MsgShow :htmlContent="templatehtmlContent" :visible="visible"></MsgShow> 
+       <el-table  
         ref="navTable" 
         style="width: 100%;"
         :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"  
-        @row-click="callback"
+        @row-dbclick="callback"
+        @row-click="showHide"
         :highlight-current-row='true'
         @current-change="currentChange"
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
         size="small"
         > 
+            
             <!-- 这是多选 -->
             <el-table-column
               label="序号"              
@@ -114,16 +110,17 @@
               </template>
             </el-table-column>
              -->
-          </el-table>
-          <slot></slot>
-  </div>
+          </el-table>          
+    </div>
+   
+   
   
   
     
 </template>
 
 <script>
-import funs from '../common/funs';
+import MsgShow from '@/components/MsgShow';
 // import {ajax} from '../common'
 
 // 模版的组件
@@ -140,31 +137,37 @@ import funs from '../common/funs';
         back2font: Function,
         getHtmlContent: Function,
         index: Number,
+        getClickHtmlContent: Function,
+        templatehtmlContent: String
+    },
+    components:{
+      MsgShow
     },
     data() {
       return {
         search: '',
         multipleSelection: [],
         share: 'index', // 这个就是共享的开怪
-        chosedrowIndex: null
+        chosedrowIndex: null,
+        visible: false
       }
     },
     updated(){
-      debugger
       this.$refs.navTable.setCurrentRow(this.list[this.chosedrowIndex]);
     },
     methods: { 
-
+      showHide(row, event, column){
+        this.getClickHtmlContent(row.content); // 将当前的html存起来
+        this.visible = !this.visible
+      },
       // 绑定到表格选项变化时触发记录下来选中哪些
       handleSelectionChange(val) {
-        this.multipleSelection = val;
-        
+        this.multipleSelection = val;        
         console.log(val)
       },
 
       // 点击分享按钮呈现可选的框
-      showSelectShare(){     
-        console.log("sfdsa") 
+      showSelectShare(){    
         this.share= 'selection'
         // this.$set(this.tableType,'share', !this.tableType.share)
         
@@ -313,7 +316,9 @@ import funs from '../common/funs';
         debugger
         this.$refs.navTable.setCurrentRow(row);
       },
-      callback(row, event, column) {
+      callback(row, event, column) {  
+
+        this.getClickHtmlContent(row.content); // 将当前的html存起来
 
         // 事件函数直接在这里设置这几个函数就可以读取了，不需要自己传入。
         // 填好对应参数即可
