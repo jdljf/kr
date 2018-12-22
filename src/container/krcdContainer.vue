@@ -12,7 +12,7 @@
         </Widgets>
         <!-- </div>        -->
       </el-aside>
-      <div class="tools" v-if="ableShow" v-show="toolsShow">
+      <div class="tools" v-show="ableShow?toolsShow:false">
         <NavMenu class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false"
           :self="self" />
         <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
@@ -64,8 +64,8 @@
             <div class="nav-tools">               
               <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
               <el-button type="primary" size="mini" plain @click="()=>inputName('保存文档模版',saveHtmlContent)">存文档模版</el-button>
-              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="()=>inputName('保存文档段',saveSection2Widget)">存文档段</el-button>
-              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true">存动态元素</el-button>
+              <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="commitShow.OnOff=true;saveType='section'">存文档段</el-button>
+              <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true;saveType='dynamic'">存动态元素</el-button>
               <!-- <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button> -->
             </div>
           </el-header>
@@ -82,7 +82,7 @@
         <!-- </div> -->
       </el-aside>
       <!-- 这里是保存模版用的隐藏按钮 -->
-      <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" />
+      <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" :saveType="saveType"><Tag :returnDataFun="returnDataFun"/></CommitTable>
     </el-container>
   </el-container>
 </template>
@@ -96,6 +96,7 @@
   import NavMenu from '../components/NavMenu'
   import CommitTable from '../components/CommitTable'
   import FileList from '../components/FileList'
+  import Tag from '../components/Tag'
   import {
     ajax
   } from '../common'
@@ -151,7 +152,8 @@
       Models,
       tabContainer,
       NavMenu,
-      CommitTable
+      CommitTable,
+      Tag
     },
 
     computed: {
@@ -201,6 +203,7 @@
 
     data() {
       return {
+        themeId: null, // 选中的tag值
         imgsArr: [
           face01,
           face02
@@ -275,14 +278,19 @@
           OnOff: false
         }, // 给初始化弹窗保存动态模版用的
         saveDynamicData: null,
+        saveSectionData: null,
 
         // 返回提交数据的函数
         returnCommitData: (data) => {
-          this.saveDynamicData = { ...data
-          };
-          this.saveCtrl2Widget(this.saveDynamicData)
+          if(this.saveType==="dynamic"){  // 存动态控件
+            this.saveDynamicData = { ...data };
+            this.saveCtrl2Widget(this.saveDynamicData)
+          }else if(this.saveType==="section"){  // 存section控件
+            this.saveSectionData = { ...data };
+            this.saveSection2Widget(this.saveSectionData)
+          }
         },
-
+        saveType: 'dynamic',
         editableArr: null, // 所有krcd-ctrldom。
         fenGeXian: null,
         selectedText: '', // 用来存储选中文字的数据
@@ -486,16 +494,20 @@
         },
 
         // 从localStorage中取组件数据存起来
-        widgetlist: localStorage.getItem('widget') ?
-          JSON.parse(localStorage.getItem('widget')) && JSON.parse(localStorage.getItem('widget')).length !== 0 ?
-          JSON.parse(localStorage.getItem('widget')) : [] : [],
+        widgetlist: [],
+        
+        // localStorage.getItem('widget') ?
+        //   JSON.parse(localStorage.getItem('widget')) && JSON.parse(localStorage.getItem('widget')).length !== 0 ?
+        //   JSON.parse(localStorage.getItem('widget')) : [] : [],
 
         // 模版列表
         templatelist: [],
 
-        ctrlist: localStorage.getItem('ctrlist') ?
-          JSON.parse(localStorage.getItem('ctrlist')) && JSON.parse(localStorage.getItem('ctrlist')).length !== 0 ?
-          JSON.parse(localStorage.getItem('ctrlist')) : [] : [],
+        ctrlist: [],
+        
+        // localStorage.getItem('ctrlist') ?
+        //   JSON.parse(localStorage.getItem('ctrlist')) && JSON.parse(localStorage.getItem('ctrlist')).length !== 0 ?
+        //   JSON.parse(localStorage.getItem('ctrlist')) : [] : [],
 
         // 左方病人的共有列表格式（暂时就这样）
         patlist: [{
@@ -812,7 +824,13 @@
     },
 
     methods: {
-
+      // Tag返回数据
+      returnDataFun(chosed){
+        // debugger
+        // 我需要的themeId
+        console.log(chosed)
+        this.themeId = chosed;  // 将返回的值存起来
+      },
       // 插入样式的方法
       insertStyle(type, innerDoc, styleString) {
         const headStyle = document.createElement('style');
@@ -967,7 +985,7 @@
       },
 
       // 保存文档段为控件
-      saveSection2Widget(itemName = "文档段模版", callback = () => {}) {
+      saveSection2Widget(inputInfo = {}, callback = () => {}) {
 
         let target;
         this.args[0].path.forEach((item,index)=>{
@@ -997,28 +1015,24 @@
 
         // 创建需要存到模版的对象
         const newItem = {
-          name: itemName,   // 模版名字
+          name: inputInfo.describe,   // 模版名字
           id: target.id,
           styleString: headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
           content: htmlContent,
           scope: '全院',
           discribe: '描述', // 描述
-          date: funs.nowtime(), //  存起来保存时间          
+          date: funs.nowtime(), //  存起来保存时间      
+          themeId: this.themeId   // 描述标签 String  
         }
-
-        // 将模版push到widgetlist数组中
-        this.widgetlist.push(newItem);
 
         // 保存到localStorage
         localStorage.setItem('widget', JSON.stringify(this.widgetlist))
 
         // 将原来的转为接口的格式
         const postData = this.font2back(newItem)
-
-        debugger
         
         // 接口保存
-        this.ajaxFunTemp('/ParagraphTemplate/Save', postData, `${itemName}组件，保存成功`, () => {
+        this.ajaxFunTemp('/ParagraphTemplate/Save', postData, `${inputInfo.describe}组件，保存成功`, () => {
           this.widgetlist.push(newItem);
         });
 
@@ -1714,6 +1728,7 @@
           switch (opt[i].name) {
             case "DESIGN":
               this.ableShow = true;
+              this.toolsShow = false;
               this.templeCtrl = true;
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
@@ -1723,6 +1738,7 @@
               break
             case "EDITOR":
               this.ableShow = true;
+              this.toolsShow = false;
               this.templeCtrl = true;
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
@@ -1732,6 +1748,7 @@
               break
             case "STRICT":
               this.ableShow = false;
+              this.toolsShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';
@@ -1742,6 +1759,7 @@
               break
             case "READONLY":
               this.ableShow = false;
+              this.toolsShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';     
@@ -1753,6 +1771,7 @@
               addModeStyle(this.insertStyle, modeStyle())
               break
             default:
+              this.ableShow = true;
               this.toolsShow = false;
               this.templeCtrl = false;
           }
@@ -1884,6 +1903,12 @@
       templateTag: function (newTemplateTag, oldTemplateTag) {
         return newTemplateTag
       },
+      commitShow: function(newValue, oldValue){
+        if(newValue.OnOff===false){
+            this.themeId = null;
+        }
+       
+      }
     },
 
     mounted() {
@@ -1896,8 +1921,8 @@
       /**
        * 请求模版数据
        */
-      ajax.post(
-        '/DocumentTemplate/GetList', {
+      function getAllList(url,listname){
+        ajax.post(url, {
             "deptCode": "",
             "creatorUserId": 0,
             "id": 0
@@ -1907,24 +1932,29 @@
               'Content-Type': 'application/json',
               'Authorization': sessionStorage.getItem('token')?sessionStorage.getItem('token'):'',
             }
-          }
-        
+          }        
         ).then((res) => {
-        console.log('成功了！', typeof res.data.data)
 
-        const templataData = res.data.data;
+          const tempData = res.data.data;
 
-        // 后端数组转为前端数组
-        const templateArr = templataData.map(this.back2font)
+          // 后端数组转为前端数组
+          const tempArr = tempData.map(self.back2font);
 
-        // 修改templatelist的数据
-        self.templatelist.push(...templateArr) // 需要保留原来this.templatelist的引用
-      }).catch((err) => {
-        console.log(err)
-      })
+          // 修改templatelist的数据
+          self[listname].push(...tempArr) // 需要保留原来this.templatelist的引用
+
+        }).catch((err) => {
+          console.log(err)
+        })
+      }
+      
+      // 统一获取所有的列表内容
+      getAllList('/DocumentTemplate/GetList','templatelist');
+      getAllList('/ParagraphTemplate/GetList','widgetlist');
+      getAllList('/ElementTemplate/GetList','ctrlist');
 
       /**
-       * 请求模版数据
+       * 请求Tree数据
        */
       async function asyncGetTemp(self) {
         await ajax.post(
@@ -2132,7 +2162,7 @@
 
             e = e || window.event;
 
-            console.log(event.path)
+            // console.log(event.path)
             
             // 设计模式需要控制
             self.editableArr = [...this.document.querySelectorAll(".krcd-ctrl[contenteditable='false']")];

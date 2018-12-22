@@ -1,10 +1,10 @@
 <template>
   <el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-width="100px" class="loginForm">
     <el-form-item label="用户名" prop="username">
-      <el-input v-model.number="loginForm.username" :clearable="true"></el-input>
+      <el-input v-model.number="loginForm.username" :clearable="true" autofocus></el-input>
     </el-form-item>
     <el-form-item label="密码" prop="password">
-      <el-input type="password" v-model="loginForm.password" autocomplete="off" :clearable="true"></el-input>
+      <el-input type="password" v-model="loginForm.password" autocomplete="off" :clearable="true" @keydown.enter.native="submitForm('loginForm')"></el-input>
     </el-form-item>
 
     <el-form-item>

@@ -1,17 +1,23 @@
 <template>
     <el-dialog title="动态模版保存" :visible.sync="commitShow.OnOff" :show-close="true" >
-        <el-form :model="saveForm" status-icon :rules="rules" ref="saveForm" label-width="200px" class="demo-saveForm">            
-            <el-form-item label="描述" prop="describe" label-width="100px">
+        <el-form :model="saveForm" status-icon :rules="rules" ref="saveForm" label-width="200px" class="saveForm">    
+            <!-- 输入区 -->               
+            <el-form-item label="模版命名" prop="describe" label-width="100px">
                 <el-input v-model.trim="saveForm.describe"></el-input>
             </el-form-item>
-            <el-form-item label="命令" prop="command" label-width="100px">
+            <el-form-item label="类型描述" prop="themeId" label-width="100px">
+                <slot></slot>
+                <el-input v-if="saveType==='dynamic'" v-model.trim="saveForm.themeId"></el-input>
+            </el-form-item>     
+            <el-form-item v-if="saveType==='dynamic'" label="命令" prop="command" label-width="100px">
                 <el-input v-model.trim="saveForm.command"></el-input>
             </el-form-item>
-            <el-form-item label="归属表格" prop="classified" label-width="100px">
+            <el-form-item v-if="saveType==='dynamic'" label="归属表格" prop="classified" label-width="100px">
                 <el-select v-model="saveForm.classified" placeholder="请选择表格类型" style="width:100%;">
                     <el-option v-for="(item,index) in docmentTypes" :key="index" :label="item.typeName" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
+            <!-- 按钮区 -->
             <el-form-item label-width="0">
                 <el-button type="primary" @click="submitForm('saveForm')">提交</el-button>
                 <el-button @click="resetForm('saveForm')">重置</el-button>
@@ -26,7 +32,8 @@
     name: 'CommitTable',
     props:{
       commitShow: Object,   // 参数传入来控制是否展开
-      returnCommitData: Function  //  函数返回数据，传入data，返回父级
+      returnCommitData: Function,  //  函数返回数据，传入data，返回父级
+      saveType: String  // 保存的类型
     },
     data() {
       var checkCommand = (rule, value, callback) => {
@@ -44,6 +51,12 @@
       var checkClassified = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('归属的表格必选'));
+        }   
+        callback();
+      };
+      var checkthemeId = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('组件类型标签必选'));
         }   
         callback();
       };
@@ -69,6 +82,7 @@
           describe:'',
           command: '',
           classified: ''  , // 归属于
+          themeId: '' , // 类型
         },
         rules: {
           describe: [
@@ -79,7 +93,10 @@
           ],
           classified: [
             { validator: checkClassified, trigger: 'blur' }
-          ]
+          ],
+          checkthemeId: [
+            { validator: checkthemeId, trigger: 'blur' }
+          ],
         }
       };
     },

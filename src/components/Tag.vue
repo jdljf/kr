@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="container">
     <el-tag :type="chosedIndex===index?'':'info'" size="medium" :key="index" v-for="(tag,index) in dynamicTags" :disable-transitions="false" ref="tag">
       <span  @click="choseChange(index)">{{tag}}</span>
     </el-tag>
@@ -40,6 +40,10 @@
 
 <script>
   export default {
+    name: 'Tag',
+    props:{
+      returnDataFun: Function  // 返回数据
+    },
     data() {
       return {
         dynamicTags: ['系统标签1', '系统标签2', '系统标签3'],
@@ -54,10 +58,11 @@
         this.dataLen = this.dynamicTags.length;   // 将系统标签长度存起来
     },
     computed:{
-        // 选中的内容
-        themeId: function(){
-          return this.dynamicTags[chosedIndex]
-        }
+        // // 选中的内容
+        // themeId: function(){
+        //     // 顺带返回数据
+        //   return this.dynamicTags[chosedIndex]
+        // }
     },
     methods: {
     //   // 删除功能
@@ -66,10 +71,12 @@
     //   },
 
       choseChange(index){
+        debugger
         // console.log(this)
         // console.log(this.$refs.tag[[index]].type)
         // this.$refs.tag[index].type = "";
         this.chosedIndex = index;
+        this.returnDataFun(index) // 返回index
       },
       showInput() {
         this.inputVisible = true;
@@ -107,3 +114,12 @@
   }
 
 </script>
+
+<style scoped>
+.container{
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+</style>
+
