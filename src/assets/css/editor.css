@@ -11,6 +11,7 @@
 }
 
 .edui-default .edui-bubble .edui-popup-content>nobr>div{    
+    flex:1;
     height: 28px;
     line-height: 28px;
     overflow: hidden;

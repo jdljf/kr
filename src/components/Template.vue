@@ -16,6 +16,7 @@
         :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"  
         @row-click="callback"
         :highlight-current-row='true'
+        @current-change="currentChange"
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
         size="small"
@@ -114,6 +115,7 @@
             </el-table-column>
              -->
           </el-table>
+          <slot></slot>
   </div>
   
   
@@ -137,17 +139,19 @@ import funs from '../common/funs';
         ajaxtemple: Function,
         back2font: Function,
         getHtmlContent: Function,
+        index: Number,
     },
     data() {
       return {
         search: '',
         multipleSelection: [],
-        share: 'index' // 这个就是共享的开怪
+        share: 'index', // 这个就是共享的开怪
+        chosedrowIndex: null
       }
     },
-    mounted(){
-      console.log("template",this.savetemple)
-      console.log(this.list)
+    updated(){
+      debugger
+      this.$refs.navTable.setCurrentRow(this.list[this.chosedrowIndex]);
     },
     methods: { 
 
@@ -155,7 +159,7 @@ import funs from '../common/funs';
       handleSelectionChange(val) {
         this.multipleSelection = val;
         
-        console.log(this.multipleSelection)
+        console.log(val)
       },
 
       // 点击分享按钮呈现可选的框
@@ -164,12 +168,21 @@ import funs from '../common/funs';
         this.share= 'selection'
         // this.$set(this.tableType,'share', !this.tableType.share)
         
-        this.$forceUpdate()
+        // this.$forceUpdate()
+      },
+      
+      // 点击的点亮并变化时触发的事件
+      currentChange(currentRow, oldCurrentRow){  
+        // debugger      
+        // this.chosedrowIndex = currentRow; // 但是当点选替换的时候，它会取消点亮
       },
 
       
       handleEdit(index, row) {
         console.log(index, row);
+        // 修改已选中的行数
+        this.chosedrowIndex = index;
+        
         // 改成保存导入
         // 删除警告
         const replaceWarn= (title,todo)=>{
@@ -204,21 +217,36 @@ import funs from '../common/funs';
                 });
         }
 
-        const updatecommit = (value)=>{
+        const updatecommit = (url,value)=>{
             // 获取数据
             const docContent = this.getHtmlContent();
             const updateData = {
                 "templateName": value,
+                "code": value,
                 "htmlContent": docContent.htmlContent,
                 "lastModifierUserId": 0,
                 "id": row.index   // 这是后端的数据
-            }          
-            
-            this.ajaxtemple('/DocumentTemplate/Update', updateData,"模版数据更新成功", ()=>this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})
+            }                      
+            this.ajaxtemple(url, updateData,"模版数据更新成功", ()=>{
+                this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})               
+              }
+
             );
         }
         
-        replaceWarn('模版',updatecommit) 
+        // replaceWarn('模版',updatecommit) 
+        switch(this.index){
+              case 0:
+                replaceWarn('文档模版', (value)=>updatecommit('/DocumentTemplate/Update', value))
+                break
+              case 1:
+                replaceWarn('段落模版', (value)=>updatecommit('/ParagraphTemplate/Update', value))
+                break
+              case 2:
+                replaceWarn('动态模版', (value)=>updatecommit('/ElementTemplate/Update', value))
+                break
+        }
+
         
       },
       handleDelete(index, row) {
@@ -234,7 +262,7 @@ import funs from '../common/funs';
                     type: 'warning'
                 }).then(() => {
                     console.log(this)
-                    todo()
+                    todo()  // 传入tab的编号
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
@@ -247,12 +275,14 @@ import funs from '../common/funs';
                   });
                 }
 
-        const delcommit = ()=>{
+        console.log(this.index)
+        // DocumentTemplate、ElementTemplate、ParagraphTemplate
+        const delcommit = (url)=>{
             // 删除TODO
-            console.log(row.index)
-             // 这里只是改变了临时的list数据，还需要改变local中的数据            
+            // console.log(row.index)
+            // 这里只是改变了临时的list数据，还需要改变local中的数据            
             
-            this.ajaxtemple('/DocumentTemplate/Delete', {
+            this.ajaxtemple(url, {
                 "deleterUserId": 0,
                 "id": row.index
               },
@@ -260,32 +290,35 @@ import funs from '../common/funs';
               ()=>this.list.splice(index,1)
             );
         }
-
-        delWarn('模版',delcommit)
-       
+        // 判断运行的函数
+        switch(this.index){
+              case 0:
+                delWarn('文档模版', ()=>delcommit('/DocumentTemplate/Delete'))
+                break
+              case 1:
+                delWarn('段落模版', ()=>delcommit('/ParagraphTemplate/Delete'))
+                break
+              case 2:
+                delWarn('动态模版', ()=>delcommit('/ElementTemplate/Delete'))
+                break
+        }
       },
       // 一个函数的包装
       todo(fun,args,styleString,command){
         // console.log(this)
         return fun(args,styleString,command) // 返回该函数的运行
       },
+      // 设置选中的行
       setCurrent(row) {
-        this.$refs.singleTable.setCurrentRow(row);
+        debugger
+        this.$refs.navTable.setCurrentRow(row);
       },
       callback(row, event, column) {
-        console.log(row)  // 改行的元素
-        console.log(event)
-        console.log(column)
+
         // 事件函数直接在这里设置这几个函数就可以读取了，不需要自己传入。
         // 填好对应参数即可
         this.todo(this.fun,row.content,row.styleString,row.command)
-
-        console.log(this.$refs)
-        // debugger
-        // this.$refs.navTable.$children[0].type="index" // 单向数据流的问题
-
-        // refs绑定好对应的对象就可以运用它的方法(这个会与上面的函数有冲突)
-        // this.$refs.navTable.toggleRowExpansion(row)  // 没有设定第二参数就会toggle
+        
       }
     }
   }

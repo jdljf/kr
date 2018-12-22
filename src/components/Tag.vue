@@ -71,7 +71,7 @@
     //   },
 
       choseChange(index){
-        debugger
+        // debugger
         // console.log(this)
         // console.log(this.$refs.tag[[index]].type)
         // this.$refs.tag[index].type = "";

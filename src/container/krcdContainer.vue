@@ -82,7 +82,7 @@
         <!-- </div> -->
       </el-aside>
       <!-- 这里是保存模版用的隐藏按钮 -->
-      <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" :saveType="saveType"><Tag :returnDataFun="returnDataFun"/></CommitTable>
+      <CommitTable :commitShow="commitShow" :returnCommitData="returnCommitData" :saveType="saveType"><Tag :returnDataFun="returnDataFun" v-if="saveType!=='dynamic'"/></CommitTable>
     </el-container>
   </el-container>
 </template>
@@ -548,7 +548,7 @@
         },
 
         /**
-         * 0、模版插入替换
+         * 0、模版v-if="saveType==='dynamic'"替换
          * params {string} content   模版/控件/字典的innerHTML内容
          * params {string} styleString  head>style标签中的样式文本
          */
@@ -600,7 +600,7 @@
             inputPattern: /^[0-9a-zA-Z\u2E80-\u9FFF]{2,17}$/, // 自己写的
             inputErrorMessage: '模版名必须大于2不得超过16个字符'
           }).then(({ value }) => {
-            debugger
+            // debugger
             this.$message({
               // type: 'success',
               message: value + '  模版，正在保存...'
@@ -769,7 +769,7 @@
 
         // 请求接口
         ajaxFunTemp: (type, content, successMsg, sucessFun = () => {}) => {
-          debugger
+          // debugger
           console.log(content)
           return ajax.post(
             `${type}`,
@@ -1249,9 +1249,6 @@
         ctrlId: null,
         ctrlStyle: null
       }, defOpt, desc) {
-
-        console.log(arguments)
-
         let div = document.createElement('span');
         div.innerHTML =
           `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
@@ -2268,11 +2265,7 @@
         // 将改变内容的监听放到加载后
         this.addListener("contentchange", function () {
           console.log("内容改变了");
-          // console.log(self.$parent.$refs)
-
-          // console.log(self)
-          // debugger
-
+          
           const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
 
           self.$parent.$refs.setContentInp.value = docThreePart.contentValue.innerHTML; // 保证v-model最新的
