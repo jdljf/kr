@@ -6,8 +6,7 @@
        <!-- <MsgShow :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  -->
        <el-table  
         ref="navTable" 
-        :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"  
-        @row-click="callback"      
+        :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"          
         :highlight-current-row='true'
         @current-change="currentChange"
         empty-text="<暂无数据>"
@@ -71,14 +70,19 @@
               </template>
               <template slot-scope="scope">
                 <el-button
-                  v-if="templeCtrl"
-                  size="mini"
-                  @click.stop="handleEdit(scope.$index, scope.row)">导入</el-button>
-                <el-button
                   size="mini"
                   type="danger"
                   v-if="templeCtrl"
-                  @click.stop="handleDelete(scope.$index, scope.row)"><i class='el-icon-delete'></i></el-button>
+                  @click.stop="callback(scope.row)">导入</el-button>
+                <el-button
+                  v-if="templeCtrl"
+                  size="mini"
+                  @click.stop="handleEdit(scope.$index, scope.row)">替换</el-button>
+                <!-- <el-button
+                  size="mini"
+                  type="danger"
+                  v-if="templeCtrl"
+                  @click.stop="handleDelete(scope.$index, scope.row)"><i class='el-icon-delete'></i></el-button> -->
               </template>
             </el-table-column>
 
@@ -153,6 +157,11 @@ import MsgShow from '@/components/MsgShow';
         this.getClickHtmlContent(row.content); // 将当前的html存起来
         // console.log("展示")
         this.changeVisible(1);
+      },
+      showHide(row, column, cell, event){
+        this.getClickHtmlContent(row.content); // 将当前的html存起来
+        // console.log("展示")
+        this.changeVisible();
       },
       hide(row, column, cell, event){
         this.getClickHtmlContent(row.content); // 将当前的html存起来
@@ -312,7 +321,7 @@ import MsgShow from '@/components/MsgShow';
       },
       // 设置选中的行
       setCurrent(row) {
-        debugger
+        // debugger
         this.$refs.navTable.setCurrentRow(row);
       },
       callback(row, event, column) {  

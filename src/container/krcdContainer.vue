@@ -29,7 +29,7 @@
           <el-container>
             <div class="editor-box" ref="editor" id="editor" :style="{ width:width }">           
             </div>         
-            <MsgShow v-show="visible" style="box-sizing: border-box;z-index: 1111;position: absolute;position: absolute;left: 208px;right: 0;top: 144px;bottom: 42px;background-color:rgba(70, 70, 70, 0.98);overflow:auto;}" :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  
+            <MsgShow v-show="visible" style="box-sizing: border-box;z-index: 1111;position: absolute;left: 208px;right: 0;top: 144px;bottom: 42px;background-color:#015ab3a3;color:#ffffff;overflow:auto;}" :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  
           </el-container>
 
         </el-container>
@@ -113,7 +113,7 @@
   import Tag from '../components/Tag'
   import {
     ajax,
-    canvas2image
+    // canvas2image
   } from '../common'
 
   import funs from '../common/funs'
@@ -628,7 +628,7 @@
 
         // 提示输入模版名称弹窗
         inputName: (name, fun) => {
-          
+          debugger
           this.$prompt('请输入模版名', name, {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -698,14 +698,14 @@
 
         // 保存真整页内容为模版
         saveHtmlContent: (val) => {
-          // promise获取数据
+        // promise获取数据
         //  imgbase64;
           
-          this.html2Img().then((value)=>{
-            const imgbase64 = value;
+          // this.html2Img().then((value)=>{
+          //   const imgbase64 = value;
+         
+            // debugger
             const docContent = this.getHtmlContent()
-            // console.log(docContent)
-
             const newItem = {
               name: val,
               id: '', // 因为是模版所以不设置了
@@ -715,17 +715,17 @@
               discribe: '描述', // 描述q
               tag: docContent.tag, // 模版类型            
               themeId: 0,   // 描述的id  
-              canvas: imgbase64  // 将canvas存起来
+              // canvas: imgbase64  // 将canvas存起来
               // date: funs.nowtime(),          // 应该以后台返回数据为准
             }
-
+            // debugger
             // 将原来的转为接口的格式
             const postData = this.font2back(newItem)
 
             this.ajaxFunTemp('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
               this.templatelist.push(newItem);
             });
-          })
+          // })
         },
 
 
@@ -1084,8 +1084,8 @@
           return newArr.join('')
         })()
 
-         this.html2Img(target).then((value)=>{
-            const imgbase64 = value;       
+        //  this.html2Img(target).then((value)=>{
+        //     const imgbase64 = value;       
 
             // 创建需要存到模版的对象
             const newItem = {
@@ -1097,7 +1097,7 @@
               discribe: '描述', // 描述
               date: funs.nowtime(), //  存起来保存时间      
               themeId: this.themeId,  // 描述标签 String  
-              canvas: imgbase64
+              // canvas: imgbase64
             }
 
             // 保存到localStorage
@@ -1110,7 +1110,7 @@
             this.ajaxFunTemp('/ParagraphTemplate/Save', postData, `${inputInfo.describe}组件，保存成功`, () => {
               this.widgetlist.push(newItem);
             });
-        })
+        // })
 
         return callback()
       },
@@ -1163,8 +1163,8 @@
          */
         console.log(target)
 
-        this.html2Img(target).then((value)=>{
-            const imgbase64 = value;       
+        // this.html2Img(target).then((value)=>{
+        //     const imgbase64 = value;       
 
             // 创建需要存到模版的对象
             const newItem = {
@@ -1175,7 +1175,7 @@
               classified: inputInfo.classified,
               htmlContent: htmlContent,
               styleContent: headStyleString, // style标签中的样式存起来插到模版对应的style标签中    
-              canvas: imgbase64
+              // canvas: imgbase64
             }
             console.log(newItem)
 
@@ -1188,7 +1188,7 @@
             this.commitShow.OnOff = false
 
             return callback()
-        })
+        // })
       },
 
 
