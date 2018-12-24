@@ -6,15 +6,16 @@
        <!-- <MsgShow :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  -->
        <el-table  
         ref="navTable" 
-        style="width: 100%;"
+        style="width: auto"
         :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"  
-        @row-click="callback"  
-        @row-contextmenu="showHide"      
+        @row-click="callback"      
         :highlight-current-row='true'
         @current-change="currentChange"
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
         size="small"
+        @cell-mouse-enter="show"
+        @cell-mouse-leave="hide"
         >
             
             <!-- 这是多选 -->
@@ -41,7 +42,7 @@
 
             <el-table-column
               label="模版名称"
-              width="130">
+              width="150">
               <template slot-scope="scope" >
                 <div slot="reference" class="name-wrapper">
                   <i class="el-icon-document"></i>
@@ -49,19 +50,18 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               label="权限分配"
               width="80">
               <template slot-scope="scope">
                 <el-popover trigger="hover" placement="top">
-                  <!-- <p>模版类型: {{ scope.row.tag}}</p> -->
-                  <p>描述: {{ scope.row.title }}</p>
+                  <p style="width:300px;height:300px;overflow:auto;"><img style="width:100%;height:auto;" :src="scope.row.canvas" alt="图片"></p>
                   <div slot="reference" class="name-wrapper">
                     <el-tag size="medium">{{ scope.row.tag }}</el-tag>
                   </div>
                 </el-popover>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="操作" width="146">
               <!-- 标题处改为input -->
               <template slot="header" slot-scope="scope">
@@ -150,10 +150,15 @@ import MsgShow from '@/components/MsgShow';
       this.$refs.navTable.setCurrentRow(this.list[this.chosedrowIndex]);
     },
     methods: { 
-      showHide(row, event, column){
+      show(row, column, cell, event){
         this.getClickHtmlContent(row.content); // 将当前的html存起来
-        console.log("展示")
-        this.changeVisible();
+        // console.log("展示")
+        this.changeVisible(1);
+      },
+      hide(row, column, cell, event){
+        this.getClickHtmlContent(row.content); // 将当前的html存起来
+        // console.log("隐藏")
+        this.changeVisible(0);
       },
       // 绑定到表格选项变化时触发记录下来选中哪些
       handleSelectionChange(val) {

@@ -112,7 +112,8 @@
   import FileList from '../components/FileList'
   import Tag from '../components/Tag'
   import {
-    ajax
+    ajax,
+    canvas2image
   } from '../common'
 
   import funs from '../common/funs'
@@ -223,6 +224,8 @@
         changeVisible: (value)=>{
           if(value===0){
             this.visible = false;
+          }else if(value===1){
+            this.visible = true;
           }else{
             this.visible = !this.visible; // 控制信息展示与否
           }
@@ -241,21 +244,21 @@
         tabsArray: [{
             clsType: 'template',
             iconCls: 'el-icon-document',
-            name: '文档模版',
+            name: '文档',
             list: "templatelist",
             fun: "templatefun",
           },
           {
             clsType: 'widget',
             iconCls: 'el-icon-tickets',
-            name: '段落模版',
+            name: '段落',
             list: "widgetlist",
             fun: "widgetfun",
           },
           {
             clsType: 'ctrl',
             iconCls: 'el-icon-edit-outline',
-            name: '动态模版',
+            name: '元素',
             list: "ctrlist",
             fun: "ctrlfun",
           }
@@ -602,6 +605,8 @@
           this.poLastDiv(iframeWin.document.querySelector('.krcd-tmp-content-value'), iframeWin) // 重新聚焦到最后 
           this.krcd.execCommand('inserthtml', docThreePart.contentValue ? docThreePart.contentValue.innerHTML : '');
 
+          this.markShadow(this);  // 增加遮罩
+
           let headerValue = iframeWin.document.getElementsByClassName("krcd-tmp-header-value")[0];
           let footerValue = iframeWin.document.getElementsByClassName("krcd-tmp-footer-value")[0];
 
@@ -644,6 +649,21 @@
           });
         },
 
+        // 截图
+        html2Img: (obj)=>{
+          const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
+          // 顺便截图下来
+          const viewDOM = innerDoc.querySelector('.view');
+          console.log(viewDOM)
+          const result = html2canvas(obj?obj:viewDOM,{async:false}).then(async function(canvas) {
+              // innerDoc.body.appendChild(canvas)
+              // 转图片
+              // console.log(canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src'))
+              return canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src')
+            });
+          return result
+        },
+
         // 获取整个文档的html
         getHtmlContent: () => {
 
@@ -651,12 +671,14 @@
           let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML; // 获取对应内容的innerHTML（content中的内容）
           
           // 顺便截图下来
-          const viewDOM = innerDoc.querySelector('.view');
-          console.log(viewDOM)
-          const canvas = html2canvas(viewDOM).then(function(canvas) {
-            return canvas
-            // document.body.appendChild(canvas);
-          });
+          // const viewDOM = innerDoc.querySelector('.view');
+          // console.log(viewDOM)
+          // html2canvas(viewDOM,{async:false}).then(async function(canvas) {
+          //   // innerDoc.body.appendChild(canvas)
+          //   // 转图片
+          //   console.log(canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src'))
+          //   return canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg')
+          // });
 
           const headStyleString = (() => {
             const arr = innerDoc.querySelectorAll('style[stylename]');
@@ -666,39 +688,44 @@
             }
             return newArr.join('')
           })()
+
           return {
             htmlContent,
             headStyleString,
-            canvas,
+            // canvas,
           }
         },
 
         // 保存真整页内容为模版
         saveHtmlContent: (val) => {
+          // promise获取数据
+        //  imgbase64;
+          
+          this.html2Img().then((value)=>{
+            const imgbase64 = value;
+            const docContent = this.getHtmlContent()
+            // console.log(docContent)
 
-          const docContent = this.getHtmlContent()
-          console.log(docContent)
+            const newItem = {
+              name: val,
+              id: '', // 因为是模版所以不设置了
+              styleString: docContent.headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
+              content: docContent.htmlContent,
+              scope: '全院',
+              discribe: '描述', // 描述q
+              tag: docContent.tag, // 模版类型            
+              themeId: 0,   // 描述的id  
+              canvas: imgbase64  // 将canvas存起来
+              // date: funs.nowtime(),          // 应该以后台返回数据为准
+            }
 
-          const newItem = {
-            name: val,
-            id: '', // 因为是模版所以不设置了
-            styleString: docContent.headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
-            content: docContent.htmlContent,
-            scope: '全院',
-            discribe: '描述', // 描述
-            tag: docContent.tag, // 模版类型            
-            themeId: 0,   // 描述的id  
-            canvas: docContent.canvas  // 将canvas存起来
-            // date: funs.nowtime(),          // 应该以后台返回数据为准
-          }
+            // 将原来的转为接口的格式
+            const postData = this.font2back(newItem)
 
-          // 将原来的转为接口的格式
-          const postData = this.font2back(newItem)
-
-          this.ajaxFunTemp('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
-            this.templatelist.push(newItem);
-          });
-
+            this.ajaxFunTemp('/DocumentTemplate/Save', postData, `${val}模版，保存成功`, () => {
+              this.templatelist.push(newItem);
+            });
+          })
         },
 
 
@@ -720,8 +747,8 @@
             // 所有有stylename的属性的style标签，并最后一个中增加样式
             this.insertStyle('stylename', innerDoc, styleString);
 
-            this.krcd.execCommand('inserthtml', content); // 聚焦点插入内容
-            // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content
+            this.krcd.execCommand('inserthtml',  content); // 聚焦点插入内容
+            // innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML = content;
 
           } else {
             alert("请在【文档段】以外插入控件")
@@ -852,12 +879,12 @@
           }
         },
 
-         // 增加一个遮罩的div
+        // 增加一个遮罩的div
         markShadow:(self)=>{
             self.iframeWin = document.getElementsByTagName('iframe')[1].contentWindow;
             self.shadowDiv = self.iframeWin.document.createElement('div');
             self.shadowDiv.style = self.shadowDivStyle('display:none');  
-            self.iframeWin.document.querySelector('html').appendChild(self.shadowDiv);
+            self.iframeWin.document.querySelector('body').appendChild(self.shadowDiv);
         }
 
       }
@@ -998,12 +1025,14 @@
           "templateName": newItem.name,
           "htmlContent": newItem.content,
           "styleContent": newItem.styleString,
+          // "styleContent": newItem.canvas,  // 测试一下canvas
           "id": newItem.index !== 0 ? newItem.index : 0, // 可以默认0
           "tag": newItem.tag,
           'elementDesc': newItem.describe,
           'command': newItem.command,
           'typeId': newItem.classified,
-          'themeId': newItem.themeId   // 描述的id只能单选，默认为0
+          'themeId': newItem.themeId,   // 描述的id只能单选，默认为0
+          'canvas': newItem.canvas
         }
       },
 
@@ -1015,12 +1044,14 @@
           "creatorUserId": 0, // 可以默认0
           name: newItem.templateName,
           content: newItem.htmlContent,
-          styleContent: newItem.styleString,
+          styleString: newItem.styleContent,
+          // styleString: newItem.styleContent, // 测试一下canvas
           index: newItem.id, // 将后台的顺序存到index中
           tag: newItem.tag,
           command: newItem.command,
           classified: newItem.typeId,
-          themeId: newItem.themeId   // 描述的id只能单选，默认为0
+          themeId: newItem.themeId,   // 描述的id只能单选，默认为0
+          canvas: newItem.canvas
         }
       },
 
@@ -1053,28 +1084,33 @@
           return newArr.join('')
         })()
 
-        // 创建需要存到模版的对象
-        const newItem = {
-          name: inputInfo.describe,   // 模版名字
-          id: target.id,
-          styleString: headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
-          content: htmlContent,
-          scope: '全院',
-          discribe: '描述', // 描述
-          date: funs.nowtime(), //  存起来保存时间      
-          themeId: this.themeId   // 描述标签 String  
-        }
+         this.html2Img(target).then((value)=>{
+            const imgbase64 = value;       
 
-        // 保存到localStorage
-        localStorage.setItem('widget', JSON.stringify(this.widgetlist))
+            // 创建需要存到模版的对象
+            const newItem = {
+              name: inputInfo.describe,   // 模版名字
+              id: target.id,
+              styleString: headStyleString, // style标签中的样式存起来插到模版对应的style标签中  
+              content: htmlContent,
+              scope: '全院',
+              discribe: '描述', // 描述
+              date: funs.nowtime(), //  存起来保存时间      
+              themeId: this.themeId,  // 描述标签 String  
+              canvas: imgbase64
+            }
 
-        // 将原来的转为接口的格式
-        const postData = this.font2back(newItem)
-        
-        // 接口保存
-        this.ajaxFunTemp('/ParagraphTemplate/Save', postData, `${inputInfo.describe}组件，保存成功`, () => {
-          this.widgetlist.push(newItem);
-        });
+            // 保存到localStorage
+            // localStorage.setItem('widgetlist', JSON.stringify(this.widgetlist))
+
+            // 将原来的转为接口的格式
+            const postData = this.font2back(newItem)
+            
+            // 接口保存
+            this.ajaxFunTemp('/ParagraphTemplate/Save', postData, `${inputInfo.describe}组件，保存成功`, () => {
+              this.widgetlist.push(newItem);
+            });
+        })
 
         return callback()
       },
@@ -1127,28 +1163,32 @@
          */
         console.log(target)
 
-        // 创建需要存到模版的对象
-        const newItem = {
-          index: 0,
-          name: target.id,
-          describe: inputInfo.describe,
-          command: inputInfo.command,
-          classified: inputInfo.classified,
-          htmlContent: htmlContent,
-          styleContent: headStyleString, // style标签中的样式存起来插到模版对应的style标签中      
-        }
-        console.log(newItem)
+        this.html2Img(target).then((value)=>{
+            const imgbase64 = value;       
 
-        // 将模版push到widgetlist数组中
-        this.ctrlist.push(newItem);
+            // 创建需要存到模版的对象
+            const newItem = {
+              index: 0,
+              name: target.id,
+              describe: inputInfo.describe,
+              command: inputInfo.command,
+              classified: inputInfo.classified,
+              htmlContent: htmlContent,
+              styleContent: headStyleString, // style标签中的样式存起来插到模版对应的style标签中    
+              canvas: imgbase64
+            }
+            console.log(newItem)
 
-        // 保存到localStorage
-        localStorage.setItem('ctrlist', JSON.stringify(this.ctrlist))
+            // 将模版push到widgetlist数组中
+            this.ctrlist.push(newItem);
 
+            // 保存到localStorage
+            // localStorage.setItem('ctrlist', JSON.stringify(this.ctrlist))
 
-        this.commitShow.OnOff = false
+            this.commitShow.OnOff = false
 
-        return callback()
+            return callback()
+        })
       },
 
 
@@ -1192,7 +1232,7 @@
         let div = document.createElement('span');
         console.log(desc)
         div.innerHTML =
-          `<span class="krcd-ctrl" krcd-type="text" krcd-right="." id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true"></span></span>`;
+          `<span class="krcd-ctrl" krcd-type="text" /*krcd-right="."*/ id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true"></span></span>`;
         div = div.firstElementChild;
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //控件状态。EDITOR编辑;READONLY只读
@@ -1291,7 +1331,7 @@
       }, defOpt, desc) {
         let div = document.createElement('span');
         div.innerHTML =
-          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
+          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} /*krcd-right="."*/ krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
         div = div.firstElementChild;
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //当前模式
@@ -1373,7 +1413,7 @@
       }, defOpt, desc) {
         let div = document.createElement('span');
         div.innerHTML =
-          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-checkbox'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-right="." krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
+          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-checkbox'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} /*krcd-right="."*/ krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
         div = div.firstElementChild;
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //当前模式
@@ -1683,6 +1723,7 @@
       // 切换模式
       mode(opt, i) {
         if (!!opt[i].name) {
+
           this.krcd.mode(opt[i].name);
 
           // 切换type
@@ -1768,9 +1809,10 @@
               this.ableShow = true;
               this.toolsShow = false;
               this.templeCtrl = true;
+              this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
-              addModeStyle(this.insertStyle, modeStyleDef())
+              addModeStyle(this.insertStyle, modeStyleDef()) 
 
               this.shadowDiv.style = this.shadowDivStyle('display:none');
               break
@@ -1778,6 +1820,7 @@
               this.ableShow = true;
               this.toolsShow = false;
               this.templeCtrl = true;
+              this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.addEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl';
               addModeStyle(this.insertStyle, modeStyleDef())
@@ -1802,11 +1845,11 @@
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
               this.fenGeXian.className = 'panel-content-ctrl ctrl-disabled';     
               
-              this.shadowDiv.style = this.shadowDivStyle('display:block');
-
               // this.tabshow.templatelist = false; 
               // 插对应的模版样式
               addModeStyle(this.insertStyle, modeStyle())
+              this.shadowDiv.style = this.shadowDivStyle('display:block');
+
               break
             default:
               this.ableShow = true;
@@ -1826,7 +1869,7 @@
           // 将mode状态的存起来
           this.currentMode = opt[i].name;
         } else {
-          return this.krcd.mode();
+          this.krcd.mode();
         }
       },
       
@@ -1919,22 +1962,22 @@
 
     // 侦查templatelist
     watch: {
-      //  侦查templist保存local
-      templatelist: function (newTemplatelist, oldTemplatelist) {
-        console.log('存local')
-        localStorage.setItem("template", JSON.stringify(newTemplatelist.map(this.font2back))) // 这样就要改变读取时的问题
-        console.log(newTemplatelist)
-      },
-      widgetlist: function (newWidgetlist, oldWidgetlist) {
-        console.log('存local')
-        localStorage.setItem("widgetlist", JSON.stringify(newWidgetlist.map(this.font2back))) // 这样就要改变读取时的问题
-        console.log(newWidgetlist)
-      },
-      ctrlist: function (newCtrlist, oldCtrlist) {
-        console.log('存local')
-        localStorage.setItem("ctrlist", JSON.stringify(newCtrlist.map(this.font2back))) // 这样就要改变读取时的问题
-        console.log(newCtrlist)
-      },
+      // //  侦查templist保存local
+      // templatelist: function (newTemplatelist, oldTemplatelist) {
+      //   console.log('存local')
+      //   localStorage.setItem("templatelist", JSON.stringify(newTemplatelist.map(this.font2back))) // 这样就要改变读取时的问题
+      //   console.log(newTemplatelist)
+      // },
+      // widgetlist: function (newWidgetlist, oldWidgetlist) {
+      //   console.log('存local')
+      //   localStorage.setItem("widgetlist", JSON.stringify(newWidgetlist.map(this.font2back))) // 这样就要改变读取时的问题
+      //   console.log(newWidgetlist)
+      // },
+      // ctrlist: function (newCtrlist, oldCtrlist) {
+      //   console.log('存local')
+      //   localStorage.setItem("ctrlist", JSON.stringify(newCtrlist.map(this.font2back))) // 这样就要改变读取时的问题
+      //   console.log(newCtrlist)
+      // },
       modelsData: function (newModelsData, oldModelsData) {
         return newModelsData
       },
