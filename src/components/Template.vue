@@ -6,7 +6,6 @@
        <!-- <MsgShow :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  -->
        <el-table  
         ref="navTable" 
-        style="width: auto"
         :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"  
         @row-click="callback"      
         :highlight-current-row='true'
@@ -28,7 +27,7 @@
             <el-table-column
               label="序号"              
               type="index"
-               width="50">    
+              width="50">    
             </el-table-column>
 
             <!-- <el-table-column
@@ -50,9 +49,9 @@
                 </div>
               </template>
             </el-table-column>
-            <!-- <el-table-column
+            <el-table-column
               label="权限分配"
-              width="80">
+              width="20">
               <template slot-scope="scope">
                 <el-popover trigger="hover" placement="top">
                   <p style="width:300px;height:300px;overflow:auto;"><img style="width:100%;height:auto;" :src="scope.row.canvas" alt="图片"></p>
@@ -61,7 +60,7 @@
                   </div>
                 </el-popover>
               </template>
-            </el-table-column> -->
+            </el-table-column>
             <el-table-column label="操作" width="146">
               <!-- 标题处改为input -->
               <template slot="header" slot-scope="scope">

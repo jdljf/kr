@@ -118,7 +118,7 @@
 
   import funs from '../common/funs'
   import tabContainer from './tabContainer'
-  import html2canvas from 'html2canvas';
+  // import html2canvas from 'html2canvas';
 
   const face01 = require('../assets/img/face01.jpeg');
   const face02 = require('../assets/img/face02.jpeg');
@@ -650,19 +650,19 @@
         },
 
         // 截图
-        html2Img: (obj)=>{
-          const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
-          // 顺便截图下来
-          const viewDOM = innerDoc.querySelector('.view');
-          console.log(viewDOM)
-          const result = html2canvas(obj?obj:viewDOM,{async:false}).then(async function(canvas) {
-              // innerDoc.body.appendChild(canvas)
-              // 转图片
-              // console.log(canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src'))
-              return canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src')
-            });
-          return result
-        },
+        // html2Img: (obj)=>{
+        //   const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
+        //   // 顺便截图下来
+        //   const viewDOM = innerDoc.querySelector('.view');
+        //   console.log(viewDOM)
+        //   const result = html2canvas(obj?obj:viewDOM,{async:false}).then(async function(canvas) {
+        //       // innerDoc.body.appendChild(canvas)
+        //       // 转图片
+        //       // console.log(canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src'))
+        //       return canvas2image.convertToImage(canvas, canvas.width/4, canvas.height/4, 'jpg').getAttribute('src')
+        //     });
+        //   return result
+        // },
 
         // 获取整个文档的html
         getHtmlContent: () => {
