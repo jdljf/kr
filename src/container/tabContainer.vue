@@ -20,9 +20,10 @@
                     :ajaxtemple="ajaxtemple" 
                     :back2font="back2font" 
                     :getHtmlContent="getHtmlContent"
-                    :getClickHtmlContent="getClickHtmlContent"
-                    :templatehtmlContent="templatehtmlContent"
+                    :getClickHtmlContent="getClickHtmlContent"  
+                    :changeVisible="changeVisible"
                     >
+                <!-- :templatehtmlContent="templatehtmlContent" -->
             </Template>
            
             <!-- 这里就是内容部分 -->
@@ -98,7 +99,8 @@ export default {
         getHtmlContent: Function,
         tabsArray: Array,
         getClickHtmlContent: Function,
-        templatehtmlContent: String
+        templatehtmlContent: String, 
+        changeVisible:Function
     },
     mounted(){        
         // debugger

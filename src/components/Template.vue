@@ -3,19 +3,19 @@
   <!--row-click 参数是row, event, column-->
   <!-- :data="list" :data中的filter筛选是搜索的关键-->
     <div>
-       <MsgShow :htmlContent="templatehtmlContent" :visible="visible"></MsgShow> 
+       <!-- <MsgShow :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  -->
        <el-table  
         ref="navTable" 
         style="width: 100%;"
         :data="list.filter(data => !search || data.name!=null&&data.name.toLowerCase().includes(search.toLowerCase()))"  
-        @row-dbclick="callback"
-        @row-click="showHide"
+        @row-click="callback"  
+        @row-contextmenu="showHide"      
         :highlight-current-row='true'
         @current-change="currentChange"
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
         size="small"
-        > 
+        >
             
             <!-- 这是多选 -->
             <el-table-column
@@ -112,11 +112,6 @@
              -->
           </el-table>          
     </div>
-   
-   
-  
-  
-    
 </template>
 
 <script>
@@ -138,10 +133,10 @@ import MsgShow from '@/components/MsgShow';
         getHtmlContent: Function,
         index: Number,
         getClickHtmlContent: Function,
-        templatehtmlContent: String
+        changeVisible: Function
     },
     components:{
-      MsgShow
+      // MsgShow
     },
     data() {
       return {
@@ -149,7 +144,6 @@ import MsgShow from '@/components/MsgShow';
         multipleSelection: [],
         share: 'index', // 这个就是共享的开怪
         chosedrowIndex: null,
-        visible: false
       }
     },
     updated(){
@@ -158,7 +152,8 @@ import MsgShow from '@/components/MsgShow';
     methods: { 
       showHide(row, event, column){
         this.getClickHtmlContent(row.content); // 将当前的html存起来
-        this.visible = !this.visible
+        console.log("展示")
+        this.changeVisible();
       },
       // 绑定到表格选项变化时触发记录下来选中哪些
       handleSelectionChange(val) {
@@ -317,6 +312,8 @@ import MsgShow from '@/components/MsgShow';
         this.$refs.navTable.setCurrentRow(row);
       },
       callback(row, event, column) {  
+        
+        this.changeVisible(0);
 
         this.getClickHtmlContent(row.content); // 将当前的html存起来
 

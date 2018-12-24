@@ -1,22 +1,24 @@
 <template>
     <el-popover 
+      width="auto"
       placement="left" 
-      width="400" 
       trigger="manual"      
-      v-model="visible">
-      <div v-html="htmlContent"></div>
+      v-model="visible"
+      popper-class="pop-style"
+      >
+      <div class="model" v-html="htmlContent"></div>
       <!-- <el-button slot="reference"></el-button> -->
     </el-popover>
 </template>
-
-
 
 <script>
   export default {
     name: 'MsgShow',
     data() {
       return {
-          
+          popoverstyle: `
+            width:auto;
+          `
       };
     },
     props: {
@@ -28,13 +30,12 @@
 
 </script>
 
-<style scoped>
-.show-html{
-    flex: 1;
-    position: absolute;
-    left:0;
-    right:0;
-    top:0;
-    bottom:0;
+<style>
+.model{
+  padding: 24px;  
+}
+.el-popover.pop-style{
+  padding:0;
+  margin: 24px 16px 24px 24px;
 }
 </style>

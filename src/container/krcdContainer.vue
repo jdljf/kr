@@ -26,9 +26,11 @@
             </FileList>
           </el-aside>
         
-          <div class="editor-box" ref="editor" id="editor" :style="{ width:width }"></div>
-
-         
+          <el-container>
+            <div class="editor-box" ref="editor" id="editor" :style="{ width:width }">           
+            </div>         
+            <MsgShow v-show="visible" style="box-sizing: border-box;z-index: 1111;position: absolute;position: absolute;left: 208px;right: 0;top: 144px;bottom: 42px;background-color:rgba(70, 70, 70, 0.98);overflow:auto;}" :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  
+          </el-container>
 
         </el-container>
 
@@ -65,7 +67,7 @@
           <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;background-color:#ffffff">
             <div class="nav-tools">               
               <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
-              <el-button type="primary" size="mini" plain @click="()=>inputName('保存文档模版',saveHtmlContent)">存文档模版</el-button>
+              <el-button type="primary" size="mini" plain @click="()=>inputName('保存当前文档为模版',saveHtmlContent)">存文档模版</el-button>
               <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="commitShow.OnOff=true;saveType='section'">存文档段</el-button>
               <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true;saveType='dynamic'">存动态元素</el-button>
               <!-- <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button> -->
@@ -82,7 +84,10 @@
               :savectrlfun="()=>inputName(saveHtmlContent)" :ajaxtemple="ajaxFunTemp" :back2font="back2font"
               :getHtmlContent="getHtmlContent"
               :getClickHtmlContent="getClickHtmlContent"
-              :templatehtmlContent="templatehtmlContent">       
+              :changeVisible="changeVisible"
+              >       
+              <!-- 
+              :templatehtmlContent="templatehtmlContent" -->
             </tabContainer>
           
         </div>
@@ -96,6 +101,7 @@
 </template>
 
 <script>
+  import MsgShow from '../components/MsgShow'
   import Tools from '../components/Tools'
   import Widgets from '../components/Widgets'
   import krcdEditor from '../components/krcdEditor'
@@ -111,6 +117,7 @@
 
   import funs from '../common/funs'
   import tabContainer from './tabContainer'
+  import html2canvas from 'html2canvas';
 
   const face01 = require('../assets/img/face01.jpeg');
   const face02 = require('../assets/img/face02.jpeg');
@@ -161,7 +168,8 @@
       tabContainer,
       NavMenu,
       CommitTable,
-      Tag
+      Tag,
+      MsgShow
     },
 
     computed: {
@@ -211,9 +219,18 @@
 
     data() {
       return {
+        visible: false, // 模版预览展示与否
+        changeVisible: (value)=>{
+          if(value===0){
+            this.visible = false;
+          }else{
+            this.visible = !this.visible; // 控制信息展示与否
+          }
+          
+        },
         // 获取数据方法
         getClickHtmlContent:(content)=>{
-          this.templatehtmlContent = content;
+          this.templatehtmlContent = content;          
         },
         templatehtmlContent: null,
         themeId: null, // 选中的tag值
@@ -632,6 +649,14 @@
 
           const innerDoc = document.getElementsByTagName('iframe')[1].contentWindow.document; // 通过这样来获取iframe中的document
           let htmlContent = innerDoc.getElementsByClassName('krcd-tmp-root')[0].innerHTML; // 获取对应内容的innerHTML（content中的内容）
+          
+          // 顺便截图下来
+          const viewDOM = innerDoc.querySelector('.view');
+          console.log(viewDOM)
+          const canvas = html2canvas(viewDOM).then(function(canvas) {
+            return canvas
+            // document.body.appendChild(canvas);
+          });
 
           const headStyleString = (() => {
             const arr = innerDoc.querySelectorAll('style[stylename]');
@@ -643,7 +668,8 @@
           })()
           return {
             htmlContent,
-            headStyleString
+            headStyleString,
+            canvas,
           }
         },
 
@@ -662,6 +688,7 @@
             discribe: '描述', // 描述
             tag: docContent.tag, // 模版类型            
             themeId: 0,   // 描述的id  
+            canvas: docContent.canvas  // 将canvas存起来
             // date: funs.nowtime(),          // 应该以后台返回数据为准
           }
 
@@ -1652,7 +1679,8 @@
       execCommand() {
         return this.krcd.execCommand.apply(this.krcd, arguments);
       },
-
+      
+      // 切换模式
       mode(opt, i) {
         if (!!opt[i].name) {
           this.krcd.mode(opt[i].name);
@@ -1801,6 +1829,8 @@
           return this.krcd.mode();
         }
       },
+      
+      
       /**
        * 工具栏定位
        */
@@ -1871,7 +1901,9 @@
           range.collapse(false); //光标移至最后
           range.select();
         }
-      }
+      },
+
+      
 
 
     },
@@ -1926,11 +1958,13 @@
       console.log(this.$refs.modstyle[0].$el)
 
       const self = this;
-
       
-      /**
-       * 请求模版数据
+     
+      /***
+       * 初始化数据请求
+       * 
        */
+
       function getAllList(url,listname){
         ajax.post(url, {
             "deptCode": "",
@@ -1957,7 +1991,7 @@
           console.log(err)
         })
       }
-      
+
       // 统一获取所有的列表内容
       getAllList('/DocumentTemplate/GetList','templatelist');
       getAllList('/ParagraphTemplate/GetList','widgetlist');
