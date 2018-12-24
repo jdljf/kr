@@ -37,7 +37,7 @@
 .el-popover.pop-style{
   padding:0;
   margin: 24px 16px 24px 24px;
-  background-color: #ffffffd5;
+  background-color: transparent;
   border-color: transparent;
   /* color: white; */
 }

@@ -13,7 +13,7 @@
         @selection-change="handleSelectionChange"
         size="small"
         @cell-mouse-enter="show"
-        @cell-mouse-leave="hide"
+        @cell-mouse-leave="show"
         >
             
             <!-- 这是多选 -->
@@ -73,11 +73,11 @@
                   size="mini"
                   type="danger"
                   v-if="templeCtrl"
-                  @click.stop="callback(scope.row)">导入</el-button>
+                  @click.stop="callback(scope.row)">打开</el-button>
                 <el-button
                   v-if="templeCtrl"
                   size="mini"
-                  @click.stop="handleEdit(scope.$index, scope.row)">替换</el-button>
+                  @click.stop="handleEdit(scope.$index, scope.row)">保存</el-button>
                 <!-- <el-button
                   size="mini"
                   type="danger"
