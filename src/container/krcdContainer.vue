@@ -67,7 +67,7 @@
           <el-header style="height:auto;padding:8px;border: 1px solid #dcdfe6;border-bottom:none;border-top:none;background-color:#ffffff">
             <div class="nav-tools">               
               <!-- <el-button type="primary" size="mini" plain @click="()=>inputName(saveHtmlContent)">文档存模版</el-button> -->
-              <el-button type="primary" size="mini" plain @click="()=>inputName('保存当前文档为模版',saveHtmlContent)">存文档模版</el-button>
+              <el-button type="primary" size="mini" plain @click="()=>inputName('保存当前文档为模版',saveHtmlContent)">新建模版</el-button>
               <el-button v-show="saveAble==='sectionAble'||saveAble==='ctrlInSection'" type="warning" size="mini" plain @click="commitShow.OnOff=true;saveType='section'">存文档段</el-button>
               <el-button v-show="saveAble==='ctrlAble'||saveAble==='ctrlInSection'" type="success" size="mini" plain @click="commitShow.OnOff=true;saveType='dynamic'">存动态元素</el-button>
               <!-- <el-button type="warning" size="mini" plain @click="()=>inputName(saveHtmlContent)">分享</el-button> -->

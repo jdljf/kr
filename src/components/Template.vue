@@ -49,7 +49,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               label="权限分配"
               width="20">
               <template slot-scope="scope">
@@ -60,7 +60,7 @@
                   </div>
                 </el-popover>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column label="操作" width="146">
               <!-- 标题处改为input -->
               <template slot="header" slot-scope="scope">
@@ -334,6 +334,11 @@ import MsgShow from '@/components/MsgShow';
 /* 为了覆盖框架默认的样式 */
 .el-table .cell {
   display: flex;
+}
+.name-wrapper{
+  height: 45px;
+  display: flex;
+  align-items: center;
 }
 
 </style>
