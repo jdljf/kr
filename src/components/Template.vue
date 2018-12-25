@@ -13,7 +13,7 @@
         @selection-change="handleSelectionChange"
         size="small"
         @cell-mouse-enter="show"
-        @cell-mouse-leave="show"
+        @cell-mouse-leave="hide"
         >
             
             <!-- 这是多选 -->
@@ -154,9 +154,10 @@ import MsgShow from '@/components/MsgShow';
     },
     methods: { 
       show(row, column, cell, event){
-        this.getClickHtmlContent(row.content); // 将当前的html存起来
-        // console.log("展示")
         this.changeVisible(1);
+        this.getClickHtmlContent(row.name, row.content); // 将当前的html存起来
+        // console.log("展示")
+        
       },
       showHide(row, column, cell, event){
         this.getClickHtmlContent(row.content); // 将当前的html存起来
@@ -164,9 +165,10 @@ import MsgShow from '@/components/MsgShow';
         this.changeVisible();
       },
       hide(row, column, cell, event){
-        this.getClickHtmlContent(row.content); // 将当前的html存起来
-        // console.log("隐藏")
         this.changeVisible(0);
+        // this.getClickHtmlContent(row.content); // 将当前的html存起来
+        // console.log("隐藏")
+       
       },
       // 绑定到表格选项变化时触发记录下来选中哪些
       handleSelectionChange(val) {

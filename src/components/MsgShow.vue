@@ -6,7 +6,7 @@
       v-model="visible"
       popper-class="pop-style"
       >
-      <div class="model" v-html="htmlContent"></div>
+      <el-tag>{{htmlContent}}</el-tag>
       <!-- <el-button slot="reference"></el-button> -->
     </el-popover>
 </template>
@@ -32,13 +32,15 @@
 
 <style>
 .model{
-  padding: 24px;  
+  /* padding: 24px;   */
 }
 .el-popover.pop-style{
+  width:100%;
+  height:100%;
   padding:0;
-  margin: 24px 16px 24px 24px;
+  /* margin: 24px 16px 24px 24px; */
   background-color: transparent;
   border-color: transparent;
-  /* color: white; */
+  color: white;
 }
 </style>

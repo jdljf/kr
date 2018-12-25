@@ -12,7 +12,7 @@
         </Widgets>
         <!-- </div>        -->
       </el-aside>
-      <div class="tools" v-show="ableShow?toolsShow:false">
+      <div class="tools" v-show="toolsShow">
         <NavMenu class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false"
           :self="self" />
         <!-- <Tools class="tools-btn" :addCtrl="addCtrl" :toolStyle="toolStyle" :toolBtns="toolBtns" contenteditable="false" />   -->
@@ -29,7 +29,7 @@
           <el-container>
             <div class="editor-box" ref="editor" id="editor" :style="{ width:width }">           
             </div>         
-            <MsgShow v-show="visible" style="box-sizing: border-box;z-index: 1111;position: absolute;left: 208px;right: 0;top: 144px;bottom: 42px;background-color:#015ab3a3;color:#ffffff;overflow:auto;}" :htmlContent="templatehtmlContent" :visible="visible"></MsgShow>  
+            <MsgShow v-show="visible" style="box-sizing: border-box;z-index: 1111;position: absolute;left: 208px;right: 0;top: 144px;height: 60px;background-color:#ffffff;overflow:auto;}" :htmlContent="templateTitle" :visible="visible"></MsgShow>  
           </el-container>
 
         </el-container>
@@ -189,11 +189,11 @@
               return []
               // [...this.arrBtns.slice(this.arrBtns.length-1)]
               break
-            case 'sectionAble':
-              this.toolsShow = true;
+            case 'sectionAble':              
               // const newTools = [...this.arrBtns.slice(1,2), 
               //                   // this.arrBtns[this.arrBtns.length - 2],  这个是保存按钮
-              //                   ...this.arrBtns.slice(2, this.arrBtns.length - 3)];
+              //                   ...this.arrBtns.slice(2, this.arrBtns.length - 3)];   
+              console.log('sectionable')
               // 展示按钮
               return [...this.arrBtns.slice(1, 2), ...this.arrBtns.slice(2, this.arrBtns.length - 3)]
               break
@@ -220,6 +220,7 @@
 
     data() {
       return {
+        styleObj: null, // 用来暂存iframe的style的DOM
         visible: false, // 模版预览展示与否
         changeVisible: (value)=>{
           if(value===0){
@@ -229,13 +230,19 @@
           }else{
             this.visible = !this.visible; // 控制信息展示与否
           }
-          
         },
         // 获取数据方法
-        getClickHtmlContent:(content)=>{
-          this.templatehtmlContent = content;          
+        getClickHtmlContent:(name,content)=>{          
+          this.templateTitle = name;
+          this.createTemplateIframe(content);  // 创建对应模版的iframe
+          if(this.visible===false){
+            this.removeTemplateIframe();
+          }else if(this.visible===true){
+            this.addTemplateIframe();
+          }
         },
-        templatehtmlContent: null,
+        templatehtmlContent: null, // 临时存储的html内容
+        templateTitle: null, // 临时存储的html内容
         themeId: null, // 选中的tag值
         imgsArr: [
           face01,
@@ -274,7 +281,7 @@
         rightOtherStyle: '', // 附带的右工具样式
         templeCtrl: false, // 整个模版的编辑和删除的控制
         toolsShow: false, // 工具的隐藏
-        ableShow: false, // 控制工具消失 
+        // ableShow: false, // 控制工具消失 
         shadowDivStyle: (shadowDivShow)=> {return `position:absolute;width: 100%;height: 100%;background-color: transparent;left:0;top:0;right:0;bottom;${shadowDivShow}`}, // 遮罩的div的样式
         shadowDiv: null, // 存dom对象
         /**
@@ -924,6 +931,62 @@
         }
       },
 
+      // 创建预览的iframe
+      createTemplateIframe(content){
+        // 将head中所有的样式都拿到
+        const allStyleTags = this.iframeWin.document.querySelectorAll('style');
+
+        let allStyles = '';
+        for(let i = 0,len = allStyleTags.length;i<len;i++){
+          allStyles += allStyleTags[i].innerHTML;
+        }
+        // console.log(allStyles)      
+        const styleObj = this.iframeWin.document.createElement('style');  
+        styleObj.innerHTML = allStyles; // 创造样式
+
+
+        let iframeObj;
+        // 创建iframe
+        try{  
+          iframeObj = this.iframeWin.document.createElement('<iframe name="model"></iframe>');  
+          }catch(e){  // 这里会形成块作用域所以直接在catch定义外面取不到
+          iframeObj = this.iframeWin.document.createElement('iframe');  
+          iframeObj.name = 'model';  
+        }
+        
+        iframeObj.style = `
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #ececec;
+          border: 0;
+        `;            
+
+        // 将样式存起来
+        this.styleObj = styleObj;
+
+        // 将iframe对象存起来
+        this.iframeObj = iframeObj;      
+        
+        // 将html也存起来
+        this.templatehtmlContent = content;
+
+      },
+      // 文档中添加ifame对象
+      addTemplateIframe(){
+          this.iframeWin.document.body.appendChild(this.iframeObj)
+          this.iframeObj.contentDocument.head.innerHTML = this.styleObj.outerHTML;
+          this.iframeObj.contentDocument.body.innerHTML = this.templatehtmlContent;
+      },
+      // 文档中删掉ifame对象
+      removeTemplateIframe(){
+          this.iframeWin.document.body.removeChild(this.iframeWin.document.querySelector('iframe'))          
+      },
+
       // 点击列表项目
       getPatMsg(patId, fileTheme) {
         // AJAX请求对应的表格
@@ -1230,10 +1293,11 @@
         ctrlStyle: null
       }, defOpt, desc) {
         let div = document.createElement('span');
-        console.log(desc)
+        // console.log(desc)
         div.innerHTML =
-          `<span class="krcd-ctrl" krcd-type="text" /*krcd-right="."*/ id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true"></span></span>`;
+          `<span class="krcd-ctrl" krcd-type="text" id=${domSet.ctrlId?domSet.ctrlId:'ctrl-text'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} contenteditable="false" ><span class="krcd-value" krcd-left="[" krcd-right="]" contenteditable="true"></span></span>`;
         div = div.firstElementChild;
+        // debugger
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //控件状态。EDITOR编辑;READONLY只读
           "notdel": 0, //是否不许删除，默认0位可以删除
@@ -1331,7 +1395,7 @@
       }, defOpt, desc) {
         let div = document.createElement('span');
         div.innerHTML =
-          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} /*krcd-right="."*/ krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
+          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-radio'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-type="radio" class="krcd-ctrl"  contenteditable="false" ><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
         div = div.firstElementChild;
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //当前模式
@@ -1413,7 +1477,7 @@
       }, defOpt, desc) {
         let div = document.createElement('span');
         div.innerHTML =
-          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-checkbox'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} /*krcd-right="."*/ krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
+          `<span id=${domSet.ctrlId?domSet.ctrlId:'ctrl-checkbox'} style=${domSet.ctrlStyle?domSet.ctrlStyle:null} krcd-type="checkbox" class="krcd-ctrl"  contenteditable="false"><span contenteditable="true" krcd-left="[" krcd-right="]"  class="krcd-value"></span></span>`
         div = div.firstElementChild;
         let newDiv = this.krcd.createCtrl(div, defOpt ? defOpt : {
           "mode": "EDITOR", //当前模式
@@ -1806,7 +1870,7 @@
           // 扩展功能的模式限制
           switch (opt[i].name) {
             case "DESIGN":
-              this.ableShow = true;
+              // this.ableShow = true;
               this.toolsShow = false;
               this.templeCtrl = true;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
@@ -1828,7 +1892,7 @@
               this.shadowDiv.style = this.shadowDivStyle('display:none');
               break
             case "STRICT":
-              this.ableShow = false;
+              // this.ableShow = false;
               this.toolsShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
@@ -1839,7 +1903,7 @@
               this.shadowDiv.style = this.shadowDivStyle('display:none');
               break
             case "READONLY":
-              this.ableShow = false;
+              // this.ableShow = false;
               this.toolsShow = false;
               this.templeCtrl = false;
               this.fenGeXian.removeEventListener("click", this.addHorizontal);
@@ -1852,7 +1916,7 @@
 
               break
             default:
-              this.ableShow = true;
+              // this.ableShow = true;
               this.toolsShow = false;
               this.templeCtrl = false;
           }
@@ -1958,6 +2022,45 @@
 
     beforeUpdate() {
       // console.log(document.getElementsByTagName('iframe'))
+      // console.log("变化开始")
+      switch (this.saveAble) {
+            case 'ctrlAble':
+              this.toolsShow = false;              
+              break
+            case 'sectionAble':              
+              // this.toolsShow = true;
+              break
+            case 'normal':            
+              // this.toolsShow = true;
+              break
+            case 'ctrlInSection':
+              this.toolsShow = false;     
+              break
+            default:
+              this.toolsShow = false;
+              break
+          }
+    },
+    updated() {
+      // console.log("变化结束")
+      // this.toolsShow = true;
+      switch (this.saveAble) {
+            case 'ctrlAble':
+              // this.toolsShow = false;              
+              break
+            case 'sectionAble':              
+              this.toolsShow = true;
+              break
+            case 'normal':            
+              this.toolsShow = true;
+              break
+            case 'ctrlInSection':
+              // this.toolsShow = false;     
+              break
+            default:
+              // this.toolsShow = false;
+              break
+          }
     },
 
     // 侦查templatelist
@@ -1991,9 +2094,8 @@
       commitShow: function(newValue, oldValue){
         if(newValue.OnOff===false){
             this.themeId = null;
-        }
-       
-      }
+        }       
+      },      
     },
 
     mounted() {
@@ -2350,7 +2452,7 @@
             
           }
 
-        }, 1500)
+        }, 2000)
 
         // 将改变内容的监听放到加载后
         this.addListener("contentchange", function () {
