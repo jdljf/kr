@@ -22,6 +22,7 @@
                     :getHtmlContent="getHtmlContent"
                     :getClickHtmlContent="getClickHtmlContent"  
                     :changeVisible="changeVisible"
+                    :setHTML="setHTML"
                     >
                 <!-- :templatehtmlContent="templatehtmlContent" -->
             </Template>
@@ -100,7 +101,8 @@ export default {
         tabsArray: Array,
         getClickHtmlContent: Function,
         templatehtmlContent: String, 
-        changeVisible:Function
+        changeVisible: Function,
+        setHTML: Function
     },
     mounted(){        
         // debugger

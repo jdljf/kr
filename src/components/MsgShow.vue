@@ -6,8 +6,8 @@
       v-model="visible"
       popper-class="pop-style"
       >
-      <el-tag>{{htmlContent}}</el-tag>
-      <!-- <el-button slot="reference"></el-button> -->
+      预览模版：<el-tag>{{htmlContent}}</el-tag>
+      <!-- <el-button size="mini">导入</el-button> -->
     </el-popover>
 </template>
 
@@ -32,15 +32,19 @@
 
 <style>
 .model{
-  /* padding: 24px;   */
+  display:flex;
+  align-items: center;
 }
 .el-popover.pop-style{
-  width:100%;
-  height:100%;
-  padding:0;
-  /* margin: 24px 16px 24px 24px; */
-  background-color: transparent;
-  border-color: transparent;
-  color: white;
+  box-sizing: border-box;
+  z-index: 1111;
+  position: absolute;
+  left: 208px;
+  right: 0px;
+  top: 144px;
+  height: 60px;
+  background-color: rgb(255, 255, 255);
+  overflow: auto;
+  margin: 12px;
 }
 </style>

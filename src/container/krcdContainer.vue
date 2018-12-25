@@ -29,7 +29,7 @@
           <el-container>
             <div class="editor-box" ref="editor" id="editor" :style="{ width:width }">           
             </div>         
-            <MsgShow v-show="visible" style="box-sizing: border-box;z-index: 1111;position: absolute;left: 208px;right: 0;top: 144px;height: 60px;background-color:#ffffff;overflow:auto;}" :htmlContent="templateTitle" :visible="visible"></MsgShow>  
+            <MsgShow v-show="visible" :htmlContent="templateTitle" :visible="visible"></MsgShow>  
           </el-container>
 
         </el-container>
@@ -85,6 +85,7 @@
               :getHtmlContent="getHtmlContent"
               :getClickHtmlContent="getClickHtmlContent"
               :changeVisible="changeVisible"
+              :setHTML="setHTML"
               >       
               <!-- 
               :templatehtmlContent="templatehtmlContent" -->
@@ -233,11 +234,11 @@
         },
         // 获取数据方法
         getClickHtmlContent:(name,content)=>{          
-          this.templateTitle = name;
-          this.createTemplateIframe(content);  // 创建对应模版的iframe
+          this.templateTitle = name;          
           if(this.visible===false){
             this.removeTemplateIframe();
           }else if(this.visible===true){
+            this.createTemplateIframe(content);  // 创建对应模版的iframe
             this.addTemplateIframe();
           }
         },
@@ -942,16 +943,17 @@
         }
         // console.log(allStyles)      
         const styleObj = this.iframeWin.document.createElement('style');  
-        styleObj.innerHTML = allStyles; // 创造样式
-
+        
+        // 记得添加样式
+        styleObj.innerHTML = allStyles + '.krcd-tmp-root .krcd-tmp-footer,.krcd-tmp-root .krcd-tmp-header {height:auto;};'; // 这里的样式需要去掉保证没问题。
 
         let iframeObj;
         // 创建iframe
         try{  
-          iframeObj = this.iframeWin.document.createElement('<iframe name="model"></iframe>');  
+            iframeObj = this.iframeWin.document.createElement('<iframe name="model"></iframe>');  
           }catch(e){  // 这里会形成块作用域所以直接在catch定义外面取不到
-          iframeObj = this.iframeWin.document.createElement('iframe');  
-          iframeObj.name = 'model';  
+            iframeObj = this.iframeWin.document.createElement('iframe');  
+            iframeObj.name = 'model';  
         }
         
         iframeObj.style = `
@@ -962,7 +964,6 @@
           bottom: 0;
           width: 100%;
           height: 100%;
-          background-color: #ececec;
           border: 0;
         `;            
 
@@ -978,13 +979,19 @@
       },
       // 文档中添加ifame对象
       addTemplateIframe(){
+          // 初始化，将原来有的iframe都去掉
+          this.removeTemplateIframe();
           this.iframeWin.document.body.appendChild(this.iframeObj)
           this.iframeObj.contentDocument.head.innerHTML = this.styleObj.outerHTML;
+          this.iframeObj.contentDocument.body.className = 'krcd-tmp-root';  // 为了样式统一需要增加，保证样式用到此类名的。
+          this.iframeObj.contentDocument.body.style = 'background-color: rgba(141, 141, 141, 0.9);'          
           this.iframeObj.contentDocument.body.innerHTML = this.templatehtmlContent;
       },
       // 文档中删掉ifame对象
       removeTemplateIframe(){
-          this.iframeWin.document.body.removeChild(this.iframeWin.document.querySelector('iframe'))          
+          if(this.iframeWin.document.querySelector('iframe')){
+              this.iframeWin.document.body.removeChild(this.iframeWin.document.querySelector('iframe'))
+          }        
       },
 
       // 点击列表项目
@@ -2457,6 +2464,8 @@
         // 将改变内容的监听放到加载后
         this.addListener("contentchange", function () {
           console.log("内容改变了");
+
+          self.toolsShow = false;
           
           const docThreePart = self.docSplit(self.iframeWin.document, self.getHtmlContent().htmlContent);
 

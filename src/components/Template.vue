@@ -12,9 +12,11 @@
         empty-text="<暂无数据>"
         @selection-change="handleSelectionChange"
         size="small"
-        @cell-mouse-enter="show"
-        @cell-mouse-leave="hide"
+        @row-click="show"
+        @row-dblclick="callback"
         >
+        <!-- @cell-mouse-enter="show" -->
+        <!-- @cell-mouse-leave="hide" -->
             
             <!-- 这是多选 -->
             <el-table-column
@@ -69,20 +71,20 @@
                   placeholder="输入关键字搜索"/>
               </template>
               <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="danger"
-                  v-if="templeCtrl"
-                  @click.stop="callback(scope.row)">打开</el-button>
-                <el-button
-                  v-if="templeCtrl"
-                  size="mini"
-                  @click.stop="handleEdit(scope.$index, scope.row)">保存</el-button>
                 <!-- <el-button
                   size="mini"
                   type="danger"
                   v-if="templeCtrl"
-                  @click.stop="handleDelete(scope.$index, scope.row)"><i class='el-icon-delete'></i></el-button> -->
+                  @click.stop="callback(scope.row)">打开</el-button> -->
+                <el-button
+                  v-if="templeCtrl"
+                  size="mini"
+                  @click.stop="handleEdit(scope.$index, scope.row)">保存</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  v-if="templeCtrl"
+                  @click.stop="handleDelete(scope.$index, scope.row)"><i class='el-icon-delete'></i></el-button>
               </template>
             </el-table-column>
 
@@ -136,7 +138,8 @@ import MsgShow from '@/components/MsgShow';
         getHtmlContent: Function,
         index: Number,
         getClickHtmlContent: Function,
-        changeVisible: Function
+        changeVisible: Function,
+        setHTML:Function
     },
     components:{
       // MsgShow
@@ -147,17 +150,23 @@ import MsgShow from '@/components/MsgShow';
         multipleSelection: [],
         share: 'index', // 这个就是共享的开怪
         chosedrowIndex: null,
+        clickRow: null,
       }
     },
     updated(){
       this.$refs.navTable.setCurrentRow(this.list[this.chosedrowIndex]);
     },
     methods: { 
-      show(row, column, cell, event){
-        this.changeVisible(1);
-        this.getClickHtmlContent(row.name, row.content); // 将当前的html存起来
-        // console.log("展示")
-        
+      show(row, event, column){
+        if(row!==this.clickRow){          
+          this.changeVisible(1);
+          this.getClickHtmlContent(row.name, row.content); // 将当前的html存起来
+          this.clickRow = row;
+        }else{
+          this.changeVisible(0);
+          this.getClickHtmlContent(row.name, row.content); // 将当前的html存起来
+          this.clickRow = null;
+        }
       },
       showHide(row, column, cell, event){
         this.getClickHtmlContent(row.content); // 将当前的html存起来
@@ -197,7 +206,6 @@ import MsgShow from '@/components/MsgShow';
         this.chosedrowIndex = index;
         
         // 改成保存导入
-        // 删除警告
         const replaceWarn= (title,todo)=>{
                 this.$prompt(`当前模版 “ ${row.name?row.name:' '} ” ，请输入新的模版名称`, '提示', {
                         confirmButtonText: '确定',
@@ -241,7 +249,7 @@ import MsgShow from '@/components/MsgShow';
                 "id": row.index   // 这是后端的数据
             }                      
             this.ajaxtemple(url, updateData,"模版数据更新成功", ()=>{
-                this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})               
+                this.list.splice(index,1,{...this.list[index],...this.back2font(updateData)})   
               }
 
             );
@@ -300,7 +308,12 @@ import MsgShow from '@/components/MsgShow';
                 "id": row.index
               },
               "模版删除成功",
-              ()=>this.list.splice(index,1)
+              ()=>{
+                this.list.splice(index,1) // 改变当前数据
+                this.hide() // 隐藏预览
+                this.setHTML('')  // 重置页面数据
+                }
+
             );
         }
         // 判断运行的函数
@@ -326,9 +339,10 @@ import MsgShow from '@/components/MsgShow';
         // debugger
         this.$refs.navTable.setCurrentRow(row);
       },
-      callback(row, event, column) {  
+      callback(row,event){  
         
         this.changeVisible(0);
+        this.clickRow = null;
 
         this.getClickHtmlContent(row.content); // 将当前的html存起来
 
